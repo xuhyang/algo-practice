@@ -1,1 +1,1 @@
-# algo-practice
+# fuck-my-life

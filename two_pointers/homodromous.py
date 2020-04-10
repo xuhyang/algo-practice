@@ -1,4 +1,4 @@
-class solution:
+class Homodromous:
 """
 604. Window Sum
 https://www.lintcode.com/problem/window-sum/description

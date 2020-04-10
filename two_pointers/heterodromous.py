@@ -1,4 +1,34 @@
-class Solution:
+class Heterodromous:
+"""
+587. Two Sum - Unique pairs
+https://www.lintcode.com/problem/two-sum-unique-pairs/description
+Given an array of integers, find how many unique pairs in the array such that their sum is equal to a specific target number. Please return the number of pairs.
+Example Input: nums = [1,1,2,45,46,46], target = 47  Output: 2
+Explanation: 1 + 46 = 47 2 + 45 = 47
+"""
+    def twoSum6(self, nums, target):
+        nums = sorted(nums)
+        left, right = 0, len(nums) - 1
+        result = 0
+
+        while left < right:
+            sum = nums[left] + nums[right]
+
+            if sum < target:
+                left +=1
+            elif sum > target:
+                right -= 1
+            else:
+                result += 1
+                left += 1
+                right -= 1
+
+                while left < right and nums[left- 1] == nums[left]:
+                    left += 1
+                while left < right and nums[right] == nums[right + 1]:
+                    right -= 1
+
+        return result
 """
 608. Two Sum II - Input array is sorted
 https://www.lintcode.com/problem/two-sum-ii-input-array-is-sorted/description
