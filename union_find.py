@@ -298,14 +298,11 @@ Output:[5,4,3,3]
             if r_a != r_b:
                 self.f[r_a] = r_b
                 self.n -= 1
-
-
         """
         @return: An integer
         """
         def query(self):
             return self.n
-
 
         def find(self, c):
             d = c

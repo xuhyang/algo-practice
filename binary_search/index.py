@@ -844,3 +844,34 @@ Input：["1110","1100","0000","0000"], x = 0, y = 1 Output：6 Explanation：The
             if image[i][c] == '1':
                 return True
         return False
+"""
+602. Russian Doll Envelopes
+https://www.lintcode.com/problem/russian-doll-envelopes/description
+Give a number of envelopes with widths and heights given as a pair of integers (w, h).
+One envelope can fit into another if and only if both the width and height of one envelope is greater than the width and height of the other envelope.
+Find the maximum number of nested layers of envelopes.
+Input：[[5,4],[6,4],[6,7],[2,3]] Output：3 Explanation： the maximum number of envelopes you can Russian doll is 3 ([2,3] => [5,4] => [6,7]).
+Input：[[4,5],[4,6],[6,7],[2,3],[1,1]] Output：4 Explanation：the maximum number of envelopes you can Russian doll is 4 ([1,1] => [2,3] => [4,5] / [4,6] => [6,7]).
+"""
+    @highlight
+    def maxEnvelopes(self, envelopes):
+        envelopes.sort(key = lambda e: (e[0], -e[1])) # -e[1] 为了好处理 相同 e[0]
+        rslt = [[sys.maxsize, sys.maxsize]]
+
+        for e in envelopes:
+            if rslt[-1][1] < e[1]: #因为sorted，e[i - 1][0] < e[i - 1][0] 只需判断 e[i - 1][1] < e[i - 1][1]； e[i - 1][0] == e[i - 1][0] 因为e[i][1]反排序不满足rslt[-1][1] < e[1]
+                rslt.append(e)
+                continue
+
+            l, r = 0, len(rslt) - 1
+            while l + 1 < r:
+                m = (l + r) // 2
+
+                if rslt[m][1] >= e[1]:
+                    r = m
+                else:
+                    l = m
+
+            rslt[l if rslt[l][1] > e[1] else r] = e #跟新当前答案， 保留部分最大长度答案直到被完全覆盖
+
+        return len(rslt)

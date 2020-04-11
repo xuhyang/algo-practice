@@ -186,3 +186,64 @@ The average of subtree of 1,-5,11 is 2.333,-5,11. So the subtree of 11 is the ma
             maxSubtree = rightMaxSubtree
 
         return sum, count, maxAvg, maxSubtree
+"""
+614. Binary Tree Longest Consecutive Sequence II
+https://www.lintcode.com/problem/binary-tree-longest-consecutive-sequence-ii/description
+Given a binary tree, find the length(number of nodes) of the longest consecutive sequence(Monotonic and adjacent node values differ by 1) path.
+The path could be start and end at any node in the tree
+Input: {1,2,0,3} Output: 4 Explanation: 0-1-2-3
+    1
+   / \
+  2   0
+ /
+3
+
+Input: {3,2,2} Output: 2 Explanation: 2-3
+    3
+   / \
+  2   2
+"""
+    def longestConsecutive2(self, root):
+        return self.dvcq(root)[0]
+
+    def dvcq(self, n):
+        if not n:
+            return 1, 1, 1, -sys.maxsize
+
+        l_lngst, l_inc, l_dec, l_val = self.dvcq(n.left)
+        r_lngst, r_inc, r_dec, r_val = self.dvcq(n.right)
+
+        l_inc = l_inc + 1 if l_val + 1 == n.val else 1
+        r_inc = r_inc + 1 if r_val + 1 == n.val else 1
+        l_dec = l_dec + 1 if l_val - 1 == n.val else 1
+        r_dec = r_dec + 1 if r_val - 1 == n.val else 1
+
+        return max(l_lngst, r_lngst, l_inc + r_dec - 1, l_dec + r_inc - 1), max(l_inc, r_inc), max(l_dec, r_dec), n.val
+"""
+619. Binary Tree Longest Consecutive Sequence III
+https://www.lintcode.com/problem/binary-tree-longest-consecutive-sequence-iii/description
+It's follow up problem for Binary Tree Longest Consecutive Sequence II
+Given a k-ary tree, find the length of the longest consecutive sequence path.
+The path could be start and end at any node in the tree
+Input: 5<6<7<>,5<>,8<>>,4<3<>,5<>,31<>>> Output: 5 Explanation:
+     5
+   /   \
+  6     4
+ /|\   /|\
+7 5 8 3 5 31
+return 5, // 3-4-5-6-7
+Input: 1<> Output: 1
+"""
+    def longestConsecutive3(self, root):
+        return self.dvcq(root)[0]
+
+    def dvcq(self, n):
+        if not n:
+            return 1, 1, 1, -sys.maxsize
+
+        lngst, inc, dec = 1, 1, 1
+        for c in n.children:
+            c_lngst, c_inc, c_dec, c_val = self.dvcq(c)
+            lngst, inc, dec = max(lngst, c_lngst), max(inc, c_inc + 1 if c_val + 1 == n.val else 1), max(dec, c_dec + 1 if c_val - 1 == n.val else 1)
+
+        return max(lngst, inc + dec - 1), inc, dec, n.val

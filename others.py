@@ -124,8 +124,6 @@ Given two strings, write a method to decide if one is a permutation of the other
                 th -= 1
 
         return th == 0
-
-
 """
 414. Divide Two Integers
 https://www.lintcode.com/problem/divide-two-integers/description
@@ -249,6 +247,30 @@ The distance between house and the post office is Manhattan distance
                     min_dstnce = min(min_dstnce, r_dstnces[i] + c_dstnces[j])
 
         return min_dstnce
+"""
+601. Flatten 2D Vector
+https://www.lintcode.com/problem/flatten-2d-vector/description
+Implement an iterator to flatten a 2d vector.
+Input:[[1,2],[3],[4,5,6]] Output:[1,2,3,4,5,6]
+Input:[[7,9],[5]] Output:[7,9,5]
+"""
+    class Vector2D(object):
+        # @param vec2d {List[List[int]]}
+        def __init__(self, vec2d):
+            self.i, self.j, self.v, self.lst_r = 0, 0, vec2d, len(vec2d) - 1
+        # @return {int} a next element
+        def next(self):
+            ans = self.v[self.i][self.j]
+            self.i, self.j = (self.i + 1, 0) if self.j == len(self.v[self.i]) - 1 else (self.i, self.j + 1)
+
+            return ans
+        # @return {boolean} true if it has next element
+        # or false
+        def hasNext(self):
+            while self.i <= self.lst_r and len(self.v[self.i]) == 0:
+                self.i += 1
+
+            return self.i < self.lst_r or self.i == self.lst_r and self.j < len(self.v[self.i])
 """
 607. Two Sum III - Data structure design
 https://www.lintcode.com/problem/two-sum-iii-data-structure-design/description

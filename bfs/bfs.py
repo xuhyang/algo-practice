@@ -555,3 +555,33 @@ Output: 4
             if q:
                 days += 1
         return  days if cnt == total_p else -1
+"""
+618. Search Graph Nodes
+https://www.lintcode.com/problem/search-graph-nodes/description
+Given a undirected graph, a node and a target, return the nearest node to given node which value of it is target, return NULL if you can't find.
+There is a mapping store the nodes' values in the given parameters.
+Input: {1,2,3,4#2,1,3#3,1,2#4,1,5#5,4} [3,4,5,50,50] 1 50 Output: 4
+Explanation:
+2------3  5
+ \     |  |
+  \    |  |
+   \   |  |
+    \  |  |
+      1 --4
+Give a node 1, target is 50
+"""
+    def searchNode(self, g, vals, n, t):
+        q, s = collections.deque([n]), set([n])
+
+        while q:
+            n = q.popleft()
+
+            if vals[n] == t:
+                return n
+
+            for nghbr in n.neighbors:
+                if nghbr not in s:
+                    q.append(nghbr)
+                    s.add(nghbr)
+
+        return None

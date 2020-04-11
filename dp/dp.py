@@ -100,3 +100,5 @@ The goal is to merge the stones in one pile observing the following rules:
 At each step of the game,the player can merge two adjacent piles to a new pile.
 The score is the number of stones in the new pile.
 You are to determine the minimum of the total score.
+
+https://www.lintcode.com/problem/k-edit-distance/
