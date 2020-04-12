@@ -72,3 +72,38 @@ Input: [5] 1 Output: 5.000
                 return True
 
         return False
+"""
+633. Find the Duplicate Number
+https://www.lintcode.com/problem/find-the-duplicate-number/description
+Given an array nums containing n + 1 integers where each integer is between 1 and n (inclusive),
+guarantee that at least one duplicate number must exist. Assume that there is only one duplicate number, find the duplicate one.
+Input: [5,5,4,3,2,1] Output: 5
+Input: [5,4,4,3,2,1] Output: 4
+Notice
+You must not modify the array (assume the array is read only).
+You must use only constant, O(1) extra space.
+Your runtime complexity should be less than O(n^2).
+There is only one duplicate number in the array, but it could be repeated more than once.
+"""
+    @highlight
+    def findDuplicate(self, a):
+        l, r = 1, len(a) - 1
+
+        while l + 1 < r:
+            m = (l + r) // 2
+
+            if self.countSmallerOrEqual(a, m) > m:
+                r = m
+            else:
+                l = m
+
+        return l if self.countSmallerOrEqual(a, l) > l else r
+
+    def countSmallerOrEqual(self, a, v):
+        cnt = 0
+
+        for e in a:
+            if e <= v:
+                cnt += 1
+
+        return cnt

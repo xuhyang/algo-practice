@@ -102,3 +102,7 @@ The score is the number of stones in the new pile.
 You are to determine the minimum of the total score.
 
 https://www.lintcode.com/problem/k-edit-distance/
+https://www.lintcode.com/problem/remove-substrings/description
+https://www.lintcode.com/problem/knight-shortest-path-ii/description
+https://www.lintcode.com/problem/decode-ways-ii/description
+https://www.lintcode.com/problem/word-break-iii/description

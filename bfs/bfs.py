@@ -585,3 +585,29 @@ Give a node 1, target is 50
                     s.add(nghbr)
 
         return None
+"""
+624. Remove Substrings
+https://www.lintcode.com/problem/remove-substrings/description
+Given a string s and a set of n substrings. You are supposed to remove every instance of those n substrings from s so that s is of the minimum length and output this minimum length.
+Input: "ccdaabcdbb" ["ab","cd"] Output: 2 Explanation: ccdaabcdbb -> ccdacdbb -> cabb -> cb (length = 2)
+Input: "abcabd" ["ab","abcd"] Output: 0 Explanation: abcabd -> abcd -> "" (length = 0)
+#其他解法： dfs + memo
+"""
+    def minLength(self, s, dict):
+        min_l, q, seen = sys.maxsize, collections.deque([s]), set([s])
+
+        while q:
+            s = q.popleft()
+            min_l = min(min_l, len(s))
+
+            for substr in dict:
+                fnd = s.find(substr)
+                while fnd != -1:
+                    nxt_s = s[:fnd] + s[fnd + len(substr):]
+                    if nxt_s not in seen:
+                        q.append(nxt_s)
+                        seen.add(nxt_s)
+
+                    fnd = s.find(substr, fnd + 1)
+
+        return min_l

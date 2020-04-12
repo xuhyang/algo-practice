@@ -1,3 +1,13 @@
+"""
+并查集总结
+动态
+1. 合并两个集合
+2. 查询某个元素所在集合
+3. 判断两个元素是否在同一个集合
+4. 获得某个集合的元素个数
+5. 统计当前集合个数
+关键操作：快速寻找老大哥节点
+"""
 class Union_find:
 """
 178. Graph Valid Tree
@@ -317,3 +327,57 @@ Output:[5,4,3,3]
                 p = e
 
             return d
+"""
+629. Minimum Spanning Tree
+Given a list of Connections, which is the Connection class (the city name at both ends of the edge and a cost between them), find some edges, connect all the cities and spend the least amount.
+Return the connects if can connect all the cities, otherwise return empty list.
+Given: the connections = ["Acity","Bcity",1], ["Acity","Ccity",2], ["Bcity","Ccity",3]
+Return: ["Acity","Bcity",1], ["Acity","Ccity",2]
+Notice Return the connections sorted by the cost, or sorted city1 name if their cost is same, or sorted city2 if their city1 name is also same.
+这个就是标准的最小生成树， 就是在图上取一些边，使得整个树不存在环， 然后
+最小生成树有好几种做法， 这里采用Kruskal算法，就是先排序， 每次都从成本最小的开始选， 如果不会够成环，就加到结果里面去，
+直到遍历到够了（也就是边的个数=节点个数-1）。判断环的地方，用union find算法
+"""
+    @highlight
+    def lowestCost(self, connections):
+        if not connections or len(connections) == 0:
+            return []
+
+        self.father = {}
+        self.count = 0
+        results = []
+        connections.sort(key=lambda x: (x.cost, x.city1, x.city2))
+
+        for connection in connections:
+            for city in (connection.city1, connection.city2):
+                if city not in self.father:
+                    self.father[city] = city
+                    self.count += 1
+
+        for connection in connections:
+            if self.union(connection.city1, connection.city2):
+                results.append(connection)
+
+        if self.count == 1:
+            return results
+        return []
+
+    def union(self, a, b):
+        root_a = self.find(a)
+        root_b = self.find(b)
+        if root_a == root_b: #不需要这条边， 加了也会生成环
+            return False
+
+        self.father[root_b] = root_a
+        self.count -= 1
+        return True
+
+    def find(self, city):
+        path = []
+        while self.father[city] != city:
+            path.append(city)
+            city = self.father[city]
+        for c in path:
+            self.father[c] = city
+
+        return city

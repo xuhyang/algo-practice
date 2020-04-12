@@ -8,11 +8,11 @@ hashcode("abcd") = (ascii(a) * 333 + ascii(b) * 332 + ascii(c) *33 + ascii(d)) %
 """
     # (a * b ) % MOD = ((a % MOD) * (b % MOD)) % MOD
     def hashCode(self, key, HASH_SIZE):
-    rslt = 0
+        rslt = 0
 
-    for c in key:
-        rslt = (rslt * 33 + ord(c)) % HASH_SIZE
-    return rslt
+        for c in key:
+            rslt = (rslt * 33 + ord(c)) % HASH_SIZE
+        return rslt
 """
 129. Rehashing
 https://www.lintcode.com/problem/rehashing/description
@@ -302,3 +302,146 @@ find(7) // return false
                 return True
 
         return False
+"""
+627. Longest Palindrome
+https://www.lintcode.com/problem/longest-palindrome/description
+Given a string which consists of lowercase or uppercase letters, find the length of the longest palindromes that can be built with those letters.
+This is case sensitive, for example "Aa" is not considered a palindrome here.
+Input: s = "abccccdd" Output : 7 Explanation: One longest palindrome that can be built is "dccaccd", whose length is `7`.
+"""
+    def longestPalindrome(self, s):
+        counts = {}
+
+        for c in s :
+            counts[c] = counts.get(c, 0) + 1
+
+        center, length = False, 0
+        for countValue in counts.values() :
+            if countValue // 2 > 0 :
+                length += countValue // 2 * 2
+            if not center and countValue % 2 == 1 :
+                center = True
+                length += 1
+
+        return length
+"""
+642. Moving Average from Data Stream
+https://www.lintcode.com/problem/moving-average-from-data-stream/description
+Given a stream of integers and a window size, calculate the moving average of all integers in the sliding window.
+MovingAverage m = new MovingAverage(3);
+m.next(1) = 1 // return 1.00000
+m.next(10) = (1 + 10) / 2 // return 5.50000
+m.next(3) = (1 + 10 + 3) / 3 // return 4.66667
+m.next(5) = (10 + 3 + 5) / 3 // return 6.00000
+"""
+    class MovingAverage:
+        """
+        @param: size: An integer
+        """
+        def __init__(self, size):
+            self.queue = collections.deque()
+            self.size = size
+            self.sum = 0
+        """
+        @param: val: An integer
+        @return:
+        """
+        def next(self, val):
+            self.sum += val - (self.queue.popleft() if len(self.queue) == self.size else 0)
+            self.queue.append(val)
+
+            return self.sum / len(self.queue)
+"""
+654. Sparse Matrix Multiplication
+https://www.lintcode.com/problem/sparse-matrix-multiplication/description
+Given two Sparse Matrix A and B, return the result of AB.
+You may assume that A's column number is equal to B's row number.
+Input: [[1,0,0],[-1,0,3]] [[7,0,0],[0,0,0],[0,0,1]] Output: [[7,0,0],[-7,0,3]]
+Explanation:
+A = [
+  [ 1, 0, 0],
+  [-1, 0, 3]
+]
+B = [
+  [ 7, 0, 0 ],
+  [ 0, 0, 0 ],
+  [ 0, 0, 1 ]
+]
+     |  1 0 0 |   | 7 0 0 |   |  7 0 0 |
+AB = | -1 0 3 | x | 0 0 0 | = | -7 0 3 |
+
+Input: [[1,0],[0,1]] [[0,1],[1,0]] Output: [[0,1],[1,0]]
+"""
+    def multiply(self, a, b):
+        n, m = len(a), len(b[0]) # a的高=答案的高，b的宽=答案的宽
+        rslt = [[0] * m for _ in range(n)]
+
+        for i in range(n):
+            for k in range(len(a[0])):
+                if a[i][k] == 0:
+                    continue
+                #每一个a[][]最多用m次，当a[][] == 0的时候省略了O(m)次计算
+                for j in range(m):
+                    rslt[i][j] += a[i][k] * b[k][j]
+
+        return rslt
+"""
+657. Insert Delete GetRandom O(1)
+https://www.lintcode.com/problem/insert-delete-getrandom-o1/description
+Design a data structure that supports all following operations in average O(1) time.
+insert(val): Inserts an item val to the set if not already present.
+remove(val): Removes an item val from the set if present.
+getRandom: Returns a random element from current set of elements. Each element must have the same probability of being returned.
+Example
+RandomizedSet randomSet = new RandomizedSet(); // Init an empty set.
+randomSet.insert(1); // Inserts 1 to the set. Returns true as 1 was inserted successfully.
+randomSet.remove(2); // Returns false as 2 does not exist in the set.
+randomSet.insert(2); // Inserts 2 to the set, returns true. Set now contains [1,2].
+randomSet.getRandom(); // getRandom should return either 1 or 2 randomly.
+randomSet.remove(1); // Removes 1 from the set, returns true. Set now contains [2].
+randomSet.insert(2); // 2 was already in the set, so return false.
+randomSet.getRandom(); // Since 2 is the only number in the set, getRandom always return 2.
+"""
+    import random
+    class RandomizedSet:
+
+        def __init__(self):
+            self.a, self.v_to_i = [], {}
+        """
+        @param: val: a value to the set
+        @return: true if the set did not already contain the specified element or false
+        """
+        def insert(self, v):
+            if v in self.v_to_i:
+                return False
+
+            self.v_to_i[v] = len(self.a)
+            self.a.append(v)
+
+            return True
+        """
+        @param: val: a value from the set
+        @return: true if the set contained the specified element or false
+        """
+        def remove(self, v):
+            if v not in self.v_to_i:
+                return False
+
+            i = self.v_to_i.pop(v)
+
+            if self.v_to_i:
+                self.v_to_i[self.a[-1]] = i
+                self.a[i] = self.a[-1]
+
+            self.a.pop()
+            return True
+        """
+        @return: Get a random element from the set
+        """
+        def getRandom(self):
+            return random.choice(self.a)
+    # Your RandomizedSet object will be instantiated and called as such:
+    # obj = RandomizedSet()
+    # param = obj.insert(val)
+    # param = obj.remove(val)
+    # param = obj.getRandom()
