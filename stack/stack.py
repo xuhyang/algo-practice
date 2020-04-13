@@ -84,8 +84,6 @@ You can assume the three stacks has the same size and big enough, you don't need
 
         def isEmpty(self, stackNum):
             return self.p[stackNum] == stackNum * self.size
-
-
 """
 370. Convert Expression to Reverse Polish Notation
 https://www.lintcode.com/problem/convert-expression-to-reverse-polish-notation/description

@@ -381,3 +381,63 @@ Notice Return the connections sorted by the cost, or sorted city1 name if their 
             self.father[c] = city
 
         return city
+"""
+805. Maximum Association Set
+https://www.jiuzhang.com/solution/maximum-association-set/#tag-highlight-lang-python
+Amazon sells books, every book has books which are strongly associated with it.
+Given ListA and ListB,indicates that ListA [i] is associated with ListB [i]
+which represents the book and associated books.
+Output the largest set associated with each other(output in any sort).
+You can assume that there is only one of the largest set.
+Notice: The number of books does not exceed 5000.
+# Example: Given ListA = ["abc","abc","abc"], ListB = ["bcd","acd","def"], return["abc","acd","bcd","dfe"].
+# Explanation: abc is associated with bcd, acd, dfe, so the largest set is the set of all books
+# Given ListA = ["a","b","d","e","f"], ListB = ["b","c","e","g","g"], return ["d","e","f","g"].
+# Explanation: The current set are [a, b, c] and [d, e, g, f], then the largest set is [d, e, g, f]
+"""
+def maximumAssociationSet(self, ListA, ListB):
+        if not ListA or not ListB:
+            return []
+
+        n = len(ListA)
+
+        self.max_father, self.max_count = ListA[0], 1
+        self.father = {}
+        self.father2books = {}
+
+        for i in range(n):
+            book1, book2 = ListA[i], ListB[i]
+
+            self.father[book1] = book1
+            self.father[book2] = book2
+
+            self.father2books[book1] = [book1]
+            self.father2books[book2] = [book2]
+
+        for i in range(n):
+            book1, book2 = ListA[i], ListB[i]
+
+            self.connect(book1, book2)
+
+        return self.father2books[self.max_father]
+
+    def connect(self, x, y):
+        root_x = self.find(x)
+        root_y = self.find(y)
+
+        if root_x != root_y:
+            self.father[root_y] = root_x
+
+            self.father2books[root_x] += self.father2books[root_y]
+
+        if len(self.father2books[root_x]) > self.max_count:
+            self.max_father = root_x
+            self.max_count = len(self.father2books[root_x])
+
+    def find(self, x):
+        if x == self.father[x]:
+            return x
+
+        self.father[x] = self.find(self.father[x])
+
+        return self.father[x]

@@ -267,4 +267,37 @@ Input: [[1,90],[1,90],[1,90],[1,90],[1,90],[1,90]] Output: 1: 90.00
                 heapq.heappop(h)
 
         return {id : sum(values) / len(values) for id, values in d.items()}
-    
+"""
+793. Intersection of Arrays
+https://www.lintcode.com/problem/intersection-of-arrays/description
+Give a number of arrays, find their intersection, and output their intersection size.
+# Input:  [[1,2,3],[3,4,5],[3,9,10]] Output:  1 Explanation: Only '3' in all three array.
+# Input: [[1,2,3,4],[1,2,5,6,7][9,10,1,5,2,3]] 	Output: 2 Explanation: The set is [1,2].
+Notice
+The total number of all array elements is not more than 500000.
+There are no duplicated elements in each array.
+"""
+    def intersectionOfArrays(self, a):
+        h, n, cnt, prv, rslt = [], len(a), 1, -sys.maxsize, 0
+
+        for i in range(n):
+            if not a[i]:
+                continue
+            a[i].sort()
+            h.append((a[i][0], i, 0))
+
+        heapify(h)
+
+        while h:
+            v, i, j = heappop(h)
+
+            cnt = cnt + 1 if prv == v else 1
+            if cnt == n:
+                rslt += 1
+
+            prv = v
+
+            if j + 1 < len(a[i]):
+                heappush(h, (a[i][j + 1], i, j + 1))
+
+        return rslt
