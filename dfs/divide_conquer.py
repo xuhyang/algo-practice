@@ -247,3 +247,43 @@ Input: 1<> Output: 1
             lngst, inc, dec = max(lngst, c_lngst), max(inc, c_inc + 1 if c_val + 1 == n.val else 1), max(dec, c_dec + 1 if c_val - 1 == n.val else 1)
 
         return max(lngst, inc + dec - 1), inc, dec, n.val
+"""
+829. Word Pattern II
+https://www.lintcode.com/problem/word-pattern-ii/description
+Given a pattern and a string str, find if str follows the same pattern.
+Here follow means a full match, such that there is a bijection between a letter in pattern and a non-empty substring in str.(i.e if a corresponds to s,
+then b cannot correspond to s. For example, given pattern = "ab", str = "ss", return false.)
+Input: pattern = "abab" str = "redblueredblue" Output: true Explanation: "a"->"red","b"->"blue"
+Input: pattern = "aaaa" str = "asdasdasdasd" Output: true Explanation: "a"->"asd"
+Input: pattern = "aabb" str = "xyzabcxzyabc" Output: false
+Notice: You may assume both pattern and str contains only lowercase letters.
+这个题不能使用动态规划或者记忆化搜索，因为参数列表中 mapping 和 used 无法记录到记忆化的哈希表中。
+"""
+    def wordPatternMatch(self, pattern, str):
+        return self.dvcq(pattern, 0, str, {}, set())
+
+    def dvcq(self, pattern, i, str, char_to_word, used):
+        if i == len(pattern):
+            return len(str) == 0
+
+        if pattern[i] in char_to_word:
+            word = char_to_word[pattern[i]]
+
+            if not str.startswith(word):
+                return False
+            return self.dvcq(pattern, i + 1, str[len(word):], char_to_word, used) #要判断下个字母在不在map里
+
+        for j in range(1, len(str) + 1):
+            word = str[:j]
+
+            if word in used:
+                continue
+
+            char_to_word[pattern[i]] = word
+            used.add(word)
+            if self.dvcq(pattern, i + 1, str[j:], char_to_word, used):
+                return True
+            char_to_word.pop(pattern[i])
+            used.remove(word)
+
+        return False

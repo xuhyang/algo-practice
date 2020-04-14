@@ -445,3 +445,28 @@ randomSet.getRandom(); // Since 2 is the only number in the set, getRandom alway
     # param = obj.insert(val)
     # param = obj.remove(val)
     # param = obj.getRandom()
+"""
+828. Word Pattern
+https://www.lintcode.com/problem/word-pattern/description
+Given a pattern and a string str, find if str follows the same pattern.
+Here follow means a full match, such that there is a bijection between a letter in pattern and a non-empty word in str.
+# Input: pattern = "abba" and str = "dog cat cat dog" Output: true Explanation: The pattern of str is abba
+# Input: pattern = "abba" and str = "dog cat cat fish" Output: false Explanation: The pattern of str is abbc
+# Input: pattern = "aaaa" and str = "dog cat cat dog" Output: false Explanation: The pattern of str is abba
+# Input: pattern = "abba" and str = "dog cat cat fish" Output: false Explanation: The pattern of str is abbc
+Notice: You may assume pattern contains only lowercase letters, and str contains lowercase letters separated by a single space.
+"""
+    def wordPattern(self, pattern, teststr):
+        s, c_to_w, w_to_c = teststr.split(' '), {}, {}
+
+        if len(s) != len(pattern):
+            return False
+
+        for i, c in enumerate(pattern):
+            w = s[i]
+            if c not in c_to_w and w not in w_to_c:
+                c_to_w[c], w_to_c[w] = w, c
+            elif c_to_w.get(c, '') != w:
+                return False
+
+        return True

@@ -21,7 +21,6 @@ Input: [5,-10,4] 2 Output: -1
             max_p_sum = max(max_p_sum, p_sums[-1] - min_p_sum)
             min_p_sum = min(min_p_sum, p_sums[i + 1 - k + 1]) #当前prefix sum index: i + 1, - k 向前推k个 + 1 才是下次可以用的min
             #ex： [5,-10,4] 2：  -10: i = 1 prefixsum index i + 1 = 2, 算完max后， 下次的min 是 算到5, i = 0的prefix sum, 即 i + 1 = 1, 可以看出差k-1个index
-
         return max_p_sum
 """
 665. Range Sum Query 2D - Immutable
@@ -70,60 +69,3 @@ class NumMatrix:
 # Your NumMatrix object will be instantiated and called as such:
 # obj = NumMatrix(matrix)
 # param_1 = obj.sumRegion(row1,col1,row2,col2)
-"""
-817. Range Sum Query 2D - Mutable
-https://www.lintcode.com/problem/range-sum-query-2d-mutable/description
-Given a 2D matrix, find the sum of the elements inside the rectangle defined by its upper left corner (row1, col1) and lower right corner (row2, col2). And the elements of the matrix could be changed.
-You have to implement three functions:
-NumMatrix(matrix) The constructor.
-sumRegion(row1, col1, row2, col2) Return the sum of the elements inside the rectangle defined by its upper left corner (row1, col1) and lower right corner (row2, col2).
-update(row, col, val) Update the element at (row, col) to val.
-# Input: sumRegion(2,1,4,3) update(3,2,2) sumRegion(2,1,4,3) Output: 8 10
-  NumMatrix(
-    [[3,0,1,4,2],
-     [5,6,3,2,1],
-     [1,2,0,1,5],
-     [4,1,0,1,7],
-     [1,0,3,0,5]]
-  )
-# Input: NumMatrix([[1]]) sumRegion(0, 0, 0, 0) update(0, 0, -1) sumRegion(0, 0, 0, 0) Output: 1 -1
-Notice
-The matrix is only modifiable by update.
-You may assume the number of calls to update and sumRegion function is distributed evenly.
-You may assume that row1 ≤ row2 and col1 ≤ col2.
-"""
-    def __init__(self, matrix):
-        self.n, self.m = len(matrix), len(matrix[0])
-        self.mtrx, self.bit = [[0] * self.m for _ in range(self.n)], [[0] * (self.m + 1) for _ in range(self.n + 1)]
-        for r in range(self.n):
-            for c in range(self.m):
-                self.update(r, c, matrix[r][c])
-
-
-    def update(self, r, c, v):
-        d, self.mtrx[r][c] = v - self.mtrx[r][c], v
-
-        r, c = r + 1, c + 1
-        while r <= self.n:
-            i = c
-            while i <= self.m:
-                self.bit[r][i] += d
-                i += i & -i
-            r += r & -r
-
-    def p_sum(self, r, c):
-        rslt = 0
-
-        r, c = r + 1, c + 1
-        while r > 0:
-            i = c
-            while i > 0:
-                rslt += self.bit[r][i]
-                i -= i & -i
-            r -= r & -r
-
-        return rslt
-
-    def sumRegion(self, r1, c1, r2, c2):
-        r1, c1 = r1 - 1, c1 - 1
-        return self.p_sum(r2, c2) + self.p_sum(r1, c1) - self.p_sum(r1, c2) - self.p_sum(r2, c1)
