@@ -441,3 +441,88 @@ def maximumAssociationSet(self, ListA, ListB):
         self.father[x] = self.find(self.father[x])
 
         return self.father[x]
+"""
+1070. Accounts Merge
+https://www.lintcode.com/problem/accounts-merge/description
+Given a list accounts, each element accounts[i] is a list of strings,
+where the first element accounts[i][0] is a name, and the rest of the elements are emails representing emails of the account.
+Now, we would like to merge these accounts. Two accounts definitely belong to the same person
+if there is some email that is common to both accounts. Note that even if two accounts have the same name, they may belong to different people as people could have the same name. A person can have any number of accounts initially, but all of their accounts definitely have the same name.
+After merging the accounts, return the accounts in the following format: the first element of each account is the name, and the rest of the elements are emails in sorted order. The accounts themselves can be returned in any order.
+Input:
+[
+	["John", "johnsmith@mail.com", "john00@mail.com"],
+	["John", "johnnybravo@mail.com"],
+	["John", "johnsmith@mail.com", "john_newyork@mail.com"],
+	["Mary", "mary@mail.com"]
+]
+
+Output:
+[
+	["John", 'john00@mail.com', 'john_newyork@mail.com', 'johnsmith@mail.com'],
+	["John", "johnnybravo@mail.com"],
+	["Mary", "mary@mail.com"]
+]
+Explanation:
+The first and third John's are the same person as they have the common email "johnsmith@mail.com".
+The second John and Mary are different people as none of their email addresses are used by other accounts.
+You could return these lists in any order, for example the answer
+[
+	['Mary', 'mary@mail.com'],
+	['John', 'johnnybravo@mail.com'],
+	['John', 'john00@mail.com', 'john_newyork@mail.com', 'johnsmith@mail.com']
+]
+is also acceptable.
+
+Notice
+The length of accounts will be in the range [1, 1000].
+The length of accounts[i] will be in the range [1, 10].
+The length of accounts[i][j] will be in the range [1, 30].
+"""
+    def accountsMerge(self, accounts):
+        r_to_name = {}
+        r_to_nodes = {}
+        f = {}
+
+        for row in accounts:
+            name, emails = row[0], row[1:]
+
+            r_a = self.find(f, emails[0])
+            for i in range(1, len(emails)):
+                r_b = self.find(f, emails[i])
+                if r_a != r_b:
+                    f[r_b] = r_a
+                    if r_b in r_to_name:
+                        r_to_name.pop(r_b)
+
+
+            if r_a not in r_to_name:
+                r_to_name[r_a] = name
+
+        for row in accounts:
+            emails = row[1:]
+            r = self.find(f, emails[0])
+            r_to_nodes[r] = r_to_nodes.get(r, set())
+            r_to_nodes[r].update(emails)
+
+        rslts = []
+        for r, name in r_to_name.items():
+            rslts.append([name] + sorted(r_to_nodes[r]))
+
+        return rslts
+
+    def find(self, f, n):
+        if n not in f:
+            f[n] = n
+            return n
+
+        c = n
+        while f[c] != c:
+            c = f[c]
+
+        while f[n] != c:
+            p = f[n]
+            f[n] = c
+            n = p
+
+        return c

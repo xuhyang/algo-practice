@@ -287,3 +287,43 @@ Notice: You may assume both pattern and str contains only lowercase letters.
             used.remove(word)
 
         return False
+"""
+902. Kth Smallest Element in a BST
+https://www.lintcode.com/problem/kth-smallest-element-in-a-bst/description
+Given a binary search tree, write a function kthSmallest to find the kth smallest element in it.
+Input：{1,#,2},2 Output：2
+Explanation：The second smallest element is 2.
+	1
+	 \
+	  2
+Input：{2,1,3},1 Output：1
+Explanation：The first smallest element is 1.
+  2
+ / \
+1   3
+Challenge: What if the BST is modified (insert/delete operations) often and you need to find the kth smallest frequently? How would you optimize the kthSmallest routine?
+"""
+    def kthSmallest(self, r, k):
+        chldrn = {}
+        self.dvcq(r, chldrn)
+        return self.dvcq2(r, chldrn, k).val
+
+    def dvcq(self, n, chldrn):
+        if not n:
+            return 0
+
+        chldrn[n] = self.dvcq(n.left, chldrn) + self.dvcq(n.right, chldrn) + 1
+
+        return chldrn[n]
+
+    def dvcq2(self, n, chldrn, k):
+        if not n:
+            return None
+
+        l_chldrn = chldrn[n.left] if n.left else 0
+
+        if l_chldrn + 1 == k:
+            return n
+        if l_chldrn >= k:
+            return self.dvcq2(n.left, chldrn, k)
+        return self.dvcq2(n.right, chldrn, k - l_chldrn - 1)

@@ -69,3 +69,79 @@ class NumMatrix:
 # Your NumMatrix object will be instantiated and called as such:
 # obj = NumMatrix(matrix)
 # param_1 = obj.sumRegion(row1,col1,row2,col2)
+"""
+943. Range Sum Query - Immutable
+https://www.lintcode.com/problem/range-sum-query-immutable/description
+Given an integer array nums, find the sum of the elements between indices i and j (i ≤ j), inclusive.
+Input: nums = [-2, 0, 3, -5, 2, -1]
+sumRange(0, 2) sumRange(2, 5) sumRange(0, 5)
+Output: 1 -1 -3
+Explanation:
+sumRange(0, 2) -> (-2) + 0 + 3 = 1
+sumRange(2, 5) -> 3 + (-5) + 2 + (-1) = -1
+sumRange(0, 5) -> (-2) + 0 + 3 + (-5) + 2 + (-1) = -3
+Input: nums = [-4, -5]
+sumRange(0, 0) sumRange(1, 1) sumRange(0, 1) sumRange(1, 1) sumRange(0, 0)
+Output: -4 -5 -9 -5 -4
+Explanation:
+sumRange(0, 0) -> -4
+sumRange(1, 1) -> -5
+sumRange(0, 1) -> (-4) + (-5) = -9
+sumRange(1, 1) -> -5
+sumRange(0, 0) -> -4
+Notice: You may assume that the array does not change. There are many calls to sumRange function.
+"""
+    class NumArray:
+
+        def __init__(self, a):
+            self.p_sum = [0] * (len(a) + 1)
+
+            for i in range(len(a)):
+                self.p_sum[i + 1] = a[i] + self.p_sum[i]
+
+        def sumRange(self, i, j):
+            return self.p_sum[j + 1] - self.p_sum[i]
+"""
+944. Maximum Submatrix
+https://www.lintcode.com/problem/maximum-submatrix/description
+Given an n x n matrix of positive and negative integers, find the submatrix with the largest possible sum.
+Input: matrix = [
+    [1,3,-1],
+    [2,3,-2],
+    [-1,-2,-3]
+]
+Output: 9 Explanation: the submatrix with the largest possible sum is:
+[
+    [1,3],
+    [2,3]
+]
+Input: matrix = [
+    [1,1,1],
+    [1,1,1],
+    [1,1,1]
+]
+Output: 9 Explanation: the submatrix with the largest possible sum is:
+[
+    [1,1,1],
+    [1,1,1],
+    [1,1,1]
+]
+"""
+    def maxSubmatrix(self, matrix):
+        n, m = len(matrix), len(matrix[0]) if matrix else 0
+        max_prfx_sum = -sys.maxsize
+
+        for top in range(n):
+            a = [0] * m
+
+            for bttm in range(top, n):
+                min_prfx_sum, prfx_sum = 0, 0
+
+                for col in range(m):
+                    a[col] += matrix[bttm][col]
+                for num in a:
+                    prfx_sum += num
+                    max_prfx_sum = max(max_prfx_sum, prfx_sum - min_prfx_sum)
+                    min_prfx_sum = min(min_prfx_sum, prfx_sum)
+
+        return max_prfx_sum if max_prfx_sum != -sys.maxsize else 0

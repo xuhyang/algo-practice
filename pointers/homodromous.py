@@ -145,3 +145,42 @@ Notice: 1 <= k <= n <= 30,000. Elements of the given array will be in the range 
                 l += 1
 
         return max_sum / k
+1375. Substring With At Least K Distinct Characters
+中文English
+Given a string S with only lowercase characters.
+
+Return the number of substrings that contains at least k distinct characters.
+
+Example
+Example 1:
+
+Input: S = "abcabcabca", k = 4
+Output: 0
+Explanation: There are only three distinct characters in the string.
+Example 2:
+
+Input: S = "abcabcabcabc", k = 3
+Output: 55
+Explanation: Any substring whose length is not smaller than 3 contains a, b, c.
+    For example, there are 10 substrings whose length are 3, "abc", "bca", "cab" ... "abc"
+    There are 9 substrings whose length are 4, "abca", "bcab", "cabc" ... "cabc"
+    ...
+    There is 1 substring whose length is 12, "abcabcabcabc"
+    So the answer is 1 + 2 + ... + 10 = 55.
+    def kDistinctCharacters(self, s, k):
+        left = 0
+        counter = {}
+        answer = 0
+        for right in range(len(s)):
+            counter[s[right]] = counter.get(s[right], 0) + 1
+
+            while left <= right and len(counter) >= k:
+                counter[s[left]] -= 1
+                if counter[s[left]] == 0:
+                    counter.pop(s[left])
+                left += 1
+
+            answer += left
+
+
+        return answer

@@ -470,3 +470,43 @@ Notice: You may assume pattern contains only lowercase letters, and str contains
                 return False
 
         return True
+"""
+955. Implement Queue by Circular Array
+https://www.lintcode.com/problem/implement-queue-by-circular-array/description:Implement queue by circulant array. You need to support the following methods:
+CircularQueue(n): initialize a circular array with size n to store elements
+boolean isFull(): return true if the array is full
+boolean isEmpty(): return true if there is no element in the array
+void enqueue(element): add an element to the queue
+int dequeue(): pop an element from the queue
+"""
+    class CircularQueue:
+        def __init__(self, n):
+            self.head = 0
+            self.arr = [0 for _ in range(n)]
+            self.size = 0
+        """
+        @return:  return true if the array is full
+        """
+        def isFull(self):
+            return self.size == len(self.arr)
+        """
+        @return: return true if there is no element in the array
+        """
+        def isEmpty(self):
+            return self.size == 0
+        """
+        @param element: the element given to be added
+        @return: nothing
+        """
+        def enqueue(self, element):
+            self.arr[(self.head + self.size) % len(self.arr)] = element
+            self.size += 1
+        """
+        @return: pop an element from the queue
+        """
+        def dequeue(self):
+            element = self.arr[self.head]
+            self.head = (self.head + 1) % len(self.arr)
+            self.size -= 1
+
+            return element
