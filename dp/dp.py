@@ -106,3 +106,4 @@ https://www.lintcode.com/problem/remove-substrings/description
 https://www.lintcode.com/problem/knight-shortest-path-ii/description
 https://www.lintcode.com/problem/decode-ways-ii/description
 https://www.lintcode.com/problem/word-break-iii/description
+https://www.lintcode.com/problem/card-game-ii/description

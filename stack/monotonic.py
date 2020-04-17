@@ -1,5 +1,24 @@
 class Monotonic:
 """
+122. Largest Rectangle in Histogram
+https://www.lintcode.com/problem/largest-rectangle-in-histogram/description
+Given n non-negative integers representing the histogram's bar height where the width of each bar is 1, find the area of largest rectangle in the histogram.
+Input：[2,1,5,6,2,3] Output：10 Explanation：The third and fourth rectangular truncated rectangle has an area of 2*5=10.
+Input：[1,1] Output：2 Explanation：The first and second rectangular truncated rectangle has an area of 2*1=2.
+"""
+    def largestRectangleArea(self, height):
+        height, max_area, s = height + [0], 0, []
+
+        for i in range(len(height)):
+
+            while s and height[s[-1]] > height[i]:
+                h, l, r = height[s.pop()], s[-1] + 1 if s else 0, i - 1
+                max_area = max(max_area, (r - l + 1) * h)
+
+            s.append(i)
+
+        return max_area
+"""
 510. Maximal Rectangle
 https://www.lintcode.com/problem/maximal-rectangle/description
 Given a 2D boolean matrix filled with False and True, find the largest rectangle
@@ -20,3 +39,49 @@ containing all True and return its area.
             s.pop()
 
         return max_area
+"""
+126. Max Tree
+https://www.lintcode.com/problem/max-tree/description
+Given an integer array with no duplicates. A max tree building on this array is defined as follow:
+The root is the maximum number in the array
+The left subtree and right subtree are the max trees of the subarray divided by the root number.
+Construct the max tree by the given array.
+考点：数据结构设计 树的调整 单调栈
+题解：利用数组实现基本数据结构的调整，当前遍历到的数字比stk中的最后一个大时，将stk中的最后一个数字转变为当前节点的左子树,
+循环调整至stk为空或者stk中的最后节点值大于新节点的值。如果stk不为空，说明stk中的最后一个节点值大于新节点值，则将新节点设为stk中的最后一个节点的右子树，将新节点存入stk。
+使用九章算法强化班中讲到的单调栈。保存一个单调递减栈。每个数从栈中被 pop 出的时候，就知道它往左和往右的第一个比他大的数的位置了。
+时间复杂度 O(n)O(n)，而暴力算法最坏情况下会有 O(n^2)O(n
+"""
+   def maxTree(self, A):
+        if not A:
+            return None
+
+        nodes = [TreeNode(num) for num in A + [sys.maxsize]]
+        stack = []
+        for index, num in enumerate(A + [sys.maxsize]):
+            while stack and A[stack[-1]] < num:
+                top = stack.pop()
+                left = A[stack[-1]] if stack else sys.maxsize
+                if left < num:
+                    nodes[stack[-1]].right = nodes[top]
+                else:
+                    nodes[index].left = nodes[top]
+
+            stack.append(index)
+
+        # sys.maxsize 's left child is the maximum number
+        return nodes[-1].left
+
+    def maxTree(self, A):
+        stack = []
+        for num in A:
+            node = TreeNode(num)    	#新建节点
+            while stack and stack[-1].val < num:		#如果stk中的最后一个节点比新节点小
+                node.left = stack.pop()					#当前新节点的左子树为stk的最后一个节点
+
+            if stack:									#如果stk不为空
+                stack[-1].right = node					#将新节点设为stk最后一个节点的右子树
+
+            stack.append(node)
+
+        return stack[0]

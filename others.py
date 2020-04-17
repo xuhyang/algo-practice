@@ -510,3 +510,24 @@ int dequeue(): pop an element from the queue
             self.size -= 1
 
             return element
+"""
+1790. Rotate String II
+https://www.lintcode.com/problem/rotate-string-ii/description
+Given a string(Given in the way of char array), a right offset and a left offset, rotate the string by offset in place.(left offest represents the offset of a string to the left,right offest represents the offset of a string to the right,
+the total offset is calculated from the left offset and the right offset,split two strings at the total offset and swap positions)。
+Input：str ="abcdefg", left = 3, right = 1 Output："cdefgab"
+Explanation：The left offset is 3, the right offset is 1, and the total offset is left 2. Therefore, the original string moves to the left and becomes "cdefg"+ "ab".
+Input：str="abcdefg", left = 0, right = 0 Output："abcdefg"
+Explanation：The left offset is 0, the right offset is 0, and the total offset is 0. So the string remains unchanged.
+"""
+    def RotateString2(self, s, l, r):
+        o = l % len(s) - r % len(s)
+
+        if o > 0:
+            lst = o - 1
+            return s[lst + 1:] + s[:lst + 1]
+        elif o < 0:
+            lst = len(s) - 1 - abs(o)
+            return s[lst + 1:] + s[:lst + 1]
+        else:
+            return s
