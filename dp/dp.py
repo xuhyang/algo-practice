@@ -1,3 +1,21 @@
+"""
+# 贪心法：只顾眼前利益
+# DP： 全局最优
+# 贪心比较了选择，dp比较了做出选择后的结果
+"""
+"""
+三种适用DP的场景
+# 求最值（max/min）
+# 求方案总数（sum）
+# 求可行性（or）
+"""
+"""
+三种不适用DP的场景
+# 求所有的具体方案
+# 输入数据是无序的
+# 暴力算法时间复杂度已经是多项式级别
+"""
+
 #https://www.lintcode.com/problem/largest-divisible-subset/description?_from=ladder&&fromId=1
 #Given a set of distinct positive integers, find the largest subset such that every pair
 #(Si, Sj) of elements in this subset satisfies: Si % Sj = 0 or Sj % Si = 0.
@@ -103,6 +121,7 @@ You are to determine the minimum of the total score.
 
 https://www.lintcode.com/problem/k-edit-distance/
 https://www.lintcode.com/problem/remove-substrings/description
+
 https://www.lintcode.com/problem/knight-shortest-path-ii/description
 https://www.lintcode.com/problem/decode-ways-ii/description
 https://www.lintcode.com/problem/word-break-iii/description
