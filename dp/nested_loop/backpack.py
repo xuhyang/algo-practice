@@ -1,5 +1,162 @@
 class backpack:
 """
+89. k Sum
+https://www.lintcode.com/problem/k-sum/description
+Given n distinct positive integers, integer k (k <= n) and a number target.
+Find k numbers where sum is target. Calculate how many solutions there are?
+Input: List = [1,2,3,4] k = 2 target = 5 Output: 2
+Explanation: 1 + 4 = 2 + 3 = 5
+Input: List = [1,2,3,4,5] k = 3 target = 6 Output: 1
+Explanation: There is only one method. 1 + 2 + 3 = 6
+"""
+
+"""
+92. Backpack
+https://www.lintcode.com/problem/backpack/description
+Given n items with size Ai, an integer m denotes the size of a backpack. How full you can fill this backpack?
+Input:  [3,4,8,5], backpack size=10	Output:  9
+Input:  [2,3,5,7], backpack size=12	Output:  12
+O(n x m) time and O(m) memory. O(n x m) memory is also acceptable if you do not know how to optimize memory.
+Notice: You can not divide any item into small pieces.
+状态：设f[i][w] = 能否用前i个物品拼出重量w (TRUE / FALSE)•
+常见误区：错误设f[i]表示前i个物品能拼出的最大重量（不超过M）
+反例：A=[3 9 5 2], M=10 错误原因：最优策略中，前N-1个物品拼出的不一定是不超过M的最大重量
+背包问题一定有一维是重量
+暴力：O(2^n)
+"""
+    def backPack(self, m, a):
+        n = len(a)
+        f = [[0] * (m + 1) for _ in range(n)]#第i个在或不在重量j里的最大重量
+
+        for i in range(n):
+            for j in range(m + 1):
+                if j < a[i]:
+                    f[i][j] = f[i - 1][j] if i - 1 >= 0 else 0
+                    continue
+                # if f[i - 1][j] + a[i] <= j:
+                #     f[i][j] = f[i - 1][j] + a[i]
+                #     continue
+                f[i][j] = max(f[i - 1][j], f[i - 1][j - a[i]] + a[i])
+
+        return f[-1][-1]
+
+    def backPack(self, m, a):
+        n = len(a)
+        f = [[0] * (m + 1) for _ in range(n + 1)]
+
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                if j < a[i - 1]:
+                    f[i][j] = f[i - 1][j]
+                    continue
+
+                f[i][j] = max(f[i - 1][j], f[i - 1][j - a[i - 1]] + a[i - 1])
+
+        return f[-1][-1]
+
+    def backPack(self, m, a):
+        n = len(a)
+        f = [[False] * (m + 1) for _ in range(2)] #能否用前i个物品拼出重量j (TRUE / FALSE)， a[0][j] = false, 前0个拼不出j
+        f[0][0] = True
+
+        for i in range(1, n + 1):
+            f[i % 2][0] = True
+
+            for j in range(m + 1):
+                if j >= a[i - 1]:
+                    f[i % 2][j] = f[(i - 1) % 2][j - a[i - 1]] or f[(i - 1) % 2][j]
+                else:
+                    f[i % 2][j] = f[(i - 1) % 2][j]
+
+        for i in range(m, -1, -1):
+            if f[n % 2][i]:
+                return i
+
+        return 0
+"""
+125. Backpack II
+https://www.lintcode.com/problem/backpack-ii/description
+There are n items and a backpack with size m. Given array A representing the size of each item and array V representing the value of each item.
+What's the maximum value can you put into the backpack?
+Input: m = 10, A = [2, 3, 5, 7], V = [1, 5, 2, 4] Output: 9
+Explanation: Put A[1] and A[3] into backpack, getting the maximum value V[1] + V[3] = 9
+Input: m = 10, A = [2, 3, 8], V = [2, 5, 8] Output: 10
+Explanation: Put A[0] and A[2] into backpack, getting the maximum value V[0] + V[2] = 10
+O(nm) memory is acceptable, can you do it in O(m) memory?
+Notice
+A[i], V[i], n, m are all integers. You can not split an item.
+The sum size of the items you want to put into backpack can not exceed m.
+Each item can only be picked up once
+"""
+   def backPackII(self, m, a, v):
+        f, n = [[0] * (m + 1) for _ in range(len(a) + 1)], len(a)
+
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                if j - a[i - 1] >= 0:
+                    f[i][j] = max(f[i - 1][j], f[i - 1][j - a[i - 1]] + v[i - 1])
+                    continue
+                f[i][j] = f[i - 1][j]
+
+        return f[-1][-1]
+
+    def backPackII(self, m, a, v):
+        n = len(a)
+        f = [[0] * (m + 1) for _ in range(n + 1)]
+
+        for j in range(1, m + 1):
+            f[0][j] = -1 #前0个物品不能拼出大于0的重量？
+
+        f[0][0] = 0
+
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                f[i][j] = f[i - 1][j]
+
+                if j - a[i - 1] >= 0 and f[i - 1][j - a[i - 1]] != -1:
+                    f[i][j] = max(f[i][j], f[i - 1][j - a[i - 1]] + v[i - 1])
+
+        max_v = max(f[-1])
+        return max_v if max_v != -1 else 0
+"""
+440. Backpack III
+https://www.jiuzhang.com/solution/backpack-iii/#tag-other
+Given n kind of items with size Ai and value Vi( each item has an infinite number available)
+and a backpack with size m. What's the maximum value can you put into the backpack?
+Notice: You cannot divide item into small pieces and the total size of items you choose should smaller or equal to m.
+Example: Given 4 items with size [2, 3, 5, 7] and value [1, 5, 2, 4], and a backpack with size 10. The maximum value is 15.
+"""
+    def backPackIII(self, m, a, v):
+        n = len(a)
+        f = [[0] * (m + 1) for _ in range(n + 1)]
+
+        for j in range(1, m + 1):
+            f[0][j] = -1
+
+        f[0][0] = 0
+
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                f[i][j] = f[i - 1][j]
+
+                if j - a[i - 1] >= 0 and f[i][j - a[i - 1]] != -1:
+                    f[i][j] = max(f[i][j], f[i][j - a[i - 1]] + v[i - 1])
+
+        max_v = max(f[-1])
+        return max_v if max_v != -1 else 0
+
+    def backPackIII(self, m, a, v):
+        n = len(a)
+        f = [0] + [-1] * m
+
+        for i in range(1, n + 1):
+            for j in range(a[i - 1], m + 1):
+                if f[j - a[i - 1]] != -1:
+                    f[j] = max(f[j], f[j - a[i - 1]] + v[i - 1])
+
+        max_v = max(f)
+        return max_v if max_v != -1 else 0
+"""
 Card Game
 https://www.lintcode.com/problem/card-game/description
 A card game that gives you two non-negative integers: totalProfit, totalCost,
@@ -16,30 +173,7 @@ Since this number may be large, you only need to return the solution number mod 
 使用记忆化搜索的方法,时间复杂度 O(n * totalProfit * totalCost)O(n∗totalProfit∗totalCost)
 0, 1背包
 """
-BASE = 1000000007
 
-    def numOfPlan(self, n, totalProfit, totalCost, a, b):
-        return self.memo_search(0, n, totalProfit, totalCost, a, b, {})
-
-    def memo_search(self, index, n, profit, cost, a, b, memo):
-        if profit < 0:
-            profit = -1
-        if cost < 0:
-            return 0
-
-        if index == n:
-            if 0 > profit and 0 < cost:
-                return 1
-            return 0
-
-        if (index, profit, cost) in memo:
-            return memo[(index, profit, cost)]
-
-        select = self.memo_search(index + 1, n, profit - a[index], cost - b[index], a, b, memo)
-        unselect = self.memo_search(index + 1, n, profit, cost, a, b, memo)
-
-        memo[(index, profit, cost)] = (select + unselect) % BASE
-        return memo[(index, profit, cost)]
 """
 1538. Card Game II
 https://www.lintcode.com/problem/card-game-ii/description
@@ -52,34 +186,3 @@ And Each card can only be used once. Determine if you can win the game.
 # Input: cost = [1,2] damage = [3,4] totalMoney = 10 totalDamage = 10 Output: false
 # Explanation: We can only cause 7 damage at most.
 """
-    def cardGame(self, cst, dmg, ttlMny, ttlDmg):
-        return self.dvcq({}, cst, dmg, ttlMny, ttlDmg, 0)
-
-    def dvcq(self, f, cst, dmg, mny_lft, dmg_lft, i):
-        if mny_lft < 0: #上层cst > mny_lft，上次dmg不能发挥. 所以计算中忽略dmg，直接false
-            return False
-
-        if dmg_lft <= 0:
-            return True
-
-        if i == len(dmg): #到了最后一张牌，还没有完成dmg要求，则False
-            return False
-
-        return self.dvcq(f, cst, dmg, mny_lft - cst[i], dmg_lft - dmg[i], i + 1) or self.dvcq(f, cst, dmg, mny_lft, dmg_lft, i + 1)
-
-    def dvcq(self, f, cst, dmg, mny_lft, dmg_lft, i):
-        if mny_lft < 0: #上层cst > mny_lft，上次dmg不能发挥. 所以计算中忽略dmg，直接false
-            return False
-
-        if dmg_lft <= 0:
-            return True
-
-        if i == len(dmg): #到了最后一张牌，且还没有完成dmg要求，则False
-            return False
-
-        if (i, mny_lft, dmg_lft) in f:
-            return f[(i, mny_lft, dmg_lft)]
-
-        f[(i, mny_lft, dmg_lft)] = self.dvcq(f, cst, dmg, mny_lft - cst[i], dmg_lft - dmg[i], i + 1) or self.dvcq(f, cst, dmg, mny_lft, dmg_lft, i + 1)
-
-        return f[(i, mny_lft, dmg_lft)]

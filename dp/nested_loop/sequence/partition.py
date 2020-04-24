@@ -19,6 +19,7 @@ Notice 我们不能解码空串，因此若消息为空，你应该返回 0。
             if i - 2 >= 0 and 10 <= int(s[i - 2] + s[i - 1]) <= 26:
                 f[i] += f[i - 2]
 
+
         return f[-1] if s else 0
 """
 676. Decode Ways II
@@ -47,7 +48,7 @@ Notice: The length of the input string will fit in range [1, 10^5]. The input st
         if c == '*':
             return 9
         return 0 if int(c) == 0 else 1 # 1 <= c <= 9
-    
+
     def cnt2(self, p, c):
         if p == '*':
             if c == '*':
