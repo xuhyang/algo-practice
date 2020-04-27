@@ -10,41 +10,26 @@ Input: [4,2,4,5,3,7] Output: 4 Explanation: LIS is [2,4,5,7]
 接龙型： 看成1*n矩阵， 任意一个点 都可以作为起点， 跳跃规则： 后一个点比前一个大
 坐标型dp,  input维度=状态维度
 """
-    #left to right
     def longestIncreasingSubsequence(self, a):
-        n = len(a)
-        f = [1] * n if a else [0] #init： [1]最小情况
-        # state: 错：前i个数最长序列长度(global_max) 对：从左到右跳到i的最长路径长度(local max)
-        # ex:[7,8,9,1,2,3,4] 如果存global_max: f=[1,2,3,3,3,3,3], local_max: f=[1,2,3,1,2,3,4]
-        # 坐标型dp：1维2维数组中，走到某个点的计算结果 local_max
-        for i in range(n):
-            for j in range(i):
-                if a[j] < a[i]:
-                    f[i] = max(f[i], f[j] + 1)
+        f = {}
+        self.dvcq(f, a, 0)
+        return max(f.values()) if a else 0
 
-        return max(f) # global max
+    def dvcq(self, f, a, i):
+        if i in f:
+            return f[i]
 
-    #打印最优解 2维 prv[i][j] = (i - 1, j - 2)
-    def longestIncreasingSubsequence(self, a):
-            f, prv = [1] * len(a) if a else [0], [-1] * len(a)
+        if i == len(a) - 1:
+            f[i] = 1
+            return f[i]
 
-            for i in range(len(a)):
-                for j in range(i):
-                    if a[j] < a[i] and f[j] + 1 > f[i]:
-                        f[i], prv[i] = f[j] + 1, j
+        f[i] = 1
+        for j in range(i + 1, len(a)):
+            lngst = self.dvcq(f, a, j)
+            if a[i] < a[j]:
+                f[i] = max(f[i], lngst + 1)
 
-            lngst, lst = 0, -1
-            for i in range(len(a)):
-                if f[i] > lngst:
-                    lngst, lst = f[i], i
-
-            pth = []
-            while lst != -1:
-                pth.append(a[lst])
-                lst = prv[lst]
-            print(pth[::-1])
-
-            return max(f) # global max
+        return f[i] if a else 0
 """
 602. Russian Doll Envelopes
 https://www.lintcode.com/problem/russian-doll-envelopes/description
@@ -63,7 +48,7 @@ of elements in this subset satisfies: Si % Sj = 0 or Sj % Si = 0.
     def largestDivisibleSubset(self, a):
         a, n, ans, t = sorted(a), len(a), [], 0
         f, p = [0] * n, [-1] * n
-        
+
         for i in range(1, n):
             for j in range(i):
                 if a[i] % a[j] == 0 and f[j] + 1 > f[i]:

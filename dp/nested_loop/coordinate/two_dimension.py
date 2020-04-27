@@ -1,4 +1,4 @@
-class two_dimension:
+,class two_dimension:
 """
 109. Triangle
 https://www.lintcode.com/problem/triangle/description

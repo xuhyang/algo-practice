@@ -102,26 +102,62 @@ return the number of sentences you can form by inserting whitespaces to the sent
                 f[i] += self.dvcq_memo(f, s, d, max_l, j)
 
         return f[i]
-
+"""
 136. Palindrome Partitioning
-中文English
+https://www.lintcode.com/problem/palindrome-partitioning/description
 Given a string s. Partition s such that every substring in the partition is a palindrome.
-
 Return all possible palindrome partitioning of s.
-
-Example
-Example 1:
-
-Input: "a"
-Output: [["a"]]
-Explanation: Only 1 char in the string, only 1 way to split it (itself).
-Example 2:
-
-Input: "aab"
-Output: [["aa", "b"], ["a", "a", "b"]]
+Input: "a" Output: [["a"]] Explanation: Only 1 char in the string, only 1 way to split it (itself).
+Input: "aab"Output: [["aa", "b"], ["a", "a", "b"]]
 Explanation: There are 2 ways to split "aab".
     1. Split "aab" into "aa" and "b", both palindrome.
     2. Split "aab" into "a", "a", and "b", all palindrome.
 Notice
-Different partitionings can be in any order.
-Each substring must be a continuous segment of s.
+Different partitionings can be in any order. Each substring must be a continuous segment of s.
+"""
+    def partition(self, s):
+        rslts = []
+        self.dfs(s, rslts, [], 0)
+        return rslts
+
+    def dfs(self, s, rslts, rslt, i):
+        if i == len(s):
+            rslts.append(rslt[:])
+            return
+
+        for j in range(i + 1, len(s) + 1):
+            sub_s = s[i: j]
+            if self.is_palindrome(sub_s):
+                rslt.append(sub_s)
+                self.dfs(s, rslts, rslt, j)
+                rslt.pop()
+
+    def is_palindrome(self, s):
+        l, r = 0, len(s) - 1
+
+        while l < r:
+            if s[l] != s[r]:
+                return False
+            l, r = l + 1, r - 1
+
+        return True
+
+    def partition(self, s):
+        return self.dvcq({}, s, 0)
+
+    def dvcq(self, f, s, i):
+        if i == len(s):
+            return []
+
+        if i in f:
+            return f[i]
+
+        f[i] = []
+        for j in range(i + 1, len(s) + 1):
+            sub_s = s[i : j]
+            if sub_s == sub_s[::-1]:
+                f[i].extend([[sub_s] + e for e in self.dvcq(f, s, j)])
+                if j == len(s):
+                    f[i].append([sub_s])
+
+        return f[i]

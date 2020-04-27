@@ -53,3 +53,39 @@ The matching should cover the entire input string (not partial).
         elif p[j] == '*':
             f[(i, j)] = self.dvcq_memo(f, s, p, i, j + 1) or self.dvcq_memo(f, s, p, i + 1, j)
         return f[(i, j)]
+"""
+154. Regular Expression Matching
+https://www.lintcode.com/problem/regular-expression-matching/description
+Implement regular expression matching with support for '.' and '*'.
+'.' Matches any single character.
+'*' Matches zero or more of the preceding element.
+The matching should cover the entire input string (not partial).
+The function prototype should be:
+bool isMatch(string s, string p)
+isMatch("aa","a") → false
+isMatch("aa","aa") → true
+isMatch("aaa","aa") → false
+isMatch("aa", "a*") → true
+isMatch("aa", ".*") → true
+isMatch("ab", ".*") → true
+isMatch("aab", "c*a*b") → true
+"""
+    def isMatch(self, s, p):
+        return self.dvcq({}, s, p, 0, 0)
+
+    def dvcq(self, f, s, p, i, j):
+        if (i, j) in f:
+            return f[(i, j)]
+
+        if i == len(s):
+            return j == len(p) or len(p) - j == 2 and p[-1] == '*'
+
+        if j == len(p):
+            return False
+
+        if j + 1 < len(p) and p[j + 1] == '*':
+            f[(i, j)] = (s[i] == p[j] or p[j] == '.') and self.dvcq(f, s, p, i + 1, j) or self.dvcq(f, s, p, i, j + 2)
+        else:
+            f[(i, j)] = (s[i] == p[j] or p[j] == '.') and self.dvcq(f, s, p, i + 1, j + 1)
+
+        return f[(i, j)]
