@@ -98,7 +98,67 @@ The matching should cover the entire input string (not partial).
 # Input: "aab" "c*a*b" Output: false
 求：可行性
 """
+    def isMatch(self, s, p):
+        n, m = len(s), len(p)
+        f = [[False] * (m + 1) for _ in range(n + 1)]
+        f[0][0] = True
 
+        for j in range(1, m + 1):
+            if p[j - 1] == '*':
+                f[0][j] = f[0][j - 1]
+
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                if s[i - 1] == p[j - 1] or p[j - 1] == '?':
+                    f[i][j] = f[i - 1][j - 1]
+                elif p[j - 1] == '*':
+                            # 第一次匹配 or 第n次匹配 or 不匹配 nested loop 因为计算结果自顶向下， 所以要考虑第n次匹配，dvcq 自底向上每次都是第n次匹配，(第一次， 和第n次 一样)
+                    f[i][j] = f[i - 1][j - 1] or f[i - 1][j] or f[i][j - 1]
+
+        return f[-1][-1]
+"""
+154. Regular Expression Matching
+https://www.lintcode.com/problem/regular-expression-matching/description
+Implement regular expression matching with support for '.' and '*'.
+'.' Matches any single character.
+'*' Matches zero or more of the preceding element.
+The matching should cover the entire input string (not partial).
+The function prototype should be:
+bool isMatch(string s, string p)
+isMatch("aa","a") → false
+isMatch("aa","aa") → true
+isMatch("aaa","aa") → false
+isMatch("aa", "a*") → true
+isMatch("aa", ".*") → true
+isMatch("ab", ".*") → true
+isMatch("aab", "c*a*b") → true
+"""
+    def isMatch(self, s, p):
+        return self.dvcq({}, s, p, 0, 0)
+
+    def dvcq(self, f, s, p, i, j):
+        n, m = len(s), len(p)
+        f = [[False] * (m + 1) for _ in range(n + 1)]
+        f[0][0] = True
+
+        for j in range(1, m + 1):
+            if j < len(p) and p[j] == '*':
+                f[0][j] = f[0][j - 1]
+
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+
+                if s[i - 1] == p[j - 1] or p[j - 1] == '.':
+                    if j < len(p) and p[j] == '*':
+                        f[i][j] = f[i - 1][j - 1] or f[i - 1][j] or f[i][j - 1]
+                    else:
+                        f[i][j] = f[i - 1][j - 1]
+                elif p[j - 1] == '*':
+                    f[i][j] = f[i][j - 1]
+                elif j < len(p) and p[j] == '*':
+                    f[i][j] = f[i - 1][j - 1]
+
+        return f[-1][-1]
 """
 623. K Edit Distance
 https://www.jiuzhang.com/solution/k-edit-distance/

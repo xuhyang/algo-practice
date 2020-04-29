@@ -1,5 +1,84 @@
 class dualsequence:
 """
+29. Interleaving String
+https://www.lintcode.com/problem/interleaving-string/description
+Given three strings: s1, s2, s3, determine whether s3 is formed by the interleaving of s1 and s2.
+Input: "aabcc" "dbbca" "aadbbcbcac" Output: true
+Input: "" "" "1" Output: false
+Input: "aabcc" "dbbca" "aadbbbaccc" Output: false
+Challenge: O(n2) time or better
+"""
+    def isInterleave(self, s1, s2, s3):
+        return self.dvcq({}, s1, s2, s3, 0, 0)
+
+    def dvcq(self, f, s1, s2, s3, i, j):
+        if i == len(s1):
+            return s2[j:] == s3[i + j:]
+        if j == len(s2):
+            return s1[i:] == s3[i + j:]
+
+        if (i, j) in f:
+            return f[(i, j)]
+
+        f[(i, j)] = (self.dvcq(f, s1, s2, s3, i + 1, j) if s1[i] == s3[i + j] else False) or (self.dvcq(f, s1, s2, s3, i, j + 1) if s2[j] == s3[i + j] else False)
+        return f[(i, j)]
+"""
+77. Longest Common Subsequence
+https://www.lintcode.com/problem/longest-common-subsequence/description
+Given two strings, find the longest common subsequence (LCS).
+Your code should return the length of LCS.
+Input:  "ABCD" and "EDCA" Output: 1 Explanation: LCS is 'A' or  'D' or 'C'
+Input: "ABCD" and "EACB" Output:  2 Explanation: LCS is "AC"
+Clarification: What's the definition of Longest Common Subsequence?
+"""
+    def longestCommonSubsequence(self, a, b):
+        return self.dvcq({}, a, b, 0, 0)
+
+    def dvcq(self, f, a, b, i, j):
+        if i == len(a) or j == len(b):
+            return 0
+
+        if (i, j) in f:
+            return f[(i, j)]
+
+        f[(i, j)] = 0
+        if a[i] == b[j]:
+            f[(i, j)] = self.dvcq(f, a, b, i + 1, j + 1) + 1
+        f[(i, j)] = max(f[(i, j)], self.dvcq(f, a, b, i + 1, j), self.dvcq(f, a, b, i, j + 1))
+
+        return f[(i, j)]
+"""
+119. Edit Distance
+https://www.lintcode.com/problem/edit-distance/description
+Given two words word1 and word2, find the minimum number of steps required to convert word1 to word2. (each operation is counted as 1 step.)
+You have the following 3 operations permitted on a word:
+Insert a character. Delete a character. Replace a character
+Input: "horse" "ros" Output: 3
+Explanation: horse -> rorse (replace 'h' with 'r') rorse -> rose (remove 'r') rose -> ros (remove 'e')
+Input: "intention" "execution" Output: 5
+Explanation:
+intention -> inention (remove 't')
+inention -> enention (replace 'i' with 'e')
+enention -> exention (replace 'n' with 'x')
+exention -> exection (replace 'n' with 'c')
+exection -> execution (insert 'u')
+"""
+    def minDistance(self, w1, w2):
+        return self.dvcq({}, w1, w2, 0, 0)
+    
+    def dvcq(self, f, w1, w2, i, j):
+        if i == len(w1):
+            return len(w2) - j
+        if j == len(w2):
+            return len(w1) - i
+
+        if (i, j) in f:
+           return f[(i, j)]
+
+        f[(i, j)] = min(self.dvcq(f, w1, w2, i, j + 1) + 1, self.dvcq(f, w1, w2, i + 1, j) + 1, self.dvcq(f, w1, w2, i + 1, j + 1) + (1 if w1[i] != w2[j] else 0))
+
+        return f[(i, j)]
+"""
 192. Wildcard Matching
 https://www.lintcode.com/problem/wildcard-matching/description
 Implement wildcard pattern matching with support for '?' and '*'.
