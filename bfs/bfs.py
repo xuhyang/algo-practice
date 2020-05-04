@@ -809,3 +809,29 @@ Can you solve it with A* algorithm?
                 s += str(b[i][j])
 
         return s
+"""
+624. Remove Substrings
+https://www.lintcode.com/problem/remove-substrings/description
+Given a string s and a set of n substrings. You are supposed to remove every instance of those n substrings from s so that s is of the minimum length and output this minimum length.
+Input: "ccdaabcdbb" ["ab","cd"] Output: 2 Explanation: ccdaabcdbb -> ccdacdbb -> cabb -> cb (length = 2)
+Input: "abcabd" ["ab","abcd"] Output: 0 Explanation: abcabd -> abcd -> "" (length = 0)
+"""
+    def minLength(self, s, d):
+        q, sn, min_l = collections.deque([s]), set([s]), len(s)
+
+        while q:
+            n = q.popleft()
+            min_l = min(min_l, len(n))
+
+            for w in d:
+                i = n.find(w)
+
+                while i != -1:
+                    nxt = n[:i] + n[i + len(w):]
+                    if nxt not in sn:
+                        q.append(nxt)
+                        sn.add(nxt)
+
+                    i = n.find(w, i + 1)
+
+        return min_l

@@ -204,9 +204,8 @@ Since this number may be large, you only need to return the solution number mod 
 0 <= b[i] <= 1000
 0 <= totalProfit<= 1000
 0 <= totalCost <= 1000
-使用记忆化搜索的方法,时间复杂度 O(n * totalProfit * totalCost)O(n∗totalProfit∗totalCost)
-0, 1背包
 """
+
 
 """
 1538. Card Game II

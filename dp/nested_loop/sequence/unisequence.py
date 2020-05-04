@@ -8,39 +8,14 @@ Given a string s and a dictionary of words dict, determine if s can be broken in
 求： 可行性
 """
     def wordBreak(self, s, d):
-        return self.dvcq(s, d, max([len(w) for w in d]) if d else 0, 0)
+        f, max_l = [True] + [False] * len(s), max(len(w) for w in d) if d else 0
 
-    def dvcq(self, s, d, max_l, i):
-        if i == len(s):
-            return True
-
-        for j in range(i + 1, len(s) + 1):
-            if  j - i > max_l:
-                break
-
-            if s[i : j] in d and self.dvcq(s, d, max_l, j):
-                return True
-
-        return False
-
-    def wordBreak(self, s, d):
-        return self.dvcq_memo({}, s, d, max([len(w) for w in d]) if d else 0, 0)
-    #下潜深度 O(i) * 每层宽度O(l) * 每个状态计算量O(l) s[i : j] in d = O(i * l^2)
-    def dvcq_memo(self, f, s, d, max_l, i):
-        if i == len(s):
-            return True
-
-        if i in f:
-            return f[i]
-
-        f[i] = False
-        for j in range(i + 1, min(max_l + i + 1, len(s) + 1)): # O(l)
-                # O(l)
-            if s[i : j] in d and self.dvcq_memo(f, s, d, max_l, j):
-                f[i] = True
-                break
-
-        return f[i]
+        for j in range(1, len(s) + 1):
+            for i in range(j):
+                if j - i <= max_l and s[i : j] in d and f[i]:
+                    f[j] = True
+                    break
+        return f[-1]
 """
 582. Word Break II
 https://www.lintcode.com/problem/word-break-ii/description
@@ -87,21 +62,14 @@ return the number of sentences you can form by inserting whitespaces to the sent
 #求：方案总数
 """
     def wordBreak3(self, s, d):
-        return self.dvcq_memo({}, s.lower(), set([w.lower() for w in d]), max([len(w) for w in d]) if d else 0, 0)
+        f, max_l, d, s = [1] + [0] * (len(s)), max([len(w) for w in d]) if d else 0, set([w.lower() for w in d]), s.lower()
 
-    def dvcq_memo(self, f, s, d, max_l, i):
-        if i == len(s):
-            return 1  # 最后一层i走到了终点,说明上一层s[i:j]在d里即符合条件，所以是一种方案
-
-        if i in f:
-            return f[i]
-
-        f[i] = 0
-        for j in range(i + 1, min(i + 1 + max_l, len(s) + 1)):
-            if s[i : j] in d:
-                f[i] += self.dvcq_memo(f, s, d, max_l, j)
-
-        return f[i]
+        for j in range(1, len(s) + 1):
+            for i in range(j):
+                if j - i <= max_l and s[i : j] in d and f[i]:
+                    f[j] += f[i]
+                    
+        return f[-1]
 
 136. Palindrome Partitioning
 中文English

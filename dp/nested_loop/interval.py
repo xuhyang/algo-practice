@@ -48,6 +48,32 @@ You may imagine nums[-1] = nums[n] = 1. They are not real therefore you can not 
 
         return f[0][-1]
 """
+200. Longest Palindromic Substring
+https://www.lintcode.com/problem/longest-palindromic-substring/description
+Given a string S, find the longest palindromic substring in S. You may assume that the maximum length of S is 1000, and there exists one unique longest palindromic substring.
+Input:"abcdzdcab" Output:"cdzdc"
+Input:"aba" Output:"aba"
+Challenge: O(n2) time is acceptable. Can you do it in O(n) time.
+"""
+    def longestPalindrome(self, s):
+        n, max_lngth, l, r = len(s), 0, 0, 0
+        f = [[False] * n for _ in range(n)]
+
+        for i in range(n):
+            f[i][i] = True
+
+        for i in range(1, n):
+            f[i][i - 1] = True
+
+        for lngth in range(2, n + 1):
+            for i in range(n - lngth + 1):
+                j = i + lngth - 1
+                f[i][j] = s[i] == s[j] and f[i + 1][j - 1]
+                if f[i][j] and lngth > max_lngth:
+                    l, r = i, j
+
+        return s[l : r + 1]
+"""
 476. Stone Game
 https://www.lintcode.com/problem/stone-game/description
 There is a stone game.At the beginning of the game the player picks n piles of stones in a line.
@@ -64,21 +90,52 @@ Explanation:
 #思路：列举最后一刀， 列举最后归并的两个区间
 """
     def stoneGame(self, a):
-        return self.dvcq({}, a, 0, len(a) - 1)
-    #方案总数 * 方案复杂度 = s, e 总数 * 每个s，e 复杂度 = O(n^2) * n
-    def dvcq(self, f, a, s, e):
-        if s >= e:
+        n = len(a)
+        f, s = [[0] * n for _ in range(n)], [0] * (n + 1)
+
+        for i in range(1, n + 1):
+            s[i] = s[i - 1] + a[i - 1]
+
+        for l in range(2, n + 1):
+            for i in range(n - l + 1):
+                j = i + l - 1
+                f[i][j] = sys.maxsize
+                for k in range(i, j):
+                    f[i][j] = min(f[i][j], f[i][k] + f[k + 1][j] + s[j + 1] - s[i])
+
+        return f[0][-1] if a else 0
+"""
+593. Stone Game II
+https://www.jiuzhang.com/solution/stone-game-ii/#tag-highlight-lang-python
+There is a stone game.At the beginning of the game the player picks n piles of stones in a circle.
+The goal is to merge the stones in one pile observing the following rules:
+At each step of the game,the player can merge two adjacent piles to a new pile.
+The score is the number of stones in the new pile.
+You are to determine the minimum of the total score.
+"""
+def stoneGame2(self, A):
+        n = len(A)
+        if n <= 1:
             return 0
 
-        if (s, e) in f:
-            return f[(s, e)]
+        s = [0]
+        dp = [[sys.maxint for i in xrange(2 * n)] for j in xrange(2 * n)]
+        for i in xrange(2 * n):
+            s.append(s[-1] + A[i % n])
+            dp[i][i] = 0
 
-        f[(s, e)] = sys.maxsize
-        for i in range(s, e + 1):
-            f[(s, e)] = min(f[(s, e)], self.dvcq(f, a, s, i) + self.dvcq(f, a, i + 1, e))
-        f[(s, e)] += sum(a[s : e + 1])
+        for l in xrange(2, 2 * n + 1):
+            for i in xrange(2 * n):
+                j = i + l - 1
+                if j >= 2 * n:
+                    continue
+                for k in xrange(i, j):
+                    dp[i][j] = min(dp[i][k] + dp[k+1][j] + s[j + 1] - s[i], dp[i][j])
 
-        return f[(s, e)]
+        ans = sys.maxint
+        for i in xrange(n):
+            ans = min(ans, dp[i][i + n - 1])
+        return ans
 """
 396.Coins in a Line III
 https://www.jiuzhang.com/solutions/coins-in-a-line-iii/
