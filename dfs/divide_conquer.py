@@ -248,6 +248,44 @@ Input: 1<> Output: 1
 
         return max(lngst, inc + dec - 1), inc, dec, n.val
 """
+802. Sudoku Solver
+https://www.lintcode.com/problem/sudoku-solver/description?_from=ladder&&fromId=1
+Write a program to solve a Sudoku puzzle by filling the empty cells. Empty cells are indicated by the number 0.
+You may assume that there will be only one unique solution.
+"""
+    def solveSudoku(self, b):
+        return self.dfs(b, 0)
+
+    def dfs(self, b, k):
+        if k == 81:
+            return True
+
+        i, j = k // 9, k % 9 #能整除几次就是第几行，整除余数就是第几列
+
+        if b[i][j] != 0:
+            return self.dfs(b, k + 1)
+
+        for e in range(1, 10):
+            if not self.valid(b, i, j, e):
+                continue
+
+
+
+            b[i][j] = e
+            if self.dfs(b, k + 1):
+                return True
+            b[i][j] = 0
+
+        return False
+
+    def valid(self, b, i, j, e):
+
+        for k in range(9): # i // 3 * 3, j // 3 * 3 算出任何i，j所在九宫的第一位
+            if b[i][k] == e or b[k][j] == e or b[i // 3 * 3 + k // 3][j // 3 * 3 + k % 3] == e:
+                return False
+
+        return True
+"""
 829. Word Pattern II
 https://www.lintcode.com/problem/word-pattern-ii/description
 Given a pattern and a string str, find if str follows the same pattern.

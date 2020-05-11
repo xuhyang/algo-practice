@@ -21,30 +21,35 @@ If the target number does not exist in the array, return -1.
         if a[r] == t:
             return r
         return -1
-
+"""
+458. Last Position of Target
 #https://www.lintcode.com/problem/last-position-of-target/description?_from=ladder&&fromId=1
 #Find the last position of a target number in a sorted array. Return -1 if target does not exist.
 #关键字： last position，sorted，array
 #思路：因为 暴力解 O(n), sorted，而且array,  所以 binary search
 #Time: O(logN), Space O(1)
-    def lastPosition(self, nums, target):
-        if len(nums) < 1:#always check size
+"""
+    def lastPosition(self, a, t):
+        if len(a) == 0:
             return -1
 
-        start, end = 0, len(nums) - 1
-        while start + 1 < end:
-            mid = (start + end) // 2
+        l, r = 0, len(a) - 1
 
-            if nums[mid] <= target: #因为 要求找最后一个target， 所以 找到一个target后继续在右半部分search
-                start = mid #因为 当前找到的target可能是最后一个target，所以 将此index保留到下次search
+        while l + 1 < r:
+            m = (l + r) // 2
+
+            if a[m] <= t:
+                l = m
             else:
-                end = mid
-        #因为 要求找最后一个target，所以 先比较nums[end]再比较nums[start]
-        if nums[end] == target:
-            return end
-        if nums[start] == target:
-            return start
+                r = m
+
+        if a[r] == t:
+            return r
+        if a[l] == t:
+            return l
         return -1
+"""
+585. Maximum Number in Mountain Sequence
 #https://www.lintcode.com/problem/maximum-number-in-mountain-sequence/description?_from=ladder&&fromId=1
 #Given a mountain sequence of n integers which, find the mountain top.
 #Example 1: #Input: nums = [1, 2, 4, 8, 6, 3] #Output: 8
@@ -54,6 +59,7 @@ If the target number does not exist in the array, return -1.
 #因为 increase firstly and then decrease 所以 两个subarray 满足 两个 sorted 条件. OOO即递增，XXX即递减，
 #所以 要找 last position of 递增 first position of 递减
 #Time: O(logN). SpaceO(n)
+"""
     def mountainSequence(self, nums):
         if len(nums) < 1:
             return -1
@@ -68,7 +74,22 @@ If the target number does not exist in the array, return -1.
                 end = mid #当前mid可能是第一位递减即 top，所以保留到下次search
 
         return max(nums[start], nums[end])#缩到两位，比个大小
-#https://www.lintcode.com/problem/find-k-closest-elements/description?_from=ladder&&fromId=1
+
+    def mountainSequence(self, a):
+        l, r = 0, len(a) - 1
+
+        while l + 1 < r:
+            m = (l + r) // 2
+
+            if a[m - 1] < a[m]:
+                l = m
+            else:
+                r = m
+
+        return max(a[l], a[r])
+"""
+460. Find K Closest Elements
+#https://www.lintcode.com/problem/find-k-closest-elements/description
 #Given target, a non-negative integer k and an integer array A sorted in ascending order,
 #find the k closest numbers to target in A, sorted in ascending order by the difference between the number and target.
 #Otherwise, sorted in ascending order by number if the difference is same.
@@ -76,6 +97,7 @@ If the target number does not exist in the array, return -1.
 #关键字: sorted, array, non-negative, k closest numbers to target
 #思路：因为暴力解 O(n), sorted, array,所以binary search. 因为 k closest， 所以 背向双指针
 #Time, O(logN), spaceO(1)
+"""
     def kClosestNumbers(self, A, target, k):
         ans = []
         if k == 0:
@@ -106,15 +128,18 @@ If the target number does not exist in the array, return -1.
                 right += 1
 
         return ans
-#https://www.lintcode.com/problem/search-in-a-big-sorted-array/description?_from=ladder&&fromId=1
-#Given a big sorted array with non-negative integers sorted by non-decreasing order.
-#The array is so big so that you can not get the length of the whole array directly, and you can only access the kth number by ArrayReader.get(k) (or ArrayReader->get(k) for C++).
-#Find the first index of a target number. Your algorithm should be in O(log k), where k is the first index of the target number.
-#Return -1, if the number doesn't exist in the array.
-#Example 1: Input: [1, 3, 6, 9, 21, ...], target = 3 Output: 1
-#关键字: sorted, array, can only access the kth number by, Find the first index of a target number
-#思路： 因为 sorted，array，find target 所以binary search， 因为array steam 所以倍增
-#Time, O(logN), spaceO(1)
+"""
+447. Search in a Big Sorted Array
+https://www.lintcode.com/problem/search-in-a-big-sorted-array/description?_from=ladder&&fromId=1
+Given a big sorted array with non-negative integers sorted by non-decreasing order.
+The array is so big so that you can not get the length of the whole array directly, and you can only access the kth number by ArrayReader.get(k) (or ArrayReader->get(k) for C++).
+Find the first index of a target number. Your algorithm should be in O(log k), where k is the first index of the target number.
+Return -1, if the number doesn't exist in the array.
+Example 1: Input: [1, 3, 6, 9, 21, ...], target = 3 Output: 1
+关键字: sorted, array, can only access the kth number by, Find the first index of a target number
+思路： 因为 sorted，array，find target 所以binary search， 因为array steam 所以倍增
+Time, O(logN), spaceO(1)
+"""
     def searchBigSortedArray(self, reader, target):
         start, end = 0, 0
         #因为 array sorted， 所以倍增index， 直到array[index] >= target,
@@ -134,21 +159,7 @@ If the target number does not exist in the array, return -1.
         if reader.get(end) == target:
             return end
         return -1
-#https://www.lintcode.com/problem/powx-n/description?_from=ladder&&fromId=1
-#also check recursive solution
-    def myPow(self, x, n):
-        if n < 0:
-            x = 1 / x
-            n = -n
 
-        ans, tmp = 1, x
-        while n != 0:
-            if n % 2 == 1:
-                ans *= tmp
-            #x^n = x^(n/2) * x^(n/2)
-            tmp *= tmp
-            n = n // 2
-        return ans
 #Suppose a sorted array is rotated at some pivot unknown to you beforehand.
 #(i.e., 0 1 2 4 5 6 7 might become 4 5 6 7 0 1 2).Find the minimum element.
 #关键字： sorted, array, rotated.
@@ -487,24 +498,6 @@ Input: [4,2,4,5,3,7] Output: 4 Explanation: LIS is [2,4,5,7]
 
         return max(f)
 """
-141. Sqrt(x)
-https://www.lintcode.com/problem/sqrtx/description
-Implement int sqrt(int x). Compute and return the square root of x.
-考点：值上二分
-"""
-    def sqrt(self, x):
-        l, r = 0, x
-
-        while l + 1 < r:
-            m = (l + r) // 2
-
-            if m * m >= x:
-                r = m
-            else:
-                l = m
-        # r * r <= x r 跟接近 sqrt x， 求最近小于等于sqrt x的数
-        return r if r * r <= x else l
-"""
 159. Find Minimum in Rotated Sorted Array
 https://www.lintcode.com/problem/find-minimum-in-rotated-sorted-array/description
 Suppose a sorted array in ascending order is rotated at some pivot unknown to you beforehand.
@@ -541,38 +534,6 @@ Suppose a sorted array is rotated at some pivot unknown to you beforehand.
                 r -= 1
 
         return min(a[l], a[r])
-"""
-437. Copy Books
-https://www.lintcode.com/problem/copy-books/description
-Given n books and the i-th book has pages[i] pages. There are k persons to copy these books.
-These books list in a row and each person can claim a continous range of books. For example, one copier can copy the books from i-th to j-th continously, but he can not copy the 1st book, 2nd book and 4th book (without 3rd book).
-They start copying books at the same time and they all cost 1 minute to copy 1 page of a book. What's the best strategy to assign books so that the slowest copier can finish at earliest time?
-Return the shortest time that the slowest copier spends.#求抄完所有书的最快时间
-Input: pages = [3, 2, 4], k = 2 Output: 5
-"""
-    def copyBooks(self, pages, k):
-        if not pages:
-            return 0
-        #无限个人抄完所有书的时间， 1个人抄完所有书的时间
-        l, r = max(pages), sum(pages)
-
-        while l + 1 < r:
-            m = (l + r) // 2
-
-            if self.isPeopleEnough(pages, m, k):
-                r = m
-            else:
-                l = m
-
-        return l if self.isPeopleEnough(pages, l, k) else r
-
-    def isPeopleEnough(self, pages, total_minutes, k):
-        people, minutes = 1, 0
-
-        for t in pages:
-            people, minutes = (people + 1, t) if minutes + t > total_minutes else (people, minutes + t)
-
-        return people <= k
 """
 447. Search in a Big Sorted Array
 https://www.lintcode.com/problem/search-in-a-big-sorted-array/description

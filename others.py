@@ -1,5 +1,58 @@
 class Others:
 """
+51. Previous Permutation
+https://www.lintcode.com/problem/previous-permutation/description
+Given a list of integers, which denote a permutation.
+Find the previous permutation in ascending order.
+Example: Input: 1,4,2,3,5 Output: 1,3,5,4,2
+"""
+   def previousPermuation(self, a):
+        n = len(a)
+
+        i = j = k = n - 1
+        while i > 0 and a[i - 1] <= a[i]:#从右向左找出最后一个递减数
+            i -= 1
+
+        if i == 0: #数组完全递减
+            return list(reversed(a))
+
+        while a[i - 1] <= a[j]: #从右向左 找出第一个比 非递减数小的
+            j -= 1
+        a[i - 1], a[j] = a[j], a[i - 1] #与非递减数交换
+
+        while i < k:
+            a[i], a[k] = a[k], a[i] #swap其余
+            i, k = i + 1, k - 1
+
+        return a
+"""
+52. Next Permutation
+https://www.lintcode.com/problem/next-permutation/description
+Given a list of integers, which denote a permutation.
+Find the next permutation in ascending order.
+Example: Input: 1,3,5,4,2 Output: 1,4,2,3,5
+"""
+    def nextPermutation(self, nums):
+        if len(nums) < 2:
+            return nums
+
+        i = len(nums) - 1
+        while i > 0 and nums[i - 1] >= nums[i]:
+            i -= 1
+
+        if i != 0:
+            for j in range(len(nums) - 1, -1, -1):
+                if nums[j] > nums[i - 1]:
+                    nums[i - 1], nums[j] = nums[j], nums[i - 1]
+                    break
+
+        k = len(nums) - 1
+        while i < k:
+            nums[i], nums[k] = nums[k], nums[i]
+            i, k = i + 1, k - 1
+
+        return nums
+"""
 128. Hash Function
 https://www.lintcode.com/problem/hash-function/description
 hashcode("abcd") = (ascii(a) * 333 + ascii(b) * 332 + ascii(c) *33 + ascii(d)) % HASH_SIZE
@@ -125,6 +178,52 @@ Given two strings, write a method to decide if one is a permutation of the other
 
         return th == 0
 """
+235. Prime Factorization
+https://www.lintcode.com/problem/prime-factorization/my-submissions
+Prime factorize a given integer.
+Example Input: 10 Output: [2, 5] Input: 660 Output: [2, 2, 3, 5, 11]
+"""
+    def primeFactorization(self, a):
+        up, f, ans = math.sqrt(a), 2, []
+
+        while a != 1 and f <= up:
+
+            if a % f == 0:
+                ans.append(f)
+                a //= f
+            else:
+                f += 1
+
+        return ans + [a] if a != 1 else ans
+"""
+400. Maximum Gap
+https://www.lintcode.com/problem/maximum-gap/description
+Given an unsorted array, find the maximum difference between the successive elements in its sorted form.
+Return 0 if the array contains less than 2 elements.
+Input: [1, 9, 2, 5] Output: 4 Explanation: The sorted form is [1, 2, 5, 9], and the maximum gap is between 5 and 9.
+Input: [1] Output: 0 Explanation: The array contains less than 2 elements.
+Challenge:Sort is easy but will cost O(nlogn) time. Try to solve it in linear time and space.
+Notice: You may assume all elements in the array are non-negative integers and fit in the 32-bit signed integer range.
+"""
+    def maximumGap(self, a):
+        n, min_e, max_e = len(a), min(a), max(a)
+        if n < 2 or min_e == max_e:
+            return 0
+
+        blks, gap = [(sys.maxsize, -sys.maxsize)] * n, math.ceil(float(max_e - min_e) / (n - 1))
+
+        for e in a:
+            i = (e - min_e) // gap
+            b_min, b_max = blks[i]
+            blks[i] = (min(b_min, e), max(b_max, e))
+
+        max_gap, last_max = 0, min_e
+        for b_min, b_max in blks:
+            if b_min != sys.maxsize:
+                max_gap, last_max = max(max_gap, b_min - last_max), b_max
+
+        return max_gap
+"""
 414. Divide Two Integers
 https://www.lintcode.com/problem/divide-two-integers/description
 Divide two integers without using multiplication, division and mod operator.
@@ -173,6 +272,20 @@ Input: x = 8.84372, n = -5 Output: 0.000
             return rslt * rslt
 
         return rslt * rslt * x
+
+    def myPow(self, x, n):
+        if n < 0:
+            x = 1 / x
+            n = -n
+
+        ans, tmp = 1, x
+        while n != 0:
+            if n % 2 == 1:
+                ans *= tmp
+            #x^n = x^(n/2) * x^(n/2)
+            tmp *= tmp
+            n = n // 2
+        return ans
 """
 526. Load Balancer
 https://www.lintcode.com/problem/load-balancer/description

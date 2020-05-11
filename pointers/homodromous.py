@@ -1,5 +1,203 @@
 class Homodromous:
 """
+6. Merge Two Sorted Arrays
+https://www.lintcode.com/problem/merge-two-sorted-arrays/description
+Merge two given sorted ascending integer array A and B into a new sorted integer array.
+"""
+    def mergeSortedArray(self, a, b):
+        rslt, i, j = [], 0, 0
+
+        while i < len(a) and j < len(b):
+            if a[i] <= b[j]:
+                rslt.append(a[i])
+                i += 1
+            else:
+                rslt.append(b[j])
+                j += 1
+
+        return rslt + a[i:] + b[j:]
+'''
+13. Implement strStr()
+For a given source string and a target string, you should output the first index(from 0) of target string in source string.
+'''
+    def strStr(self, s, t):
+        len_s, len_t = len(s), len(t)
+        for i in range(len_s - len_t + 1):
+            j = i
+            for c in t:
+                if s[j] != c:
+                    break
+                j += 1
+            if j - i == len_t:
+                return i
+        return -1
+"""
+32. Minimum Window Substring
+https://www.lintcode.com/problem/minimum-window-substring/description
+Given two strings source and target. Return the minimum substring of source which contains each char of target.
+Input: source = "adobecodebanc", target = "abc" Output: "banc"
+考点：同向双指针, threshold 实现
+"""
+    def minWindow(self, s, t):
+        thrshld, cnt, k = collections.Counter(t), {}, 0
+        g_l, g_r, min_len = -1, -1, sys.maxsize
+
+        l = 0
+        for r, c in enumerate(s):
+            cnt[c] = cnt.get(c, 0) + 1
+            if c in thrshld and cnt[c] == thrshld[c]:
+                k += 1
+
+            while k == len(thrshld):
+                if r - l + 1 < min_len:
+                    g_l, g_r, min_len = l, r, r - l + 1
+
+                l_c = s[l]
+                cnt[l_c] -= 1
+                if l_c in thrshld and cnt[l_c] == thrshld[l_c] - 1:
+                    k -= 1
+                l += 1
+
+        return s[g_l: g_r + 1] if min_len < sys.maxsize else ''
+"""
+101. Remove Duplicates from Sorted Array II
+https://www.lintcode.com/problem/remove-duplicates-from-sorted-array-ii/my-submissions
+Given a sorted array, remove the duplicates in place such that each element appear at most twice and return the new length.
+If a number appears more than two times, then keep the number appears twice in array after remove.
+Input:  [1,1,1,2,2,3] Output: 5 Explanation: the length is 5: [1,1,2,2,3]
+"""
+    #前驱
+    def removeDuplicates(self, a):
+        l, cnt = 0, 1 #l 代表 r 发现的数字该放的位置
+
+        for r in range(1, len(a)):
+            cnt = cnt + 1 if a[l] == a[r] else 1
+
+            if cnt <= 2:
+                l += 1
+                a[l] = a[r]
+
+        return l + 1
+"""
+102. Linked List Cycle
+https://www.lintcode.com/problem/linked-list-cycle/description
+Given a linked list, determine if it has a cycle in it.
+"""
+    def hasCycle(self, head):
+        s = f = head
+
+        while f and f.next:
+            f, s = f.next.next, s.next
+
+            if f == s:
+                return True
+
+        return False
+"""
+103. Linked List Cycle II
+https://www.lintcode.com/problem/linked-list-cycle-ii/description
+Given a linked list, return the node where the cycle begins.
+使用双指针判断链表中是否有环，慢指针每次走一步，快指针每次走两步，若链表中有环，则两指针必定相遇。
+假设环的长度为l，环上入口距离链表头距离为a，两指针第一次相遇处距离环入口为b，则另一段环的长度为c=l-b，
+由于快指针走过的距离是慢指针的两倍，则有a+l+b=2*(a+b),又有l=b+c，
+可得a=c，故当判断有环时(slow==fast)时，从头移动慢指针，同时移动快指针，两指针相遇处即为环的入口。
+"""
+    def detectCycle(self, head):
+        s = f = head
+
+        if not f or not f.next:
+            return None
+
+        while f and f.next:
+            s, f = s.next, f.next.next
+
+            if s == f:
+                break
+
+        if s != f:
+            return None
+
+        s = head
+        while s != f:
+            s, f = s.next, f.next
+
+        return s
+"""
+104. Merge K Sorted Lists
+https://www.lintcode.com/problem/merge-k-sorted-lists/description
+Merge k sorted linked lists and return it as one sorted list.
+Example Input: [2->6->null,5->null,7->null] Output:  2->5->6->7->null
+"""
+    #dvcq + merge sort
+    def mergeKLists(self, l):
+        return self.dvcq(l, 0, len(l) - 1)
+
+    def dvcq(self, l, s, e):
+        if l[s] == l[e]:
+            return l[s]
+
+        m = (s + e) // 2
+        return self.merge(self.dvcq(l, s, m), self.dvcq(l, m + 1, e))
+
+    def merge(self, p1, p2):
+        d = p = ListNode(sys.maxsize)
+
+        while p1 and p2:
+            if p1.val <= p2.val:
+                p.next = p1
+                p1 = p1.next
+            else:
+                p.next = p2
+                p2 = p2.next
+            p = p.next
+
+        p.next = p1 or p2
+
+        return d.next
+
+    def mergeKLists(self, l):
+        h = []
+        d = p = ListNode(sys.maxsize)
+        for n in l:
+            if n:
+                heapq.heappush(h, (n.val, n))
+
+        while h:
+            n = heapq.heappop(h)[1]
+            p.next = n
+            p = p.next
+            n = n.next
+            print(n.val)
+            if n:
+                heapq.heappush(h, (n.val, n))
+
+        return d.next
+
+    #两两归并
+    def mergeKLists(self, l):
+        q = collections.deque(l)
+
+        while len(q) > 1:
+            q.append(self.merge(q.popleft(), q.popleft()))
+
+        return q[0]
+
+    def merge(self, p1, p2):
+        d = p = ListNode(sys.maxsize)
+
+        while p1 and p2:
+            if p1.val <= p2.val:
+                p.next = p1
+                p1 = p1.next
+            else:
+                p.next = p2
+                p2 = p2.next
+            p = p.next
+
+        p.next = p1 or p2
+
+        return d.next
+"""
 165. Merge Two Sorted Lists
 https://www.lintcode.com/problem/merge-two-sorted-lists/description
 Merge two sorted (ascending) linked lists and return it as a new sorted list.
@@ -20,7 +218,372 @@ and sorted in ascending order.
         p.next = l1 if l1 else l2
 
         return h.next
-    
+"""
+197. Permutation Index
+https://www.lintcode.com/problem/permutation-index/description
+Given a permutation which contains no repeated number,
+find its index in all the permutations of these numbers, which are ordered in lexicographical order. The index begins at 1.
+"""
+    @highlight
+    def permutationIndex(self, a):
+        n, p, idx = len(a), 1, 1
+
+        for i in range(n - 2, -1, -1):
+            cnt = 0
+
+            for j in range(i + 1, n):
+                if a[i] > a[j]:
+                   cnt += 1
+
+            idx += cnt * p
+            p *= len(a) - i
+
+        return idx
+"""
+198. Permutation Index II
+https://www.lintcode.com/problem/permutation-index-ii/description
+Given a permutation which may contain repeated numbers,
+find its index in all the permutations of these numbers, which are ordered in lexicographical order. The index begins at 1.
+"""
+    @highlight
+    def permutationIndexII(self, a):
+        n, p, d_p, idx, cntr = len(a), 1, 1, 1, {}
+
+        for i in range(n - 1, -1, -1):
+            cntr[a[i]] = cntr.get(a[i], 0) + 1
+            d_p *= cntr[a[i]]
+
+            cnt = 0
+            for j in range(i + 1, n):
+                if a[i] > a[j]:
+                    cnt += 1
+
+            idx += cnt * p // d_p
+            p *= n - i
+
+        return idx
+"""
+200. Longest Palindromic Substring
+https://www.lintcode.com/problem/longest-palindromic-substring/description
+Given a string S, find the longest palindromic substring in S.
+You may assume that the maximum length of S is 1000, and there exists one unique longest palindromic substring.
+"""
+    def longestPalindrome(self, s):
+        lngst = ''
+
+        for m in range(len(s)):
+            lngst = max([lngst, self.plndrm(s, m, m), self.plndrm(s, m, m + 1)],  key=len)
+
+        return lngst
+
+    def plndrm(self, s, l, r):
+        lngth = 0
+
+        while l >= 0 and r < len(s):
+            if s[l] != s[r]:
+                break
+            lngth, l, r = lngth + 1, l - 1, r + 1
+
+        return s[l + 1 : r]
+"""
+228. Middle of Linked List
+https://www.lintcode.com/problem/middle-of-linked-list/description
+Find the middle node of a linked list.
+"""
+    def middleNode(self, head):
+        slow = fast = head
+
+        if not fast or not fast.next:
+            return fast
+
+        fast = slow.next
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+
+        return slow
+"""
+380. Intersection of Two Linked Lists
+https://www.lintcode.com/problem/intersection-of-two-linked-lists/description
+Write a program to find the node at which the intersection of two singly linked lists begins.
+Input:
+	A:          a1 → a2
+	                   ↘
+	                     c1 → c2 → c3
+	                   ↗
+	B:     b1 → b2 → b3
+"""
+#1 2 3
+#      4 5
+#  9 8
+#             ===
+#1 2 3 4 5 9 8 4 5
+#9 8 4 5 1 2 3 4 5
+#             ===
+    @highlight
+    def getIntersectionNode(self, headA, headB):
+        a, b = headA, headB
+        while a != b:
+            a = a.next if a else headB
+            b = b.next if b else headA
+        return a
+"""
+384. Longest Substring Without Repeating Characters
+https://www.lintcode.com/problem/longest-substring-without-repeating-characters/description
+Given a string, find the length of the longest substring without repeating characters.
+Input: "abcabcbb" Output: 3 Input: "bbbbb" Output: 1
+#思路：前指针移动到第一个重复数字，打擂台记录全局最大值， 后指针前移直到删除重复数字第一次出现的位置
+"""
+    #前驱， 好处是后轮不会移动整个array
+    def lengthOfLongestSubstring(self, a):
+        l, s, lngst = 0, set(), 0
+        #
+        for r in range(len(a)):
+
+            while a[r] in s:
+                s.remove(a[l])
+                l += 1
+
+            if a[r] not in s:
+                s.add(a[r])
+            lngst = max(lngst, r - l + 1)
+
+        return lngst
+    #后驱，前轮探路
+    def lengthOfLongestSubstring(self, a):
+        r, s, lngst = 0, set(), 0
+
+        for l in range(len(a)):
+
+            while r < len(a) and a[r] not in s:
+                s.add(a[r])
+                r += 1
+
+            lngst = max(lngst, r - l)
+            s.remove(a[l])
+
+        return lngst
+"""
+386. Longest Substring with At Most K Distinct Characters
+https://www.lintcode.com/problem/longest-substring-with-at-most-k-distinct-characters/my-submissions
+Given a string S, find the length of the longest substring T that contains at most k distinct characters.
+"""
+    @hightlight
+    def lengthOfLongestSubstringKDistinct(self, a, k):
+        l, cntr, lngst = 0, {}, 0
+
+        for r in range(len(a)):
+            cntr[a[r]] = cntr.get(a[r], 0) + 1
+
+            if len(cntr) <= k:
+                lngst = max(lngst, r - l + 1)
+
+            while len(cntr) > k:
+                cntr[a[l]] -= 1
+                if cntr[a[l]] == 0:
+                    cntr.pop(a[l])
+                l += 1
+
+        return lngst
+
+    def lengthOfLongestSubstringKDistinct(self, a, k):
+        r, cntr, lngst = 0, {}, 0
+
+        if k == 0:
+            return 0
+        for l in range(len(a)):
+
+            while r < len(a) and (len(cntr) < k or len(cntr) == k and a[r] in cntr):
+                cntr[a[r]] = cntr.get(a[r], 0) + 1
+                r += 1
+
+            lngst = max(lngst, r - l)
+
+            cntr[a[l]] -= 1
+            if cntr[a[l]] == 0:
+                cntr.pop(a[l])
+
+        return lngst
+"""
+404. Subarray Sum II
+https://www.lintcode.com/problem/subarray-sum-ii/description
+Given an positive integer array A and an interval. Return the number of subarrays whose sum is in the range of given interval.
+Input: A = [1, 2, 3, 4], start = 1, end = 3 Output: 4
+#思路：3指针 + win_sum 维持两个窗口 < start, <= end, 注意 < start, 等于start的交给end窗口
+"""
+    @highlight
+    def subarraySumII(self, a, start, end):
+        l, r, l_sum, r_sum, ans, n = 0, 0, 0, 0, 0, len(a)
+
+        for i in range(n):
+            l, r = max(i, l), max(i, r)
+
+            while l < n and l_sum + a[l] < start:
+                l_sum += a[l]
+                l += 1
+            while r < n and r_sum + a[r] <= end:
+                r_sum += a[r]
+                r += 1
+
+            if r > l:
+                ans += r - l
+
+            if l > i:
+                l_sum -= a[i]
+            if r > i:
+                r_sum -= a[i]
+
+        return ans
+"""
+406. Minimum Size Subarray Sum
+https://www.lintcode.com/problem/submatrix-sum/description
+Given an array of n positive integers and a positive integer s, find the minimal length of a subarray of which the sum ≥ s. If there isn't one, return -1 instead.
+Input: [2,3,1,2,4,3], s = 7 Output: 2
+# 2p + win_sum
+"""
+    def minimumSize(self, a, s):
+        l = 0
+        win_sum = 0
+        min_lngth = sys.maxsize
+
+        for r in range(len(a)):
+            win_sum += a[r]
+
+            while l <= r and win_sum >= s:
+                min_lngth = min(min_lngth, r - l + 1)
+                win_sum -= a[l]
+                l += 1
+
+        return min_lngth if min_lngth != sys.maxsize else -1
+"""
+415. Valid Palindrome
+https://www.lintcode.com/problem/valid-palindrome/description
+Given a string, determine if it is a palindrome,
+considering only alphanumeric characters and ignoring cases.
+"""
+    def isPalindrome(self, s):
+        l, r = 0, len(s) - 1
+
+        while l < r:
+            if not s[l].isalnum():
+                l += 1
+                continue
+            if not s[r].isalnum():
+                r -= 1
+                continue
+
+            if s[l].lower() != s[r].lower():
+                return False
+            l, r = l + 1, r - 1
+
+        return True
+
+"""
+521. Remove Duplicate Numbers in Array
+https://www.lintcode.com/problem/remove-duplicate-numbers-in-array/description
+Description：Given an array of integers, remove the duplicate numbers in it.
+You should: Do it in place in the array. Move the unique numbers to the front of the array.
+Return the total number of the unique numbers. You don't need to keep the original order of the integers.
+Example 1: Input: nums = [1,3,1,4,4,2] Output: [1,3,4,2,?,?] 4
+"""
+    def deduplication(self, a):
+        if not a:
+            return 0
+
+        a.sort()
+
+        l = 1 #前驱，
+        for r in range(1, len(a)):
+            if a[r - 1] == a[r]:
+                continue
+            a[l] = a[r]
+            l += 1
+
+        return l
+"""
+539. Move Zeroes
+https://www.lintcode.com/problem/move-zeroes/description
+Given an array nums, write a function to move all 0's to the end of it while maintaining the relative order of the non-zero elements.
+Input: nums = [0, 1, 0, 3, 12], Output: [1, 3, 12, 0, 0].
+Input: nums = [0, 0, 0, 3, 1], Output: [3, 1, 0, 0, 0].
+"""
+    def moveZeroes(self, a):
+        l = 0
+        for r in range(len(a)):
+            if a[r] == 0:
+                continue
+
+            a[l], a[r] = a[r], a[l]
+            l += 1
+        return l
+"""
+547. Intersection of Two Arrays
+https://www.lintcode.com/problem/intersection-of-two-arrays/description
+Given two arrays, write a function to compute their intersection.
+Input: nums1 = [1, 2, 2, 1], nums2 = [2, 2] Output: [2]
+#其他解法：binary_search
+"""
+    def intersection(self, a1, a2):
+        i, j = 0, 0
+        a1.sort()
+        a2.sort()
+        ans = []
+
+        while i < len(a1) and j < len(a2):
+            if a1[i] == a2[j] and (not ans or ans[-1] != a1[i]):
+                ans.append(a1[i])
+                i, j = i + 1, j + 1
+            elif a1[i] < a2[j]:
+                i += 1
+            else:
+                j += 1
+
+        return ans
+
+    def intersection(self, a1, a2):
+        s1, ans = set(a1), set()
+
+        for e in a2:
+            if e in s1:
+                ans.add(e)
+
+        return list(ans)
+
+    def intersection(self, a1, a2):
+        return list(set(a1) & set(a2))
+"""
+548. Intersection of Two Arrays II
+https://www.lintcode.com/problem/intersection-of-two-arrays-ii/description
+Given two arrays, write a function to compute their intersection.
+Input: nums1 = [1, 2, 2, 1], nums2 = [2, 2] Output: [2, 2]
+"""
+    def intersection(self, a1, a2):
+        i, j = 0, 0
+        a1.sort()
+        a2.sort()
+        ans = []
+
+        while i < len(a1) and j < len(a2):
+            if a1[i] == a2[j]:
+                ans.append(a1[i])
+                i, j = i + 1, j + 1
+            elif a1[i] < a2[j]:
+                i += 1
+            else:
+                j += 1
+
+        return ans
+
+    def intersection(self, nums1, nums2):
+        d = collections.Counter(nums1)
+
+        rslt = []
+        for num in nums2:
+            if d[num] > 0:
+                d[num] -= 1
+                rslt.append(num)
+
+        return rslt
 """
 604. Window Sum
 https://www.lintcode.com/problem/window-sum/description

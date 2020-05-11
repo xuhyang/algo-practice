@@ -59,7 +59,7 @@ Challenge: O(n2) time is acceptable. Can you do it in O(n) time.
         n, max_lngth, l, r = len(s), 0, 0, 0
         f = [[False] * n for _ in range(n)]
 
-        for i in range(n):
+        for i in range(n): #这里只能用true false， 因为f[i - 1][j + 1] = True, f[i][j]才可能true
             f[i][i] = True
 
         for i in range(1, n):
@@ -73,6 +73,29 @@ Challenge: O(n2) time is acceptable. Can you do it in O(n) time.
                     l, r = i, j
 
         return s[l : r + 1]
+"""
+667. Longest Palindromic Subsequence
+https://www.lintcode.com/problem/longest-palindromic-subsequence/description
+Given a string s, find the longest palindromic subsequence's length in s. You may assume that the maximum length of s is 1000.
+Input: "bbbab" Output: 4 Explanation: One possible longest palindromic subsequence is "bbbb".
+Input: "bbbbb" Output: 5
+"""
+    def longestPalindromeSubseq(self, s):
+        n = len(s)
+        f = [[0] * n for _ in range(n)]
+
+        for i in range(n):
+            f[i][i] = 1
+
+        for l in range(2, n + 1):
+            for i in range(n - l + 1):
+                j = i + l - 1
+                if s[i] == s[j]:
+                    f[i][j] = f[i + 1][j - 1] + 2
+                else:
+                    f[i][j] = max(f[i + 1][j], f[i][j - 1])
+
+        return f[0][-1] if s else 0
 """
 476. Stone Game
 https://www.lintcode.com/problem/stone-game/description

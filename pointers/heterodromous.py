@@ -1,5 +1,186 @@
 class Heterodromous:
 """
+56. Two Sum
+https://www.lintcode.com/problem/two-sum/description
+Given an array of integers, find two numbers such that they add up to a specific target number.
+The function twoSum should return indices of the two numbers such that they add up to the target,
+where index1 must be less than index2. Please note that your returned answers (both index1 and index2) are zero-based.
+"""
+    def twoSum(self, a, t):
+        d = {}
+
+        for i in range(len(a)):
+            if a[i] in d:
+                return [i, d[a[i]]] if i < d[a[i]] else [d[a[i]], i]
+            else:
+                d[t - a[i]] = i
+
+        return [-1, -1]
+
+    def twoSum(self, a, t):
+        a = [(e, i) for i, e in enumerate(a)]
+        l, r = 0, len(a) - 1
+        a.sort()
+
+        while l < r:
+            sum = a[l][0] + a[r][0]
+
+            if sum == t:
+                return sorted([a[l][1], a[r][1]])
+            if sum < t:
+                l += 1
+            else:
+                r -= 1
+
+        return None
+"""
+57. 3Sum
+https://www.lintcode.com/problem/3sum/description
+Given an array S of n integers, are there elements a, b, c in S such that a + b + c = 0?
+Find all unique triplets in the array which gives the sum of zero.
+"""
+    def threeSum(self, a):
+        a, n, rslt = sorted(a), len(a), []
+
+        for i in range(n):
+            if i > 0 and a[i - 1] == a[i]: #i剪枝
+                continue
+            l, r = i + 1, n - 1
+            while l < r:
+                sum = a[l] + a[r]
+                if sum < -a[i] or l > i + 1 and a[l - 1] == a[l]: #l 剪枝
+                    l += 1
+                elif sum > -a[i] or r < n - 1 and a[r] == a[r + 1]: # r剪枝
+                    r -= 1
+                else:
+                    rslt.append([a[i], a[l], a[r]])
+                    l, r = l + 1, r - 1
+        return rslt
+"""
+58. 4Sum
+https://www.lintcode.com/problem/4sum/description
+Given an array S of n integers, are there elements a, b, c, and d in S such that a + b + c + d = target?
+Find all unique quadruplets in the array which gives the sum of target.
+Input:[1,0,-1,0,-2,2],0 Output: [[-1, 0, 0, 1], [-2, -1, 1, 2], [-2, 0, 0, 2]]
+"""
+    def fourSum(self, a, t):
+        a, n, ans = sorted(a), len(a), []
+
+        for i in range(n - 3):
+            if i > 0 and a[i - 1] == a[i]: #i剪枝
+                continue
+            for j in range(i + 1, n - 2):
+                if j > i + 1 and a[j - 1] == a[j]: #j剪枝
+                    continue
+
+                s, l, r = a[i] + a[j], j + 1, n - 1
+                while l < r:
+                    t_s = s + a[l] + a[r]
+
+                    if t_s < t or l > j + 1 and a[l - 1] == a[l]: #l剪枝
+                        l += 1
+                    elif t_s > t or r < n - 1 and a[r] == a[r + 1]:#r剪枝
+                        r -= 1
+                    else:
+                        ans.append([a[i], a[j], a[l], a[r]])
+                        l, r = l + 1, r - 1
+
+        return ans
+"""
+59. 3Sum Closest
+https://www.lintcode.com/problem/3sum-closest/description
+Given an array S of n integers, find three integers in S such that the sum is closest to a given number, target. Return the sum of the three integers.
+Input:[2,7,11,15],3 Output:20 Explanation: 2+7+11=20
+Input:[-1,2,1,-4],1 Output:2 Explanation: -1+2+1=2
+Challenge O(n^2) time, O(1) extra space
+Notice You may assume that each input would have exactly one solution.
+"""
+    def threeSumClosest(self, a, t):
+        a, ans, n = sorted(a), sys.maxsize, len(a)
+
+        for i in range(n):
+            if i > 0 and a[i - 1] == a[i]:
+                continue
+            l, r = i + 1, len(a) - 1
+            while l < r:
+                s = a[i] + a[l] + a[r]
+
+                if abs(s - t) < abs(ans - t):
+                    ans = s
+
+                if s < t or l > i + 1 and a[l - 1] == a[l]:
+                    l += 1
+                elif s > t or r < n - 1 and a[r] == a[r + 1]:
+                    r -= 1
+                else:
+                    break
+
+        return ans
+"""
+415. Valid Palindrome
+http://www.lintcode.com/problem/valid-palindrome-ii/
+Given a string, determine if it is a palindrome, considering only alphanumeric characters and ignoring cases.
+Input: "A man, a plan, a canal: Panama" Output: true Explanation: "amanaplanacanalpanama"
+Input: "race a car" Output: false Explanation: "raceacar" Challenge O(n) time without extra memory.
+Notice Have you consider that the string might be empty? This is a good question to ask during an interview.
+For the purpose of this problem, we define empty string as valid palindrome.
+"""
+    def isPalindrome(self, s):
+        l, r = 0, len(s) - 1
+
+        while l < r:
+            if not s[l].isalnum():
+                l += 1
+                continue
+            if not s[r].isalnum():
+                r -= 1
+                continue
+
+            if s[l].lower() != s[r].lower():
+                return False
+            l, r = l + 1, r - 1
+
+        return True
+"""
+443. Two Sum - Greater than target
+https://www.lintcode.com/problem/two-sum-greater-than-target/description
+Given an array of integers, find how many pairs in the array such that their sum is bigger than a specific target number. Please return the number of pairs
+"""
+    def twoSum2(self, a, t):
+        l, r = 0, len(a) - 1
+        a.sort()
+        cnt = 0
+
+        while l < r:
+            if a[l] + a[r] > t:
+                cnt += r - l # 大于t，代表当前l，l + 1...2..到r 符合条件
+                r -= 1
+            else:
+                l += 1
+        return cnt
+"""
+533. Two Sum - Closest to target
+https://www.lintcode.com/problem/two-sum-closest-to-target/description
+Given an array nums of n integers, find two integers in nums such that the sum is closest to a given number, target.
+Return the absolute value of difference between the sum of the two integers and the target.
+"""
+    def twoSumClosest(self, a, t):
+        l, r, min_diff = 0, len(a) - 1, sys.maxsize
+        a.sort()
+
+        while l < r:
+            s = a[l] + a[r]
+            min_diff = min(min_diff, abs(s - t))
+
+            if s < t:
+                l += 1
+            elif s > t:
+                r -= 1
+            else:
+                break
+
+        return min_diff           
+"""
 587. Two Sum - Unique pairs
 https://www.lintcode.com/problem/two-sum-unique-pairs/description
 Given an array of integers, find how many unique pairs in the array such that their sum is equal to a specific target number. Please return the number of pairs.

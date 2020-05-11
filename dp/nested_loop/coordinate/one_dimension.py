@@ -140,7 +140,7 @@ Challenge O(n) time and O(1) memory.
             f[i] = max(f[i - 1], f[i - 2] + a[i - 1])
 
         return f[-1]
-        
+
 """
 602. Russian Doll Envelopes
 https://www.lintcode.com/problem/russian-doll-envelopes/description
@@ -173,3 +173,45 @@ of elements in this subset satisfies: Si % Sj = 0 or Sj % Si = 0.
             t = p[t]
 
         return ans
+"""
+398. Longest Continuous Increasing Subsequence II
+https://www.lintcode.com/problem/longest-continuous-increasing-subsequence-ii/description
+Give you an integer matrix (with row size n, column size m)，
+find the longest increasing continuous subsequence in this matrix.
+(The definition of the longest increasing continuous subsequence here
+can start at any row or column and go up/down/right/left any direction).
+Given a matrix:
+[
+  [1 ,2 ,3 ,4 ,5],
+  [16,17,24,23,6],
+  [15,18,25,22,7],
+  [14,19,20,21,8],
+  [13,12,11,10,9]
+]
+return 25
+Challenge O(nm) time and memory.
+"""
+    def longestContinuousIncreasingSubsequence2(self, A):
+        if not A or not A[0]:
+            return 0
+            
+        n, m = len(A), len(A[0])
+        points = []
+        for i in range(n):
+            for j in range(m):
+                points.append((A[i][j], i, j))
+
+        points.sort()
+
+        longest_hash = {}
+        for i in range(len(points)):
+            key = (points[i][1], points[i][2])
+            longest_hash[key] = 1
+            for dx, dy in [(1, 0), (0, -1), (-1, 0), (0, 1)]:
+                x, y = points[i][1] + dx, points[i][2] + dy
+                if x < 0 or x >= n or y < 0 or y >= m:
+                    continue
+                if A[x][y] < points[i][0]:
+                    longest_hash[key] = max(longest_hash[key], longest_hash[(x, y)] + 1)
+
+        return max(longest_hash.values())

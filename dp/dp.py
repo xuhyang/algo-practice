@@ -34,6 +34,7 @@ Input: m = 2, n = 36 Output: 8
         for j in range(1, m + 1):
             f[1][j] = 1
 
+
         for i in range(2, n + 1):
             for j in range(2, m + 1):
                 f[i][j] = sys.maxsize
@@ -41,7 +42,5 @@ Input: m = 2, n = 36 Output: 8
                     f[i][j] = min(f[i][j], max(f[k - 1][j - 1], f[i - k][j]) + 1)
 
         return f[-1][-1]
-
-https://www.lintcode.com/problem/longest-continuous-increasing-subsequence-ii/description
 
 https://www.lintcode.com/problem/card-game-ii/

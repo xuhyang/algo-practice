@@ -556,6 +556,30 @@ Output: 4
                 days += 1
         return  days if cnt == total_p else -1
 """
+600. Smallest Rectangle Enclosing Black Pixels
+https://www.lintcode.com/problem/smallest-rectangle-enclosing-black-pixels/description
+An image is represented by a binary matrix with 0 as a white pixel and 1 as a black pixel. The black pixels are connected,
+i.e., there is only one black region. Pixels are connected horizontally and vertically. Given the location (x, y) of one of the black pixels, return the area of the smallest (axis-aligned) rectangle that encloses all black pixels.
+Input：["0010","0110","0100"]，x=0，y=2 Output：6 Explanation：The upper left coordinate of the matrix is (0,1), and the lower right coordinate is (2,2).
+Input：["1110","1100","0000","0000"], x = 0, y = 1 Output：6 Explanation： The upper left coordinate of the matrix is (0, 0), and the lower right coordinate is (1,2).
+"""
+    def minArea(self, image, x, y):
+        q, s = collections.deque([(x, y)]), set([(x, y)])
+        n, m = len(image), len(image[0])
+        x_min, y_min, x_max, y_max = n, m, 0, 0
+
+        while q:
+            x, y = q.popleft()
+            x_min, y_min, x_max, y_max = min(x_min, x), min(y_min, y), max(x_max, x), max(y_max, y)
+
+            for dx, dy in ((0, -1), (-1, 0), (0, 1), (1, 0)):
+                nxt = (nx, ny) = x + dx, y + dy
+                if 0 <= nx < n and 0 <= ny < m and image[nx][ny] == '1' and nxt not in s:
+                    q.append(nxt)
+                    s.add(nxt)
+
+        return (x_max - x_min + 1) * (y_max - y_min + 1)
+"""
 618. Search Graph Nodes
 https://www.lintcode.com/problem/search-graph-nodes/description
 Given a undirected graph, a node and a target, return the nearest node to given node which value of it is target, return NULL if you can't find.

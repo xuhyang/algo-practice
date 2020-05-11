@@ -1,5 +1,52 @@
 class tree_traversal:
 """
+86. Binary Search Tree Iterator
+https://www.lintcode.com/problem/binary-search-tree-iterator/description
+Design an iterator over a binary search tree with the following rules:
+Elements are visited in ascending order (i.e. an in-order traversal)
+next() and hasNext() queries run in O(1) time in average.
+Input:  {10,1,11,#,6,#,12} Output:  [1, 6, 10, 11, 12] Explanation: The BST is look like this:
+  10
+  /\
+ 1 11
+  \  \
+   6  12
+You can return the inorder traversal of a BST [1, 6, 10, 11, 12]
+Input: {2,1,3} Output: [1,2,3] Explanation: The BST is look like this:
+  2
+ / \
+1   3
+You can return the inorder traversal of a BST tree [1,2,3]
+Challenge Extra memory usage O(h), h is the height of the tree.
+Super Star: Extra memory usage O(1)
+"""
+    class BSTIterator:
+        """
+        @param: root: The root of binary tree.
+        """
+        def __init__(self, r):
+            self.s = []
+            while r:
+                self.s.append(r)
+                r = r.left
+        """
+        @return: True if there has next node, or false
+        """
+        def hasNext(self, ):
+            return len(self.s) > 0
+        """
+        @return: return next node
+        """
+        def next(self, ):
+            nxt = self.s.pop()
+            n = nxt.right
+
+            while n:
+                self.s.append(n)
+                n = n.left
+
+            return nxt
+"""
 900. Closest Binary Search Tree Value
 https://www.lintcode.com/problem/closest-binary-search-tree-value/description
 Given a non-empty binary search tree and a target value, find the value in the BST that is closest to the target.
@@ -55,7 +102,7 @@ You are guaranteed to have only one unique set of k values in the BST that are c
     def closestKValues(self, n, t, k):
         prv, nxt, rslt = [], [], []
 
-        while n:
+        while n: #走到底， 因为bst下一个，是右子最左， 上一个左子最右
             if n.val <= t:
                 prv.append(n)
                 n = n.right
