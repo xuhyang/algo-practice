@@ -1,7 +1,7 @@
 class Solution:
 """
-https://www.lintcode.com/problem/first-position-of-target/description
 14. First Position of Target
+https://www.lintcode.com/problem/first-position-of-target/description
 For a given sorted array (ascending order) and a target number, find the first index of this number in O(log n) time complexity.
 If the target number does not exist in the array, return -1.
 """
@@ -22,6 +22,51 @@ If the target number does not exist in the array, return -1.
             return r
         return -1
 """
+61. Search for a Range
+https://www.lintcode.com/problem/search-for-a-range/description
+Given a sorted array of n integers, find the starting and ending position of a given target value.
+If the target is not found in the array, return [-1, -1].
+"""
+    def searchRange(self, a, t):
+        rslt = [-1, -1]
+
+        l, r = 0, len(a) - 1
+        if l > r:
+            return rslt
+
+        while l + 1 < r:
+            m = (l + r) // 2
+
+            if a[m] < t:
+                l = m
+            else:
+                r = m
+
+        if a[l] == t:
+            rslt[0] = l
+        elif a[r] == t:
+            rslt[0] = r
+        else:
+            return rslt
+
+        l, r = 0, len(a) - 1
+        while l + 1 < r:
+            m = (l + r) // 2
+
+            if a[m] <= t:
+                l = m
+            else:
+                r = m
+
+        if a[r] == t:
+            rslt[1] = r
+        elif a[l] == t:
+            rslt[1] = l
+        else:
+            rslt[1] = rslt[0]
+
+        return rslt
+"""
 458. Last Position of Target
 #https://www.lintcode.com/problem/last-position-of-target/description?_from=ladder&&fromId=1
 #Find the last position of a target number in a sorted array. Return -1 if target does not exist.
@@ -30,9 +75,6 @@ If the target number does not exist in the array, return -1.
 #Time: O(logN), Space O(1)
 """
     def lastPosition(self, a, t):
-        if len(a) == 0:
-            return -1
-
         l, r = 0, len(a) - 1
 
         while l + 1 < r:
@@ -43,14 +85,14 @@ If the target number does not exist in the array, return -1.
             else:
                 r = m
 
-        if a[r] == t:
+        if a and a[r] == t:
             return r
-        if a[l] == t:
+        if a and a[l] == t:
             return l
         return -1
 """
 585. Maximum Number in Mountain Sequence
-#https://www.lintcode.com/problem/maximum-number-in-mountain-sequence/description?_from=ladder&&fromId=1
+#https://www.lintcode.com/problem/maximum-number-in-mountain-sequence/description
 #Given a mountain sequence of n integers which, find the mountain top.
 #Example 1: #Input: nums = [1, 2, 4, 8, 6, 3] #Output: 8
 #关键字：increase firstly and then decrease
@@ -159,7 +201,6 @@ Time, O(logN), spaceO(1)
         if reader.get(end) == target:
             return end
         return -1
-
 #Suppose a sorted array is rotated at some pivot unknown to you beforehand.
 #(i.e., 0 1 2 4 5 6 7 might become 4 5 6 7 0 1 2).Find the minimum element.
 #关键字： sorted, array, rotated.
@@ -215,65 +256,6 @@ Time, O(logN), spaceO(1)
                 start = mid
 
         return nums[start] if nums[start] < nums[end] else nums[end]
-#https://www.lintcode.com/problem/fast-power/description?_from=ladder&&fromId=1
-#Calculate the a^n % b where a, b and n are all 32bit non-negative integers.
-#模运算与基本四则运算有些相似，但是除法例外。其规则如下：
-# (a + b) % p = (a % p + b % p) % p （1）
-# (a - b) % p = (a % p - b % p + p) % p （2）
-# (a * b) % p = (a % p * b % p) % p （3）
-# a ^ b % p = ((a % p)^b) % p （4）
-    def fastPower(self, a, b, n):
-        ans, tmp = 1, a
-
-        while n != 0:
-            if n % 2 == 1:
-                ans = (ans * tmp) % b
-            tmp = (tmp * tmp) % b
-            n = n // 2
-        return ans % b
-#https://www.lintcode.com/problem/find-peak-element/description?_from=ladder&&fromId=1
-#There is an integer array which has the following features:
-#The numbers in adjacent positions are different. #A[0] < A[1] && A[A.length - 2] > A[A.length - 1].
-#We define a position P is a peak if: A[P] > A[P-1] && A[P] > A[P+1]
-#Find a peak element in this array. Return the index of the peak.
-#关键字：array find a peak element
-#思路：因为 暴力解 O(N), 所以 binary search. 因为 已知A[0],A[1]升序 A[n],A[n-1]升序，所以 找mid升序的half
-#利用binary search做 排除法
-    def findPeak(self, A):
-        start, end = 1, len(A) - 2 #or start, end = 0, len(nums) - 1
-
-        while start + 1 < end:
-            mid = (start + end) // 2
-
-            if A[mid - 1] < A[mid] > A[mid + 1]: #peak found
-                return mid
-            elif A[mid - 1] > A[mid]: #left has rising order
-                end = mid
-            else:
-                start = mid
-
-        if A[start] > A[end]:
-            return start
-        return end
-#https://www.lintcode.com/problem/first-bad-version/description?_from=ladder&&fromId=1
-#The code base version is an integer start from 1 to n. One day, someone committed a bad version in the code case,
-#so it caused this version and the following versions are all failed in the unit tests. Find the first bad version.
-#关键字 first，
-#思路 因为 暴力解O(N), 所以想到binary search. 因为first 所以 找first position
-    def findFirstBadVersion(self, n):
-        start, end = 1, n
-
-        while start + 1 < end:
-            mid = (start + end) // 2
-
-            if SVNRepo.isBadVersion(mid):
-                end = mid
-            else:
-                start = mid
-
-        if SVNRepo.isBadVersion(start):
-            return start
-        return end
 #https://www.lintcode.com/problem/search-in-rotated-sorted-array/description?_from=ladder&&fromId=1
 #Suppose a sorted array is rotated at some pivot unknown to you beforehand. (i.e., 0 1 2 4 5 6 7 might become 4 5 6 7 0 1 2).
 #You are given a target value to search. If found in the array return its index, otherwise return -1.
@@ -305,52 +287,6 @@ Time, O(logN), spaceO(1)
         if A[end] == target:
             return end
         return -1
-"""
-61. Search for a Range
-https://www.lintcode.com/problem/search-for-a-range/description
-https://www.lintcode.com/problem/search-for-a-range/description
-Given a sorted array of n integers, find the starting and ending position of a given target value.
-If the target is not found in the array, return [-1, -1].
-"""
-    def searchRange(self, a, t):
-        rslt = [-1, -1]
-
-        l, r = 0, len(a) - 1
-        if l > r:
-            return rslt
-
-        while l + 1 < r:
-            m = (l + r) // 2
-
-            if a[m] < t:
-                l = m
-            else:
-                r = m
-
-        if a[l] == t:
-            rslt[0] = l
-        elif a[r] == t:
-            rslt[0] = r
-        else:
-            return rslt
-
-        l, r = 0, len(a) - 1
-        while l + 1 < r:
-            m = (l + r) // 2
-
-            if a[m] <= t:
-                l = m
-            else:
-                r = m
-
-        if a[r] == t:
-            rslt[1] = r
-        elif a[l] == t:
-            rslt[1] = l
-        else:
-            rslt[1] = rslt[0]
-
-        return rslt
 """
 62. Search in Rotated Sorted Array
 https://www.lintcode.com/problem/search-in-rotated-sorted-array/description
@@ -419,6 +355,7 @@ The code base version is an integer start from 1 to n.
 One day, someone committed a bad version in the code case,
 so it caused this version and the following versions are all failed in the unit tests. Find the first bad version.
 You can call isBadVersion to help you determine which version is the first bad one. The details interface can be found in the code's annotation part.
+#思路 因为 暴力解O(N), 所以想到binary search. 因为first 所以 找first position
 """
     class SVNRepo:#mock
        @classmethod
@@ -447,6 +384,9 @@ A[0] < A[1] && A[A.length - 2] > A[A.length - 1].
 We define a position P is a peak if:
 A[P] > A[P-1] && A[P] > A[P+1]
 Find a peak element in this array. Return the index of the peak.
+#关键字：array find a peak element
+#思路：因为 暴力解 O(N), 所以 binary search. 因为 已知A[0],A[1]升序 A[n],A[n-1]升序，所以 找mid升序的half
+#利用binary search做 排除法
 """
     def findPeak(self, a):
         l, r = 1, len(a) - 2  #注意
@@ -460,43 +400,6 @@ Find a peak element in this array. Return the index of the peak.
                 r = m
 
         return l if a[l] > a[r] else r
-"""
-76. Longest Increasing Subsequence
-https://www.lintcode.com/problem/longest-increasing-subsequence/my-submissions
-Given a sequence of integers, find the longest increasing subsequence (LIS).
-You code should return the length of the LIS.
-Input: [4,2,4,5,3,7] Output: 4 Explanation: LIS is [2,4,5,7]
-"""
-    def longestIncreasingSubsequence(self, a):
-        ans = [a[0]] if a else []
-
-        for e in a:
-            if ans[-1] < e:
-                ans.append(e)
-                continue
-
-            l, r = 0, len(ans) - 1
-            while l + 1 < r:
-                m = (l + r) // 2
-
-                if ans[m] < e:
-                    l = m
-                else:
-                    r = m
-            ans[l if e < ans[l] else r] = e #insert into lis, 破坏原本lis 但是最大长度不变
-
-        return len(ans)
-
-    def longestIncreasingSubsequence(self, a):
-        n = len(a)
-        f = [1] * n if a else [0]
-
-        for i in range(n):
-            for j in range(i):
-                if a[j] < a[i]:
-                    f[i] = max(f[i], f[j] + 1)
-
-        return max(f)
 """
 159. Find Minimum in Rotated Sorted Array
 https://www.lintcode.com/problem/find-minimum-in-rotated-sorted-array/description
@@ -568,9 +471,6 @@ https://www.lintcode.com/problem/classical-binary-search/description
 Find any position of a target number in a sorted array. Return -1 if target does not exist.
 """
     def findPosition(self, a, t):
-        if not a:
-            return -1
-
         l, r = 0, len(a) - 1
 
         while l + 1 < r:
@@ -581,9 +481,9 @@ Find any position of a target number in a sorted array. Return -1 if target does
             else:
                 l = m
 
-        if a[l] == t:
+        if a and a[l] == t:
             return l
-        elif a[r] == t:
+        elif a and a[r] == t:
             return r
         return -1
 """
@@ -592,9 +492,6 @@ https://www.lintcode.com/problem/last-position-of-target/description
 Find the last position of a target number in a sorted array. Return -1 if target does not exist.
 """
     def lastPosition(self, a, t):
-        if len(a) == 0:
-            return -1
-
         l, r = 0, len(a) - 1
 
         while l + 1 < r:
@@ -605,9 +502,9 @@ Find the last position of a target number in a sorted array. Return -1 if target
             else:
                 r = m
 
-        if a[r] == t:
+        if a and a[r] == t:
             return r
-        if a[l] == t:
+        if a and a[l] == t:
             return l
         return -1
 """
@@ -684,7 +581,7 @@ Example Input: [1, 3, 3, 4, 5] and target = 3,  Output: 2.
 547. Intersection of Two Arrays
 https://www.lintcode.com/problem/intersection-of-two-arrays/description
 Given two arrays, write a function to compute their intersection.
-#其他解法：two_pointer
+#其他解法：two_pointer, set
 """
     def intersection(self, a1, a2):
         a1, a2 = (a1, a2) if len(a1) > len(a2) else (a2, a1)
@@ -713,8 +610,55 @@ Given two arrays, write a function to compute their intersection.
 https://www.lintcode.com/problem/intersection-of-two-arrays-ii/description
 Given two arrays, write a function to compute their intersection.
 Input: nums1 = [1, 2, 2, 1], nums2 = [2, 2] Output: [2, 2]
-#不能用binary search 因为没有counter
 """
+    def intersection(self, a1, a2):
+        a1, a2 = (a1, sorted(a2)) if len(a1) > len(a2) else (a2, sorted(a1))
+        cnt, ans = {}, []
+
+        for e in a1:
+            if e in cnt:
+                if cnt[e] > 0:
+                    ans.append(e)
+                    cnt[e] -= 1
+                continue
+
+            i = -1
+            l, r = 0, len(a2) - 1
+
+            while l + 1 < r:
+                m = (l + r) // 2
+
+                if a2[m] < e:
+                    l = m
+                else:
+                    r = m
+
+            if a2 and a2[l] == e:
+                i = l
+            elif a2 and a2[r] == e:
+                i = r
+            if i == -1:
+                continue
+
+            l, r = 0, len(a2) - 1
+
+            while l + 1 < r:
+                m = (l + r) // 2
+
+                if a2[m] <= e:
+                    l = m
+                else:
+                    r = m
+
+            if a2 and a2[r] == e:
+                cnt[e] = r - i + 1
+            elif a2 and a2[l] == e:
+                cnt[e] = l - i + 1
+
+            ans.append(e)
+            cnt[e] -= 1
+
+        return ans
 """
 585. Maximum Number in Mountain Sequence
 https://www.lintcode.com/problem/maximum-number-in-mountain-sequence/description
@@ -800,39 +744,7 @@ Input：["1110","1100","0000","0000"], x = 0, y = 1 Output：6 Explanation：The
 
     def hasBlkOnCol(self, image, c):
 
-
         for i in range(len(image)):
             if image[i][c] == '1':
                 return True
         return False
-"""
-602. Russian Doll Envelopes
-https://www.lintcode.com/problem/russian-doll-envelopes/description
-Give a number of envelopes with widths and heights given as a pair of integers (w, h).
-One envelope can fit into another if and only if both the width and height of one envelope is greater than the width and height of the other envelope.
-Find the maximum number of nested layers of envelopes.
-Input：[[5,4],[6,4],[6,7],[2,3]] Output：3 Explanation： the maximum number of envelopes you can Russian doll is 3 ([2,3] => [5,4] => [6,7]).
-Input：[[4,5],[4,6],[6,7],[2,3],[1,1]] Output：4 Explanation：the maximum number of envelopes you can Russian doll is 4 ([1,1] => [2,3] => [4,5] / [4,6] => [6,7]).
-"""
-    @highlight
-    def maxEnvelopes(self, envelopes):
-        envelopes.sort(key = lambda e: (e[0], -e[1])) # -e[1] 为了好处理 相同 e[0]
-        rslt = [[sys.maxsize, sys.maxsize]]
-
-        for e in envelopes:
-            if rslt[-1][1] < e[1]: #因为sorted，e[i - 1][0] < e[i - 1][0] 只需判断 e[i - 1][1] < e[i - 1][1]； e[i - 1][0] == e[i - 1][0] 因为e[i][1]反排序不满足rslt[-1][1] < e[1]
-                rslt.append(e)
-                continue
-
-            l, r = 0, len(rslt) - 1
-            while l + 1 < r:
-                m = (l + r) // 2
-
-                if rslt[m][1] >= e[1]:
-                    r = m
-                else:
-                    l = m
-
-            rslt[l if rslt[l][1] > e[1] else r] = e #跟新当前答案， 保留部分最大长度答案直到被完全覆盖
-
-        return len(rslt)

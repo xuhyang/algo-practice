@@ -53,11 +53,6 @@ Both pop and top methods should return the value of first element.
             self.s2.append(e)
 
             return e
-
-122. Largest Rectangle in Histogram
-https://www.lintcode.com/problem/largest-rectangle-in-histogram/description
-126. Max Tree
-https://www.lintcode.com/problem/max-tree/description
 """
 224. Implement Three Stacks by Single Array
 https://www.lintcode.com/problem/implement-three-stacks-by-single-array/description
@@ -235,7 +230,6 @@ Given an expression s contains numbers, letters and brackets.
 Number represents the number of repetitions inside the brackets(can be a string or another expression)．Please expand expression to be a string.
 Input: S = 3[2[ad]3[pf]]xyz Output: "adadpfpfpfadadpfpfpfadadpfpfpfxyz"
 """
-
     def expressionExpand(self, s):
         stck = []
 

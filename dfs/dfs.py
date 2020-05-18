@@ -1,4 +1,5 @@
 class dfs:
+#dfs需要深度参数，深度参数可以隐藏在其他参数里，ex: len
 """
 10. String Permutation II
 https://www.lintcode.com/problem/string-permutation-ii/description
@@ -135,7 +136,6 @@ Input: candidates = [2, 3, 6, 7], target = 7 Output: [[7], [2, 2, 3]]
     def combinationSum(self, a, t):
         rslts = []
         self.dfs(sorted(a), t, [], rslts, 0)
-
         return rslts
 
     def dfs(self, a, t, rslt, rslts, i):
@@ -152,6 +152,35 @@ Input: candidates = [2, 3, 6, 7], target = 7 Output: [[7], [2, 2, 3]]
             rslt.append(a[j])
             self.dfs(a, t - a[j], rslt, rslts, j) #下一层只能选j和j后的数字，不能选j前的数字不然出现即223又232，322
             rslt.pop()
+"""
+153. Combination Sum II
+https://www.lintcode.com/problem/combination-sum-ii/description
+Given an array num and a number target.
+Find all unique combinations in num where the numbers sum to target.
+考点：135可以重复， 这题不可以
+"""
+    def combinationSum2(self, a, t):
+        rslts = []
+        self.dfs(sorted(a), rslts, [], t, 0)
+        return rslts
+
+    def dfs(self, a, rslts, rslt, t, i):
+
+        if t == 0:
+            rslts.append(list(rslt))
+            return
+        if t < 0:
+            return
+
+        for j in range(i, len(a)):
+            if j > i and a[j - 1] == a[j]:
+                continue
+
+            rslt.append(a[j])
+            self.dfs(a, rslts, rslt, t - a[j], j + 1)
+            rslt.pop()
+            \
+
 """
 33. N-Queens
 https://www.lintcode.com/problem/n-queens/description
@@ -189,8 +218,7 @@ Given a 2D board and a word, find if the word exists in the grid.
 The word can be constructed from letters of sequentially adjacent cell,
 where "adjacent" cells are those horizontally or vertically neighboring.
 The same letter cell may not be used more than once.
-Input：["ABCE","SFCS","ADEE"]，"ABCCED"
-Output：true
+Input：["ABCE","SFCS","ADEE"]，"ABCCED" Output：true
 [A B C E
  S F C S
  A D E E]
@@ -239,33 +267,6 @@ Input: n = 4, k = 2 Output: [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
         for j in range(i, n):
             rslt.append(j)
             self.dfs(n, rslts, rslt, k - 1, j + 1)
-            rslt.pop()
-"""
-153. Combination Sum II
-https://www.lintcode.com/problem/combination-sum-ii/description
-Given an array num and a number target.
-Find all unique combinations in num where the numbers sum to target.
-考点：135可以重复， 这题不可以
-"""
-    def combinationSum2(self, a, t):
-        rslts = []
-        self.dfs(sorted(a), rslts, [], t, 0)
-        return rslts
-
-    def dfs(self, a, rslts, rslt, t, i):
-
-        if t == 0:
-            rslts.append(list(rslt))
-            return
-        if t < 0:
-            return
-
-        for j in range(i, len(a)):
-            if j > i and a[j - 1] == a[j]:
-                continue
-
-            rslt.append(a[j])
-            self.dfs(a, rslts, rslt, t - a[j], j + 1)
             rslt.pop()
 """
 246. Binary Tree Path Sum II

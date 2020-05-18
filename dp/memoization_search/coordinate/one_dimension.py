@@ -31,34 +31,38 @@ Input: [4,2,4,5,3,7] Output: 4 Explanation: LIS is [2,4,5,7]
 
         return f[i] if a else 0
 """
-602. Russian Doll Envelopes
-https://www.lintcode.com/problem/russian-doll-envelopes/description
-Give a number of envelopes with widths and heights given as a pair of integers (w, h).
-One envelope can fit into another if and only if both the width and height of one envelope is greater than the width and height of the other envelope.
-Find the maximum number of nested layers of envelopes.
-Input：[[5,4],[6,4],[6,7],[2,3]] Output：3 Explanation：the maximum number of envelopes you can Russian doll is 3 ([2,3] => [5,4] => [6,7]).
-Input：[[4,5],[4,6],[6,7],[2,3],[1,1]] Output：4 Explanation：the maximum number of envelopes you can Russian doll is 4 ([1,1] => [2,3] => [4,5] / [4,6] => [6,7]).
+622. Frog Jump
+https://www.lintcode.com/problem/frog-jump/description
+A frog is crossing a river. The river is divided into x units and at each unit there may or may not exist a stone.
+The frog can jump on a stone, but it must not jump into the water.
+Given a list of stones' positions (in units) in sorted ascending order,
+determine if the frog is able to cross the river by landing on the last stone.
+Initially, the frog is on the first stone and assume the first jump must be 1 unit.
+If the frog's last jump was k units, then its next jump must be either k - 1, k, or k + 1 units.
+Note that the frog can only jump in the forward direction.
+Given stones = [0,1,3,5,6,8,12,17] Input: [0,1,3,5,6,8,12,17] Output: true Explanation: There are a total of 8 stones.
+The first stone at the 0th unit, second stone at the 1st unit,third stone at the 3rd unit, and so on...The last stone at the 17th unit.Return true.
+The frog can jump to the last stone by jumping 1 unit to the 2nd stone, then 2 units to the 3rd stone, then 2 units to the 4th stone, then 3 units to the 6th stone, 4 units to the 7th stone, and 5 units to the 8th stone.
+Given stones = `[0,1,2,3,4,8,9,11]` Input: [0,1,2,3,4,8,9,11] Output: false Explanation:
+Return false. There is no way to jump to the last stone as the gap between the 5th and 6th stone is too large.
 """
-"""
-603. Largest Divisible Subset
-https://www.lintcode.com/problem/largest-divisible-subset/description
-Given a set of distinct positive integers, find the largest subset such that every pair (Si, Sj)
-of elements in this subset satisfies: Si % Sj = 0 or Sj % Si = 0.
-"""
-    def largestDivisibleSubset(self, a):
-        a, n, ans, t = sorted(a), len(a), [], 0
-        f, p = [0] * n, [-1] * n
+    def canCross(self, a):
+        return self.dvcq({}, set(a), a[-1], a[0], 0)
 
-        for i in range(1, n):
-            for j in range(i):
-                if a[i] % a[j] == 0 and f[j] + 1 > f[i]:
-                    f[i], p[i] = f[j] + 1, j
+    def dvcq(self, f, s, t, e, i):
+        if (e, i) in f:
+            return f[(e, i)]
 
-                    if f[i] > f[t]:
-                        t = i
+        if e not in s or i < 0:
+            return False
 
-        while t != -1:
-            ans.append(a[t])
-            t = p[t]
+        if e == t:
+            return True
 
-        return ans
+        f[(e, i)] = False
+        for j in (-1, 0, 1):
+            if self.dvcq(f, s, t, e + i + j, i + j):
+                f[(e, i)] = True
+                break
+
+        return f[(e, i)]

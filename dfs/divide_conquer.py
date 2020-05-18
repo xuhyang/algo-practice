@@ -1,5 +1,103 @@
 class Divide_Conquer:
 """
+93. Balanced Binary Tree
+https://www.lintcode.com/problem/balanced-binary-tree/description
+Given a binary tree, determine if it is height-balanced.
+a height-balanced binary tree is defined as a binary tree in which the depth of
+the two subtrees of every node never differ by more than 1.
+"""
+    def isBalanced(self, rt):
+        return self.dvcq(rt)[0]
+
+    def dvcq(self, n):
+        if not n:
+            return True, 0
+
+        l_blncd, l_hght = self.dvcq(n.left)
+        r_blncd, r_hght = self.dvcq(n.right)
+
+        return l_blncd and r_blncd and abs(l_hght - r_hght) <= 1, max(l_hght, r_hght) + 1
+"""
+94. Binary Tree Maximum Path Sum
+https://www.lintcode.com/problem/binary-tree-maximum-path-sum/my-submissions
+Given a binary tree, find the maximum path sum. The path may start and end at any node in the tree.
+#考点：类似 41. Maximum Subarray
+"""
+    def maxPathSum(self, rt):
+        return self.dvcq(rt)[0]
+
+    def dvcq(self, n):
+        if not n:
+            return -sys.maxsize, 0
+
+        l_g_max, l_sub_pth = self.dvcq(n.left)
+        r_g_max, r_sub_pth = self.dvcq(n.right)
+        
+        # sub_pth = max(0, l_sub_pth, r_sub_pth) + n.val, 当之前subpath > 0 连续subpath， 否则新subpath
+        sub_pth = max(max(l_sub_pth, r_sub_pth) + n.val, n.val) #包含当前点的较大的sub_path是连续之前的sub_path或者新path
+        g_max = max(l_g_max, r_g_max, sub_pth, l_sub_pth + n.val + r_sub_pth) #更新全局最大
+
+        return g_max, sub_pth
+"""
+475. Binary Tree Maximum Path Sum II
+https://www.lintcode.com/problem/binary-tree-maximum-path-sum-ii/description
+Given a binary tree, find the maximum path sum from root.
+The path may end at any node in the tree and contain at least one node in it.
+思路：这里不需要globl. 只需要计算local root的最大路径
+"""
+    def maxPathSum2(self, root):
+        return self.dvcq(root)
+
+    def dvcq(self, n):
+        if not n:
+            return 0
+
+        #return max( max(self.dvcq(n.left), self.dvcq(n.right) ) + n.val, n.val)
+        return max(0, self.dvcq(n.left), self.dvcq(n.right)) + n.val
+"""
+97. Maximum Depth of Binary Tree
+https://www.lintcode.com/problem/maximum-depth-of-binary-tree/description
+Given a binary tree, find its maximum depth.
+The maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+"""
+    def maxDepth(self, root):
+        return self.dvcq(root)
+
+    def dvcq(self, n):
+        if not n:
+            return 0
+
+        return max(self.dvcq(n.left), self.dvcq(n.right)) + 1
+"""
+155. Minimum Depth of Binary Tree
+https://www.lintcode.com/problem/minimum-depth-of-binary-tree/description
+Given a binary tree, find its minimum depth.
+The minimum depth is the number of nodes along the shortest path from the root node down to the nearest leaf node.
+"""
+    def minDepth(self, root):
+        return self.dvcq(root)
+
+    def dvcq(self, n):
+        if not n:
+            return 0
+
+        return min(self.dvcq(n.left), self.dvcq(n.right)) + 1 if n.left and n.right else max(self.dvcq(n.left), self.dvcq(n.right)) + 1
+"""
+175. Invert Binary Tree
+https://www.lintcode.com/problem/invert-binary-tree/description
+Invert a binary tree.Left and right subtrees exchange.
+"""
+    def invertBinaryTree(self, root):
+        self.dvcnqr(root)
+
+    def dvcnqr(self, node):
+        if not node:
+            return None
+
+        node.left, node.right = self.dvcnqr(node.right), self.dvcnqr(node.left)
+
+        return node
+"""
 577. Merge K Sorted Interval Lists
 https://www.lintcode.com/problem/merge-k-sorted-interval-lists/description
 Merge K sorted interval lists into one sorted interval list.

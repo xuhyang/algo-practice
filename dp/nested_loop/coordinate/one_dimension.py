@@ -140,7 +140,6 @@ Challenge O(n) time and O(1) memory.
             f[i] = max(f[i - 1], f[i - 2] + a[i - 1])
 
         return f[-1]
-
 """
 602. Russian Doll Envelopes
 https://www.lintcode.com/problem/russian-doll-envelopes/description
@@ -194,7 +193,7 @@ Challenge O(nm) time and memory.
     def longestContinuousIncreasingSubsequence2(self, A):
         if not A or not A[0]:
             return 0
-            
+
         n, m = len(A), len(A[0])
         points = []
         for i in range(n):
@@ -215,3 +214,119 @@ Challenge O(nm) time and memory.
                     longest_hash[key] = max(longest_hash[key], longest_hash[(x, y)] + 1)
 
         return max(longest_hash.values())
+"""
+622. Frog Jump
+https://www.lintcode.com/problem/frog-jump/description
+A frog is crossing a river. The river is divided into x units and at each unit there may or may not exist a stone.
+The frog can jump on a stone, but it must not jump into the water.
+Given a list of stones' positions (in units) in sorted ascending order,
+determine if the frog is able to cross the river by landing on the last stone.
+Initially, the frog is on the first stone and assume the first jump must be 1 unit.
+If the frog's last jump was k units, then its next jump must be either k - 1, k, or k + 1 units.
+Note that the frog can only jump in the forward direction.
+Given stones = [0,1,3,5,6,8,12,17] Input: [0,1,3,5,6,8,12,17] Output: true Explanation: There are a total of 8 stones.
+The first stone at the 0th unit, second stone at the 1st unit,third stone at the 3rd unit, and so on...The last stone at the 17th unit.Return true.
+The frog can jump to the last stone by jumping 1 unit to the 2nd stone, then 2 units to the 3rd stone, then 2 units to the 4th stone, then 3 units to the 6th stone, 4 units to the 7th stone, and 5 units to the 8th stone.
+Given stones = `[0,1,2,3,4,8,9,11]` Input: [0,1,2,3,4,8,9,11] Output: false Explanation:
+Return false. There is no way to jump to the last stone as the gap between the 5th and 6th stone is too large.
+"""
+    def canCross(self, a):
+        f = {e : set() for e in a}
+        f[a[0]].add(0)
+
+        for e in a:
+            for i in f[e]:
+                for j in (-1, 0, 1):
+                    n_e, n_i = e + i + j, i + j
+                    if n_e in f and n_i > 0:
+                        f[n_e].add(n_i)
+
+        return len(f[a[-1]]) > 0
+"""
+41. Maximum Subarray
+https://www.lintcode.com/problem/maximum-subarray/description
+Given an array of integers, find a contiguous subarray which has the largest sum.
+# Input: [−2,2,−3,4,−1,2,1,−5,3] Output: 6 Explanation: the contiguous subarray [4,−1,2,1] has the largest sum = 6.
+# Input: [1,2,3,4] Output: 10 Explanation: the contiguous subarray [1,2,3,4] has the largest sum = 10.
+Challenge: Can you do it in time complexity O(n)?
+"""
+    def maxSubArray(self, a):
+        p, min_p, max_p = 0, 0, -sys.maxsize
+
+        for e in a:
+            p += e
+            max_p, min_p = max(max_p, p - min_p), min(min_p, p)
+
+        return max_p
+
+    def maxSubArray(self, a):
+        l = g = -sys.maxsize
+
+        for e in a:
+            l = max(l + e, e)
+            g = max(g, l)
+
+        return g
+"""
+42. Maximum Subarray II
+https://www.lintcode.com/problem/maximum-subarray-ii/description
+Given an array of integers, find two non-overlapping subarrays which have the largest sum.
+The number in each subarray should be contiguous. Return the largest sum.
+Example 1: Input: [1, 3, -1, 2, -1, 2] Output: 7 Explanation: the two subarrays are [1, 3] and [2, -1, 2] or [1, 3, -1, 2] and [2].
+Example 2: Input: [5,4] Output: 9 Explanation: the two subarrays are [5] and [4].
+Challenge Can you do it in time complexity O(n) ?
+Notice: The subarray should contain at least one number
+"""
+    def maxTwoSubArrays(self, a):
+        n, s = len(a), [0] * (len(a) - 1)
+
+        p, min_p, max_p = 0, 0, -sys.maxsize
+        for i in range(n - 1):
+            p += a[i]
+            max_p, min_p = max(max_p, p - min_p), min(min_p, p)
+            s[i] = max_p
+
+        p, min_p, max_p = 0, 0, -sys.maxsize
+        for i in range(n - 1, 0, -1):
+            p += a[i]
+            max_p, min_p = max(max_p, p - min_p), min(min_p, p)
+            s[i - 1] += max_p
+
+        return max(s)
+
+    def maxTwoSubArrays(self, a):
+        n, s = len(a), [0] * (len(a) - 1)
+
+        l = g = -sys.maxsize
+        for i in range(n - 1):#只需算到n-2， n-1 在第二段
+            l = max(l + a[i], a[i])
+            s[i] = g = max(g, l)
+
+        l = g = -sys.maxsize
+        for i in range(n - 1, 0, -1):
+            l = max(l + a[i], a[i])
+            g = max(g, l)
+            s[i - 1] += g
+
+        return max(s)
+"""
+620. Maximum Subarray IV
+https://www.lintcode.com/problem/maximum-subarray-iv/description
+Given an integer arrays, find a contiguous subarray which has the largest sum and length should be greater or equal to given length k.
+Return the largest sum, return 0 if there are fewer than k elements in the array.
+Input: [-2,2,-3,4,-1,2,1,-5,3] 5 Output: 5 Explanation: [2,-3,4,-1,2,1] sum=5
+Input: [5,-10,4] 2 Output: -1
+Notice: Ensure that the result is an integer type. k > 0
+"""
+    def maxSubarray4(self, a, k):
+        p, min_p, max_p = [0], 0, -sys.maxsize
+
+        for i in range(len(a)):
+            p.append(p[-1] + a[i])
+
+            if len(p) <= k:
+                continue
+
+            max_p, min_p = max(max_p, p[-1] - min_p), min(min_p, p[i + 1 - k + 1])
+
+        return max_p if k <= len(a) else 0

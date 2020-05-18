@@ -13,11 +13,12 @@ Input: A = [1,2,3,4,5,6] B = [2,3,4,5] Output: 3.5
     def findMedianSortedArrays(self, a, b):
         n = len(a) + len(b)
         if n % 2 == 1:
-            return self.findKth(a, b, 0, 0, n // 2 + 1)
+            return self.findKth(a, b, n // 2 + 1)
         else:
-            return (self.findKth(a, b, 0, 0, n // 2) + self.findKth(a, b, 0, 0, n // 2 + 1)) / 2
+            return (self.findKth(a, b, n // 2) + self.findKth(a, b, n // 2 + 1)) / 2
 
-    def findKth(self, a, b, i, j, k):
+    def findKth(self, a, b, k):
+        i, j = 0, 0
 
         while k > 1:
             ni, nj = i + k // 2 - 1, j + k // 2 - 1
@@ -30,15 +31,8 @@ Input: A = [1,2,3,4,5,6] B = [2,3,4,5] Output: 3.5
             return a[i + k - 1]
         return min(a[i], b[j])
 
-    def findKth(self, a, b, i, j, k):
-        l, r = None, None
-
-        if i == len(a):
-            l, r = b[0], b[-1]
-        elif j == len(b):
-            l, r = a[0], a[-1]
-        else:
-            l, r = min(a[0], b[0]), max(a[-1], b[-1])
+    def findKth(self, a, b, k):
+        l, r = min(a[0] if a else sys.maxsize, b[0] if b else sys.maxsize), max(a[-1] if a else -sys.maxsize, b[-1] if b else -sys.maxsize)
 
         while l + 1 < r:
             m = (l + r) // 2
@@ -48,11 +42,9 @@ Input: A = [1,2,3,4,5,6] B = [2,3,4,5] Output: 3.5
             else:
                 r = m
 
-        return l if self.cnt(a, l) + self.cnt(b, l) >= k else r
+        return l if self.cnt(a, l) + self.cnt(b, l) == k else r
 
     def cnt(self, a, v):
-        if len(a) == 0:
-            return 0
         l, r = 0, len(a) - 1
         while l + 1 < r:
             m = (l + r) // 2
@@ -61,12 +53,63 @@ Input: A = [1,2,3,4,5,6] B = [2,3,4,5] Output: 3.5
             else:
                 r = m
 
-        if a[r] <= v:
+        if a and a[r] <= v:
             return r + 1
-        if a[l] <= v:
+        if a and a[l] <= v:
             return l + 1
         return 0
 """
+931. Median of K Sorted Arrays
+https://www.lintcode.com/problem/median-of-k-sorted-arrays/description
+There are k sorted arrays nums. Find the median of the given k sorted arrays.
+Input: [[1],[2],[3]] Output: 2.00
+Input: [[1,1,2],[2,4,8],[3,7,10,20]] Output: 3.50
+Notice
+The length of the given arrays may not equal to each other.
+The elements of the given arrays are all positive number.
+Return 0 if there are no elements in the array.
+In order to ensure time complexity, the program will be executed repeatedly.
+"""
+    def findMedian(self, a_a):
+        n = sum([len(a) for a in a_a])
+
+        if n % 2 == 1:
+            return self.fndKth(a_a, n // 2 + 1)
+
+        return (self.fndKth(a_a, n // 2) + self.fndKth(a_a, n // 2 + 1)) / 2
+
+    def fndKth(self, a_a, k):
+        l, r = min([a[0] if a else sys.maxsize for a in a_a]), max([a[-1] if a else -sys.maxsize for a in a_a])
+
+        while l + 1 < r:
+            m = (l + r) // 2
+
+            if self.cnt(a_a, m) < k:
+                l = m
+            else:
+                r = m
+
+        return l if self.cnt(a_a, l) == k else r
+
+    def cnt(self, a_a, t):
+        cnt = 0
+        for a in a_a:
+            l, r = 0, len(a) - 1
+
+            while l + 1 < r:
+                m = (l + r) // 2
+
+                if a[m] <= t:
+                    l = m
+                else:
+                    r = m
+
+            if a and a[r] <= t:
+                cnt += (r + 1)
+            elif a and a[l] <= t:
+                cnt += (l + 1)
+
+        return cnt
 141. Sqrt(x)
 https://www.lintcode.com/problem/sqrtx/description
 Implement int sqrt(int x). Compute and return the square root of x.
