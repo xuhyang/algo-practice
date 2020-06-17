@@ -220,3 +220,46 @@ Clarification: If the knight is at (x, y), he can get to the following positions
                         f[i][j] = min(f[i][j], f[x][y] + 1)
 
         return f[-1][-1] if f[-1][-1] != sys.maxsize else -1
+"""
+553. Bomb Enemy
+https://www.lintcode.com/problem/bomb-enemy/description
+Given a 2D grid, each cell is either a wall 'W', an enemy 'E' or empty '0' (the number zero), return the maximum enemies you can kill using one bomb.
+The bomb kills all the enemies in the same row and column from the planted point until it hits the wall since the wall is too strong to be destroyed.
+Input: grid =[ "0E00", "E0WE", "0E00"] Output: 3 Explanation: Placing a bomb at (1,1) kills 3 enemies
+Input: grid =[ "0E00", "EEWE", "0E00"] Output: 2 Explanation: Placing a bomb at (0,0) or (0,3) or (2,0) or (2,3) kills 2 enemies
+Notice: You can only put the bomb at an empty cell.
+"""
+    def maxKilledEnemies(self, g):
+        n, m, max_kills = len(g), len(g[0]) if g else 0, 0
+        north, west, south, east = [[[0 for _ in range(m)] for _ in range(n)] for _ in range(4)]
+
+        for i in range(n):
+            for j in range(m):
+                if g[i][j] is 'W':
+                    continue
+                if g[i][j] is 'E':
+                    north[i][j] += 1
+                    west[i][j] += 1
+                if i > 0:
+                    north[i][j] += north[i-1][j]
+                if j > 0:
+                    west[i][j] += west[i][j-1]
+
+        for i in range(n-1, -1, -1):
+            for j in range(m-1, -1, -1):
+                if g[i][j] is 'W':
+                    continue
+                if g[i][j] is 'E':
+                    south[i][j] += 1
+                    east[i][j] += 1
+                if i + 1 < n:
+                    south[i][j] += south[i+1][j]
+                if j + 1 < m:
+                    east[i][j] += east[i][j+1]
+
+        for i in range(n):
+            for j in range(m):
+                if g[i][j] is '0':
+                    max_kills = max(max_kills, north[i][j] + west[i][j] + south[i][j] + east[i][j])
+
+        return max_kills

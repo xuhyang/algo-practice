@@ -110,6 +110,7 @@ In order to ensure time complexity, the program will be executed repeatedly.
                 cnt += (l + 1)
 
         return cnt
+"""
 141. Sqrt(x)
 https://www.lintcode.com/problem/sqrtx/description
 Implement int sqrt(int x). Compute and return the square root of x.
@@ -236,6 +237,20 @@ Return the number of smallest minutes need to copy all the books.
         for i in times:
             num += tm // i
         return n <= num
+
+    def copyBooksII(self, n, times):
+        # write your code here
+        heap = []
+        for time in times:
+            heapq.heappush(heap, (time, time))
+
+        min_time = 0
+        while n > 0:
+            min_time, base = heapq.heappop(heap)
+            n -= 1
+            heapq.heappush(heap, (min_time + base, base))
+
+        return min_time
 """
 586. Sqrt(x) II
 https://www.lintcode.com/problem/sqrtx-ii/description
@@ -280,36 +295,50 @@ Input: [5] 1 Output: 5.000
 时间复杂度为O(nlgn)
 """
     @highlight
-    def maxAverage(self, nums, k):
-        # write your code here
-        if nums is None or len(nums) < k:
-            return -1
+    def maxAverage(self, a, k):
+        l, r, n = sum(a) / len(a), max(a), len(a)
 
-        start = min(nums)
-        end = max(nums)
+        while l + 1e-5 < r:
+            m = (l + r) / 2
+            p_sum, min_p, rslt = [0], 0, False
+            for i in range(n):
+                p_sum.append(p_sum[-1] + a[i] - m)
+                if i <=  k - 1:
+                    continue
 
-        while start + 1e-6 < end:
-            mid = (start + end) / 2
-            if self.has_bigger_avg(mid, nums, k):
-                start = mid
+                if p_sum[-1] - min_p >= 0:
+                    rslt = True
+                    break
+                min_p = min(min_p, p_sum[i + 1 - k + 1])
+            if rslt:
+                l = m
             else:
-                end = mid
+                r = m
 
-        return start
+        return r
 
-    def has_bigger_avg(self, avg, nums, k):
-        prefix_sum = [0]
-        min_sum = sys.maxsize
-        for i in range(len(nums)):
-            prefix_sum.append(nums[i] - avg + prefix_sum[-1])
-            if i < k - 1:
-                continue
-            min_sum = min(min_sum, prefix_sum[i + 1 - k])
+    def maxAverage(self, a, k):
+        l, r, n = sum(a) / len(a), max(a), len(a)
 
-            if prefix_sum[-1] - min_sum >= 0:
-                return True
+        while l + 1e-5 < r:
+            m = (l + r) / 2
+            p_sum, min_p, rslt = [0], 0, False
+            for i in range(n):
+                p_sum.append(p_sum[-1] + a[i] - m)
+                if i <=  k - 1:
+                    continue
 
-        return False
+                min_p = min(min_p, p_sum[i + 1 - k])
+                if p_sum[-1] - min_p >= 0:
+                    rslt = True
+                    break
+
+            if rslt:
+                l = m
+            else:
+                r = m
+
+        return r
 """
 633. Find the Duplicate Number
 https://www.lintcode.com/problem/find-the-duplicate-number/description

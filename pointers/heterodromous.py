@@ -117,6 +117,56 @@ Notice You may assume that each input would have exactly one solution.
 
         return ans
 """
+363. Trapping Rain Water
+Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it is able to trap after raining.
+Trapping Rain Water
+Input: [0,1,0] Output: 0
+Input: [0,1,0,2,1,0,1,3,2,1,2,1] Output: 6
+Challenge
+O(n) time and O(1) memory O(n) time and O(n) memory is also acceptable.
+"""
+    def trapRainWater(self, h):
+        l, r, w = 0, len(h) - 1, 0
+        l_max, r_max = (h[l], h[r]) if h else (0, 0)
+
+        while l <= r:
+
+            if l_max <= r_max:
+                l_max = max(l_max, h[l])
+                w, l = w + l_max - h[l], l + 1
+            else:
+                r_max = max(r_max, h[r])
+                w, r = w + r_max - h[r], r - 1
+            
+        return w
+"""
+382. Triangle Count
+Given an array of integers, how many three numbers can be found in the array,
+so that we can build an triangle whose three edges length is the three numbers that we find?
+Given array S = [3,4,6,7], return 3. They are:
+[3,4,6]
+[3,6,7]
+[4,6,7]
+Given array S = [4,4,4,4], return 4. They are:
+[4(1),4(2),4(3)]
+[4(1),4(2),4(4)]
+[4(1),4(3),4(4)]
+[4(2),4(3),4(4)]
+"""
+    def triangleNumber(self, a: List[int]) -> int:
+        cnt, a = 0, sorted(a)
+
+        for t in range(len(a) - 1, 1, -1):
+            l, r = 0, t - 1
+
+            while l < r:
+                if a[l] + a[r] > a[t]:
+                    cnt, r = cnt + r - l, r - 1
+                else:
+                    l += 1
+
+        return cnt
+"""
 415. Valid Palindrome
 http://www.lintcode.com/problem/valid-palindrome-ii/
 Given a string, determine if it is a palindrome, considering only alphanumeric characters and ignoring cases.
@@ -179,7 +229,7 @@ Return the absolute value of difference between the sum of the two integers and 
             else:
                 break
 
-        return min_diff           
+        return min_diff
 """
 587. Two Sum - Unique pairs
 https://www.lintcode.com/problem/two-sum-unique-pairs/description

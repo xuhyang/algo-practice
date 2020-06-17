@@ -1,12 +1,14 @@
 """
 并查集总结
-动态
 1. 合并两个集合
 2. 查询某个元素所在集合
 3. 判断两个元素是否在同一个集合
 4. 获得某个集合的元素个数
 5. 统计当前集合个数
 关键操作：快速寻找老大哥节点
+
+跟连通性有关的问题都可以使用BFS和UnionFind什么时候无法使用UnionFind?
+需要拆开两个集合的时候无法使用UnionFind第34页
 """
 class Union_find:
 """
@@ -394,6 +396,7 @@ Notice: The number of books does not exceed 5000.
 # Explanation: abc is associated with bcd, acd, dfe, so the largest set is the set of all books
 # Given ListA = ["a","b","d","e","f"], ListB = ["b","c","e","g","g"], return ["d","e","f","g"].
 # Explanation: The current set are [a, b, c] and [d, e, g, f], then the largest set is [d, e, g, f]
+#其他解法bfs
 """
 def maximumAssociationSet(self, ListA, ListB):
         if not ListA or not ListB:

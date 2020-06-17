@@ -167,18 +167,16 @@ Input: list = [1,[4,[6]]] Output: [1,4,6]
 
         def __init__(self, nestedList):
             self.s = nestedList[::-1]
-
         # @return {int} the next element in the iteration
         def next(self):
             return self.s.pop().getInteger()
-
         # @return {boolean} true if the iteration has more element or false
         def hasNext(self):
-            while self.s:
-                if self.s[-1].isInteger():
-                    return True
+
+            while self.s and not self.s[-1].isInteger():
                 self.s.extend(self.s.pop().getList()[::-1])
-            return False
+
+            return len(self.s) > 0
 """
 551. Nested List Weight Sum
 https://www.lintcode.com/problem/nested-list-weight-sum/description

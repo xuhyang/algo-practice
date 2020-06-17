@@ -181,7 +181,7 @@ Explanation:
 """
     def connectedSet(self, nodes):
         q, s, rslt = collections.deque(), set(), []
-
+        #把n一个个放到queue，记录每一个连通块
         for n in nodes:
             if n in s:
                 continue
@@ -219,6 +219,7 @@ Explanation:
 """
     def connectedSet2(self, nodes):
         g = {}
+        #把n一个个放到queue，记录每一个连通块
         for n in nodes:
             g[n] = g.get(n, [])
             for nei in n.neighbors:
@@ -246,6 +247,64 @@ Explanation:
                 ans[-1].sort()
 
         return ans
+"""
+477. Surrounded Regions
+https://www.lintcode.com/problem/surrounded-regions/description
+Given a 2D board containing 'X' and 'O', capture all regions surrounded by 'X'.
+A region is captured by flipping all 'O''s into 'X''s in that surrounded region.
+Example
+Input:
+  X X X X
+  X O O X
+  X X O X
+  X O X X
+Output:
+  X X X X
+  X X X X
+  X X X X
+  X O X X
+Input:
+  X X X X
+  X O O X
+  X O O X
+  X O X X
+Output:
+  X X X X
+  X O O X
+  X O O X
+  X O X X
+#其他解法union-find
+"""
+    def surroundedRegions(self, b):
+        n, m, q = len(b), len(b[0]) if b else 0, collections.deque()
+        #把边界一起加到queue，标记所有连通块
+        for x in range(n):
+            if b[x][0] == 'O':
+                q.append((x, 0))
+                b[x][0] = 'Z'
+            if b[x][m - 1] == 'O':
+                q.append((x, m - 1))
+                b[x][m - 1] = 'Z'
+        for y in range(m):
+            if b[0][y] == 'O':
+                q.append((0, y))
+                b[0][y] = 'Z'
+            if b[n - 1][y] == 'O':
+                q.append((n - 1, y))
+                b[n - 1][y] = 'Z'
+
+        while q:
+            x, y = q.popleft()
+
+            for dx, dy in ((0, - 1), (-1, 0), (0, 1), (1, 0)):
+                nx, ny = dx + x, dy + y
+                if 0 <= nx < n and 0 <= ny < m and b[nx][ny] == 'O':
+                    q.append((nx, ny))
+                    b[nx][ny] = 'Z'
+
+        for i in range(n):
+            for j in range(m):
+                b[i][j] = 'O' if b[i][j] == 'Z' else 'X'
 """
 433. Number of Islands
 https://www.lintcode.com/problem/number-of-islands/description
@@ -288,66 +347,6 @@ Input:
                 if 0 <= n_r < n and 0 <= n_c < m and grid[n_r][n_c] == 1 and not seen[n_r][n_c]:
                     queue.append((n_r, n_c))
                     seen[n_r][n_c] = True
-"""
-477. Surrounded Regions
-https://www.lintcode.com/problem/surrounded-regions/description
-Given a 2D board containing 'X' and 'O', capture all regions surrounded by 'X'.
-A region is captured by flipping all 'O''s into 'X''s in that surrounded region.
-Example
-Input:
-  X X X X
-  X O O X
-  X X O X
-  X O X X
-Output:
-  X X X X
-  X X X X
-  X X X X
-  X O X X
-Input:
-  X X X X
-  X O O X
-  X O O X
-  X O X X
-Output:
-  X X X X
-  X O O X
-  X O O X
-  X O X X
-#其他解法union-find
-"""
-    def surroundedRegions(self, b):
-        n, m = len(b), len(b[0]) if b else 0
-        q = collections.deque()
-        d = ((0, - 1), (-1, 0), (0, 1), (1, 0))
-
-        for x in range(n):
-            if b[x][0] == 'O':
-                q.append((x, 0))
-                b[x][0] = 'Z'
-            if b[x][m - 1] == 'O':
-                q.append((x, m - 1))
-                b[x][m - 1] = 'Z'
-        for y in range(m):
-            if b[0][y] == 'O':
-                q.append((0, y))
-                b[0][y] = 'Z'
-            if b[n - 1][y] == 'O':
-                q.append((n - 1, y))
-                b[n - 1][y] = 'Z'
-
-        while q:
-            x, y = q.popleft()
-
-            for dx, dy in d:
-                nx, ny = dx + x, dy + y
-                if 0 <= nx < n and 0 <= ny < m and b[nx][ny] == 'O':
-                    q.append((nx, ny))
-                    b[nx][ny] = 'Z'
-
-        for i in range(n):
-            for j in range(m):
-                b[i][j] = 'O' if b[i][j] == 'Z' else 'X'
 """
 531. Six Degrees
 https://www.lintcode.com/problem/six-degrees/description
@@ -877,7 +876,7 @@ Return false. There is no way to jump to the last stone as the gap between the 5
 """
     def canCross(self, a):
         q, sn, s = collections.deque([(a[0], 0)]), set([(a[0], 0)]), set(a)
-        
+
         while q:
             e, i = q.popleft()
             if e == a[-1]:
@@ -891,3 +890,62 @@ Return false. There is no way to jump to the last stone as the gap between the 5
                 sn.add(n)
 
         return False
+"""
+805. Maximum Association Set
+https://www.jiuzhang.com/solution/maximum-association-set/#tag-highlight-lang-python
+Amazon sells books, every book has books which are strongly associated with it.
+Given ListA and ListB,indicates that ListA [i] is associated with ListB [i]
+which represents the book and associated books.
+Output the largest set associated with each other(output in any sort).
+You can assume that there is only one of the largest set.
+Notice: The number of books does not exceed 5000.
+# Example: Given ListA = ["abc","abc","abc"], ListB = ["bcd","acd","def"], return["abc","acd","bcd","dfe"].
+# Explanation: abc is associated with bcd, acd, dfe, so the largest set is the set of all books
+# Given ListA = ["a","b","d","e","f"], ListB = ["b","c","e","g","g"], return ["d","e","f","g"].
+# Explanation: The current set are [a, b, c] and [d, e, g, f], then the largest set is [d, e, g, f]
+#其他解法union find
+"""
+    def maximumAssociationSet(self, ListA, ListB):
+        ## Basic Ideas: Use hashmap
+        ## Complexity: Time O(n), Space O(n)
+        m = {}
+        length = len(ListA)
+        # Build relationship
+        for i in range(0, length):
+            bookA, bookB = ListA[i], ListB[i]
+            if bookA in m:
+                m[bookA].add(bookB)
+            else:
+                m[bookA] = set([bookB])
+
+            if bookB in m:
+                m[bookB].add(bookA)
+            else:
+                m[bookB] = set([bookA])
+
+        visited = set([])
+        max_count, res = 0, []
+        # Only need to scan ListA
+        for i in range(0, length):
+            if ListA[i] in visited: continue
+            queue, l = [], []
+            queue.append(ListA[i])
+            l.append(ListA[i])
+            visited.add(ListA[i])
+            count = 1
+            while len(queue) != 0:
+                for k in range(0, len(queue)):
+                    book = queue[-1]
+                    del queue[-1]
+                    # find the next candidates
+                    for node in m[book]:
+                        if node in visited: continue
+                        queue.append(node)
+                        visited.add(node)
+                        l.append(node)
+                        count += 1
+                # collect result
+                if count > max_count:
+                    max_count = count
+                    res = l
+        return res

@@ -1,5 +1,125 @@
 class tree_traversal:
 """
+66. Binary Tree Preorder Traversal
+https://www.lintcode.com/problem/binary-tree-preorder-traversal/description
+Given a binary tree, return the preorder traversal of its nodes' values.
+Input：{1,2,3} Output：[1,2,3] Explanation: it will be serialized {1,2,3}
+   1
+  / \
+ 2   3
+Input：{1,#,2,3} Output：[1,2,3] Explanation: it will be serialized {1,#,2,3}
+1
+ \
+  2
+ /
+3
+Challenge Can you do it without recursion?
+Notice
+The first data is the root node, followed by the value of the left and right son nodes, and "#" indicates that there is no child node.
+The number of nodes does not exceed 20.
+"""
+    def preorderTraversal(self, r):
+        n, s, ans = r, [], []
+
+        while n:
+            s.append(n)
+            ans.append(n.val)
+            n = n.left
+
+        while s:
+            n = s.pop().right
+            while n:
+                s.append(n)
+                ans.append(n.val)
+                n = n.left
+
+        return ans
+
+"""
+67. Binary Tree Inorder Traversal
+https://www.lintcode.com/problem/binary-tree-inorder-traversal/description
+Given a binary tree, return the inorder traversal of its nodes' values.
+Example Input：{1,2,3} Output：[2,1,3] Explanation: it will be serialized {1,2,3}
+   1
+  / \
+ 2   3
+Input：{1,#,2,3} Output：[1,3,2] Explanation: it will be serialized {1,#,2,3}
+1
+ \
+  2
+ /
+3
+Challenge
+Can you do it without recursion?
+"""
+    def inorderTraversal(self, r):
+        n, s, ans = r, [], []
+
+        while n:
+            s.append(n)
+            n = n.left
+
+        while s:
+            n = s.pop()
+            ans.append(n.val)
+            n = n.right
+            while n:
+                s.append(n)
+                n = n.left
+
+        return ans
+
+    def inorderTraversal(self, r):
+        ans = []
+        self.inorder(ans, r)
+        return ans
+
+    def inorder(self, ans, n):
+        if not n:
+            return
+
+        self.inorder(ans, n.left)
+        ans.append(n.val)
+        self.inorder(ans, n.right)
+"""
+68. Binary Tree Postorder Traversal
+https://www.lintcode.com/problem/binary-tree-postorder-traversal/description
+Given a binary tree, return the postorder traversal of its nodes' values.
+Input：{1,2,3} Output：[2,3,1] Explanation: it will be serialized {1,2,3}
+   1
+  / \
+ 2   3
+Input：{1,#,2,3} Output：[3,2,1] Explanation: it will be serialized {1,#,2,3}
+1
+ \
+  2
+ /
+3
+Challenge Can you do it without recursion?
+Notice: The first data is the root node, followed by the value of the left and right son nodes, and "#" indicates that there is no child node.
+The number of nodes does not exceed 20.
+"""
+    def postorderTraversal(self, r):
+        n, ans, s = r, [], []
+
+        while n:
+            s.append(n)
+            n = n.left
+
+        while s:
+            n = s[-1].right
+            #没有右子树， 或者右子树已经在答案里
+            if not n or n and ans and n.val == ans[-1]:
+                ans.append(s.pop().val)
+                continue
+
+            while n:
+                s.append(n)
+                n = n.left
+
+        return ans
+
+"""
 86. Binary Search Tree Iterator
 https://www.lintcode.com/problem/binary-search-tree-iterator/description
 Design an iterator over a binary search tree with the following rules:

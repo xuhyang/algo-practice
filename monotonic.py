@@ -46,11 +46,18 @@ Given an integer array with no duplicates. A max tree building on this array is 
 The root is the maximum number in the array
 The left subtree and right subtree are the max trees of the subarray divided by the root number.
 Construct the max tree by the given array.
+Example Given [2, 5, 6, 0, 3, 1], the max tree constructed by this array is:
+    6
+   / \
+  5   3
+ /   / \
+2   0   1
+Challenge O(n) time and memory.
 考点：数据结构设计 树的调整 单调栈
 题解：利用数组实现基本数据结构的调整，当前遍历到的数字比stk中的最后一个大时，将stk中的最后一个数字转变为当前节点的左子树,
 循环调整至stk为空或者stk中的最后节点值大于新节点的值。如果stk不为空，说明stk中的最后一个节点值大于新节点值，则将新节点设为stk中的最后一个节点的右子树，将新节点存入stk。
 使用九章算法强化班中讲到的单调栈。保存一个单调递减栈。每个数从栈中被 pop 出的时候，就知道它往左和往右的第一个比他大的数的位置了。
-时间复杂度 O(n)O(n)，而暴力算法最坏情况下会有 O(n^2)O(n
+时间复杂度 O(n)，而暴力算法最坏情况下会有 O(n^2)O(n
 """
    def maxTree(self, A):
         if not A:
@@ -85,3 +92,39 @@ Construct the max tree by the given array.
             stack.append(node)
 
         return stack[0]
+"""
+362. Sliding Window Maximum
+https://www.lintcode.com/problem/sliding-window-maximum/description
+Given an array of n integer with duplicate number, and a moving window(size k),
+move the window at each iteration from the start of the array, find the maximum number inside the window at each moving.
+Input: [1,2,7,7,8] 3 output: [7,7,8]
+Explanation：
+At first the window is at the start of the array like this `[|1, 2, 7| ,7, 8]` , return the maximum `7`;
+then the window move one step forward.`[1, |2, 7 ,7|, 8]`, return the maximum `7`;
+then the window move one step forward again.`[1, 2, |7, 7, 8|]`, return the maximum `8`
+Input: [1,2,3,1,2,3] 5 Output: [3,3]
+Explanation:
+At first, the state of the window is as follows: ` [,2,3,1,2,1 | , 3] `, a maximum of ` 3 `;
+And then the window to the right one. ` [1, | 2,3,1,2,3 |] `, a maximum of ` 3 `;
+Challenge o(n) time and O(k) memory
+"""
+    def maxSlidingWindow(self, a, k):
+        q, ans = collections.deque(), []
+
+        for i in range(min(k, len(a))):
+            self.push(q, a[i])
+
+        for i in range(max(0, k - 1), len(a)):
+            self.push(q, a[i])
+            ans.append(q[0])
+            if a[i - k + 1] == q[0]:
+                q.popleft()
+
+        return ans
+
+    def push(self, q, e):
+
+        while q and q[-1] < e:
+            q.pop()
+
+        q.append(e)

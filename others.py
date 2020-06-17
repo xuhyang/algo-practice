@@ -204,13 +204,22 @@ Input: [1, 9, 2, 5] Output: 4 Explanation: The sorted form is [1, 2, 5, 9], and 
 Input: [1] Output: 0 Explanation: The array contains less than 2 elements.
 Challenge:Sort is easy but will cost O(nlogn) time. Try to solve it in linear time and space.
 Notice: You may assume all elements in the array are non-negative integers and fit in the 32-bit signed integer range.
+# 假设有N个元素A到B。
+# 首先我们定义 max_v 和 min_v 表示这个数组的最大/最小元素, N 表示这个数组元素的个数. 那么这个数组一共会有 N - 1 个间距
+# 这 N - 1 个间距的平均值就是 avgGap =ceil (max_v - min_v) / (N - 1), 这个平均值也是 答案 的最小值. 因为这 N 个元素平均分配时ex [1, 2, 3], 最大的间距最小. avgGap = 1, ans = 1
+然后我们对这 N 个元素分类, 分类依据就是这个元素与 min_v的间距是 avgGap 的多少倍. 为什么这样分类呢? 因为这样分类, 同一组内的元素的间距必然不会是最大间距.
+这时我们要找的最大间距处于组与组之间, 即某一组里最小的元素与它上一组的最大的元素的间距的最大值. 因此, 我们只需要维护每一组里最小与最大的元素即可.
+令bucket（桶）的大小len = ceil[(max_v - min_v) / (N - 1)]，则最多会有(max_v -min_v) / len + 1个桶
+对于数组中的任意整数K，很容易通过算式loc = (K - min_v) / len - 1找出其桶的位置，然后维护每一个桶的最大值和最小值
+设定 bucket_max 和 bucket_min 数组, bucket_max[i] 表示原数组中与 bucket_min的差为 avgGap 的 i 倍(向下取整)的最大的元素, 同理 bucket_min[i] 表示相同含义下的最小的元素.
+然后我们遍历 bucket_min,bucket_max, 将第 i组的最小值 bucket_min[i] 与第 i - 1 组的最大值 bucket_max[i - 1] 做差, 维护最大值就可以得到答案了.
 """
     def maximumGap(self, a):
         n, min_e, max_e = len(a), min(a), max(a)
         if n < 2 or min_e == max_e:
             return 0
 
-        blks, gap = [(sys.maxsize, -sys.maxsize)] * n, math.ceil(float(max_e - min_e) / (n - 1))
+        blks, gap = [(sys.maxsize, -sys.maxsize)] * n, math.ceil(float(max_e - min_e) / (n - 1)) #avgGap
 
         for e in a:
             i = (e - min_e) // gap
@@ -370,20 +379,22 @@ Input:[[7,9],[5]] Output:[7,9,5]
     class Vector2D(object):
         # @param vec2d {List[List[int]]}
         def __init__(self, vec2d):
-            self.i, self.j, self.v, self.lst_r = 0, 0, vec2d, len(vec2d) - 1
+            self.i, self.j, self.a = 0, 0, vec2d
         # @return {int} a next element
         def next(self):
-            ans = self.v[self.i][self.j]
-            self.i, self.j = (self.i + 1, 0) if self.j == len(self.v[self.i]) - 1 else (self.i, self.j + 1)
-
+            ans, self.j = self.a[self.i][self.j], self.j + 1 #前进j, 让hasnext判断
             return ans
-        # @return {boolean} true if it has next element
-        # or false
+        # @return {boolean} true if it has next element or false
         def hasNext(self):
-            while self.i <= self.lst_r and len(self.v[self.i]) == 0:
+            # j还在当前arr
+            if self.i < len(self.a) and self.j <= len(self.a[self.i]) - 1:
+                return True
+
+            self.i, self.j = self.i + 1, 0# 下一个arr
+            while self.i < len(self.a) and not self.a[self.i]:#下一个arr空
                 self.i += 1
 
-            return self.i < self.lst_r or self.i == self.lst_r and self.j < len(self.v[self.i])
+            return self.i < len(self.a)
 """
 607. Two Sum III - Data structure design
 https://www.lintcode.com/problem/two-sum-iii-data-structure-design/description

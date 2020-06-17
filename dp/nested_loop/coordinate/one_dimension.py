@@ -330,3 +330,124 @@ Notice: Ensure that the result is an integer type. k > 0
             max_p, min_p = max(max_p, p[-1] - min_p), min(min_p, p[i + 1 - k + 1])
 
         return max_p if k <= len(a) else 0
+"""
+139. Subarray Sum Closest
+https://www.lintcode.com/problem/subarray-sum-closest/description
+Given an integer array, find a subarray with sum closest to zero. Return the indexes of the first number and last number.
+Input: [-3,1,1,-3,5] Output: [0,2] Explanation: [0,2], [1,3], [1,1], [2,2], [0,4]
+"""
+    def subarraySumClosest(self, a):
+        s, p, min_diff, ans = 0, [[0, -1] for _ in range(len(a) + 1)], sys.maxsize, [-1, -1]
+
+        for i in range(len(a)):
+            s += a[i]
+            p[i][0], p[i][1] = s, i
+
+        p.sort()
+        for j in range(1, len(p)):
+            prv_s, prv_i, s, i = p[j - 1][0], p[j - 1][1], p[j][0], p[j][1]
+
+            if abs(s - prv_s) < min_diff:
+                min_diff, ans[0], ans[1] = abs(s - prv_s), min(prv_i, i) + 1, max(prv_i, i)
+
+        return ans
+"""
+402. Continuous Subarray Sum
+https://www.lintcode.com/problem/continuous-subarray-sum/description
+Given an integer array, find a continuous subarray where the sum of numbers is the biggest.
+Your code should return the index of the first number and the index of the last number.
+(If their are duplicate answer, return the minimum one in lexicographical order)
+Input: [-3, 1, 3, -3, 4] Output: [1, 4]
+Input: [0, 1, 0, 1] Output: [0, 3]
+Explanation: The minimum one in lexicographical order.
+"""
+    def continuousSubarraySum(self, a):
+        s, p, min_s, min_s_i, max_s, ans = 0, [0] * len(a), 0, -1, -sys.maxsize, [-1, -1]
+
+        for j in range(len(a)):
+            p[j] = s = s + a[j]
+            if s - min_s > max_s:
+                max_s, ans[0], ans[1] = s - min_s, min_s_i + 1, j
+            if s < min_s:
+                min_s, min_s_i = s, j
+
+        return ans
+"""
+403. Continuous Subarray Sum II
+https://www.jiuzhang.com/problem/continuous-subarray-sum-ii/#tag-highlight-lang-python
+Given an circular integer array (the next element of the last element is the first element),
+find a continuous subarray in it, where the sum of numbers is the biggest.
+Your code should return the index of the first number and the index of the last number.
+If duplicate answers exist, return any of them.
+Input: [3, 1, -100, -3, 4] Output: [4, 1]
+Input: [1,-1] Output: [0, 0]
+"""
+    def continuousSubarraySumII(self, A):
+        max_start, max_end, max_sum = self.find_maximum_subarray(A)
+        min_start, min_end, min_sum = self.find_maximum_subarray([-a for a in A])
+        min_sum = -min_sum  # *-1 after reuse find maximum array
+
+        total = sum(A)
+        if max_sum >= total - min_sum or min_end - min_start + 1 == len(A):
+            return [max_start, max_end]
+
+        return [min_end + 1, min_start - 1]
+
+    def find_maximum_subarray(self, nums):
+        max_sum = -sys.maxsize
+        curt_sum, start = 0, 0
+        max_range = []
+
+        for index, num in enumerate(nums):
+            if curt_sum < 0:
+                curt_sum = 0
+                start = index
+            curt_sum += num
+            if curt_sum > max_sum:
+                max_sum = curt_sum
+                max_range = [start, index]
+
+        return max_range[0], max_range[1], max_sum
+"""
+558 Sliding Window Matrix Maximum
+Given an array of n m matrix, and a moving matrix window (size k k),
+move the window from top left to botton right at each iteration,
+find the maximum sum of the elements inside the window at each moving. Return 0 if the answer does not exist.
+For matrix [ [1, 5, 3], [3, 2, 1], [4, 1, 9], ] The moving window size k = 2. return 13.
+At first the window is at the start of the array like this [ [|1, 5|, 3], [|3, 2|, 1], [4, 1, 9], ] ,get the sum 11;
+then the window move one step forward. [ [1, |5, 3|], [3, |2, 1|], [4, 1, 9], ],get the sum 11;
+then the window move one step forward again. [[1, 5, 3], [|3, 2|, 1], [|4, 1|, 9], ], get the sum 10;
+then the window move one step forward again. [ [1, 5, 3], [3, |2, 1|], [4, |1, 9|], ] ,get the sum 13;
+SO finally, get the maximum from all the sum which is 13.
+Challenge O(n^2) time.
+"""
+    def maxSlidingMatrix(self, mtrx, k):
+        n, m, s, max_s = len(mtrx), len(mtrx[0]), [0] * (len(mtrx) + 1), -10000
+        p = [0] * (n + 1)
+        for i in range(n):
+            for j in range(m):
+                s[j + 1] += mtrx[i][j]
+                p[j + 1] = s[j + 1] + p[j]
+
+                if j >= k - 1 and i >= k - 1:
+                    max_s = max(max_s, p[j + 1] - p[j + 1 - k])
+            if i >= k - 1:
+              for j in range(m):
+                s[j + 1] -= mtrx[i - k + 1][j]
+
+        return max_s
+
+    def maxSlidingMatrix(self, matrix, k):
+        n, m = len(matrix), len(matrix[0])
+        if n < k or m < k:
+            return 0
+        sum = [[0] * (m + 1) for _ in range(n + 1)]
+        for i in range(n):
+            for j in range(m):
+                # 二维前缀和
+                sum[i + 1][j + 1] = sum[i][j + 1] + sum[i + 1][j] - sum[i][j] + matrix[i][j]
+        ans = sum[k][k];
+        for i in range(1, n - k + 2):
+            for j in range(1, m - k + 2):
+                ans = max(ans, sum[i + k - 1][j + k - 1] - sum[i - 1][j + k - 1] - sum[i + k - 1][j - 1] + sum[i - 1][j - 1])
+        return ans

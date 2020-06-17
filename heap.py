@@ -301,3 +301,50 @@ There are no duplicated elements in each array.
                 heappush(h, (a[i][j + 1], i, j + 1))
 
         return rslt
+"""
+543. Kth Largest in N Arrays
+Find K-th largest element in N arrays.
+Notice You can swap elements in the array
+In n=2 arrays [[9,3,2,4,7],[1,2,3,4,8]], the 3rd largest element is 7.
+In n=2 arrays [[9,3,2,4,8],[1,2,3,4,2]], the 1st largest element is 9, 2nd largest element is 8, 3rd largest element is 7 and etc.
+"""
+    #最大堆， 利用n array 倒 排序 性质，pop一个， push一个
+    def KthInArrays(self, arrays, k):
+        if not arrays:
+            return None
+
+        # in order to avoid directly changing the original arrays
+        # and remove the empty arrays, we need a new sortedArrays
+        sortedArrays = []
+        for arr in arrays:
+            if not arr:
+                continue
+            sortedArrays.append(sorted(arr, reverse=True))
+
+        maxheap = [
+            (-arr[0], index, 0)
+            for index, arr in enumerate(sortedArrays)
+        ]
+        heapq.heapify(maxheap)
+
+        num = None
+        for _ in range(k):
+            num, x, y = heapq.heappop(maxheap)
+            num = -num
+            if y + 1 < len(sortedArrays[x]):
+                heapq.heappush(maxheap, (-sortedArrays[x][y + 1], x, y + 1))
+
+        return num
+"""
+1439. Find the Kth Smallest Sum of a Matrix With Sorted Rows
+https://leetcode.com/problems/find-the-kth-smallest-sum-of-a-matrix-with-sorted-rows/
+You are given an m * n matrix, mat, and an integer k, which has its rows sorted in non-decreasing order.
+You are allowed to choose exactly 1 element from each row to form an array. Return the Kth smallest array sum among all possible arrays.
+Input: mat = [[1,3,11],[2,4,6]], k = 5 Output: 7 Explanation: Choosing one element from each row, the first k smallest sum are:
+[1,2], [1,4], [3,2], [3,4], [1,6]. Where the 5th sum is 7.
+Input: mat = [[1,3,11],[2,4,6]], k = 9 Output: 17
+Input: mat = [[1,10,10],[1,4,5],[2,3,6]], k = 7 Output: 9 Explanation: Choosing one element from each row, the first k smallest sum are:
+[1,1,2], [1,1,3], [1,4,2], [1,4,3], [1,1,6], [1,5,2], [1,5,3]. Where the 7th sum is 9.
+Input: mat = [[1,1,10],[2,2,9]], k = 7 Output: 12
+"""
+    #最小堆， 利用 n array排序 性质，pop一个， push 备选3 个
