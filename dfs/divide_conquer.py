@@ -18,7 +18,7 @@ the two subtrees of every node never differ by more than 1.
 
         return l_blncd and r_blncd and abs(l_hght - r_hght) <= 1, max(l_hght, r_hght) + 1
 """
-94. Binary Tree Maximum Path Sum
+94.| Binary Tree Maximum Path Sum
 https://www.lintcode.com/problem/binary-tree-maximum-path-sum/my-submissions
 Given a binary tree, find the maximum path sum. The path may start and end at any node in the tree.
 #考点：类似 41. Maximum Subarray
@@ -32,12 +32,22 @@ Given a binary tree, find the maximum path sum. The path may start and end at an
 
         l_g_max, l_sub_pth = self.dvcq(n.left)
         r_g_max, r_sub_pth = self.dvcq(n.right)
-        
+
         # sub_pth = max(0, l_sub_pth, r_sub_pth) + n.val, 当之前subpath > 0 连续subpath， 否则新subpath
         sub_pth = max(max(l_sub_pth, r_sub_pth) + n.val, n.val) #包含当前点的较大的sub_path是连续之前的sub_path或者新path
         g_max = max(l_g_max, r_g_max, sub_pth, l_sub_pth + n.val + r_sub_pth) #更新全局最大
 
         return g_max, sub_pth
+
+    def dvcq(self, n):
+        if not n:
+            return -sys.maxsize, 0
+
+        l_g_max, l_max_pth = self.dvcq(n.left)
+        r_g_max, r_max_pth = self.dvcq(n.right)
+
+        max_pth = max(l_max_pth, r_max_pth, 0) + n.val
+        return max(l_g_max, r_g_max, max_pth, l_max_pth + r_max_pth + n.val), max_pth
 """
 475. Binary Tree Maximum Path Sum II
 https://www.lintcode.com/problem/binary-tree-maximum-path-sum-ii/description
@@ -54,6 +64,36 @@ The path may end at any node in the tree and contain at least one node in it.
 
         #return max( max(self.dvcq(n.left), self.dvcq(n.right) ) + n.val, n.val)
         return max(0, self.dvcq(n.left), self.dvcq(n.right)) + n.val
+"""
+95. Validate Binary Search Tree
+https://www.lintcode.com/problem/validate-binary-search-tree/description
+Given a binary tree, determine if it is a valid binary search tree (BST).
+Assume a BST is defined as follows:
+    The left subtree of a node contains only nodes with keys less than the node's key.
+    The right subtree of a node contains only nodes with keys greater than the node's key.
+    Both the left and right subtrees must also be binary search trees.
+A single node tree is a BST
+Example 1: Input:  {-1} Output：true Explanation： For the following binary tree(only one node): -1
+Example 2: Input:  {2,1,4,#,#,3,5} Output: true
+Example 3: Input:  {10,5,#,1,100} Output: false
+For the following binary tree:
+	  10
+	 /
+	5
+   / \
+  1   100
+"""
+   def isValidBST(self, r):
+        return self.dvcq(r)[0]
+
+    def dvcq(self, n):
+        if not n:
+            return True, sys.maxsize, -sys.maxsize #bst, min, max
+
+        l_bst, l_min, l_max = self.dvcq(n.left)
+        r_bst, r_min, r_max = self.dvcq(n.right)
+
+        return l_bst and r_bst and l_max < n.val and n.val < r_min, min(l_min, n.val), max(r_max, n.val)
 """
 97. Maximum Depth of Binary Tree
 https://www.lintcode.com/problem/maximum-depth-of-binary-tree/description
@@ -170,7 +210,6 @@ Return null if LCA does not exist.
         return l[0] or r[0] if l[0] or r[0] else n if a_fnd and b_fnd else None, a_fnd, b_fnd
 """
 595. Binary Tree Longest Consecutive Sequence
-中文English
 Given a binary tree, find the length of the longest consecutive sequence path.
 The path refers to any sequence of nodes from some starting node to any node in the tree
 along the parent-child connections. The longest consecutive path need to be from parent to child (cannot be the reverse).
@@ -194,20 +233,18 @@ Input:
  1
 Output:2 Explanation: Longest consecutive sequence path is 2-3,not 3-2-1, so return 2.
 """
-    def longestConsecutive(self, root):
-        return self.dvcq(root)[0]
+    def longestConsecutive(self, r):
+        return self.dvcq(r)[0]
 
     def dvcq(self, n):
         if not n:
-            return 1, 1, -sys.maxsize
+            return 0, 0
 
-        l_lngst, l_crnt, l_val = self.dvcq(n.left)
-        r_lngst, r_crnt, r_val = self.dvcq(n.right)
+        l_g, l_lcl = self.dvcq(n.left)
+        r_g, r_lcl = self.dvcq(n.right)
+        lcl = max(l_lcl + 1 if n.left and n.val + 1 == n.left.val else 1, r_lcl + 1 if n.right and n.val + 1 == n.right.val else 1)
 
-        l_crnt = l_crnt + 1 if l_val - 1 == n.val else 1
-        r_crnt = r_crnt + 1 if r_val - 1 == n.val else 1
-
-        return max(l_crnt, r_crnt, l_lngst, r_lngst), max(l_crnt, r_crnt), n.val
+        return max(l_g, r_g, lcl), lcl
 """
 596. Minimum Subtree
 https://www.lintcode.com/problem/minimum-subtree/description
@@ -219,8 +256,7 @@ Input: {1,-5,2,1,2,-4,-5} Output:1 Explanation: The tree is look like this:
  / \   /  \
 1   2 -4  -5
 The sum of whole tree is minimum, so return the root.
-Input: {1} Output:1 Explanation: The tree is look like this:
-   1
+Input: {1} Output:1 Explanation: The tree is look like this: 1
 There is one and only one subtree in the tree. So we return 1.
 """
     def findSubtree(self, root):
@@ -367,8 +403,6 @@ You may assume that there will be only one unique solution.
             if not self.valid(b, i, j, e):
                 continue
 
-
-
             b[i][j] = e
             if self.dfs(b, k + 1):
                 return True
@@ -395,54 +429,48 @@ Input: pattern = "aabb" str = "xyzabcxzyabc" Output: false
 Notice: You may assume both pattern and str contains only lowercase letters.
 这个题不能使用动态规划或者记忆化搜索，因为参数列表中 mapping 和 used 无法记录到记忆化的哈希表中。
 """
-    def wordPatternMatch(self, pattern, str):
-        return self.dvcq(pattern, 0, str, {}, set())
+    def wordPatternMatch(self, p, s):
+        return self.dvcq(p, s, {}, set(), 0, 0)
 
-    def dvcq(self, pattern, i, str, char_to_word, used):
-        if i == len(pattern):
-            return len(str) == 0
+    def dvcq(self, p, s, d, m, l, r):
+        if l == len(p):
+            return r == len(s)
 
-        if pattern[i] in char_to_word:
-            word = char_to_word[pattern[i]]
+        if p[l] in d:
+            return d[p[l]] == s[r : min(len(s), r + len(d[p[l]]))] and self.dvcq(p, s, d, m, l + 1, r + len(d[p[l]]))
 
-            if not str.startswith(word):
-                return False
-            return self.dvcq(pattern, i + 1, str[len(word):], char_to_word, used) #要判断下个字母在不在map里
-
-        for j in range(1, len(str) + 1):
-            word = str[:j]
-
-            if word in used:
+        for j in range(r, len(s)):
+            w = s[r : j + 1]
+            if w in m:
                 continue
 
-            char_to_word[pattern[i]] = word
-            used.add(word)
-            if self.dvcq(pattern, i + 1, str[j:], char_to_word, used):
+            d[p[l]] = w
+            m.add(w)
+            if self.dvcq(p, s, d, m, l + 1, j + 1):
                 return True
-            char_to_word.pop(pattern[i])
-            used.remove(word)
+            d.pop(p[l])
+            m.remove(w)
 
         return False
 """
 902. Kth Smallest Element in a BST
 https://www.lintcode.com/problem/kth-smallest-element-in-a-bst/description
 Given a binary search tree, write a function kthSmallest to find the kth smallest element in it.
-Input：{1,#,2},2 Output：2
-Explanation：The second smallest element is 2.
+Input：{1,#,2},2 Output：2 Explanation：The second smallest element is 2.
 	1
 	 \
 	  2
-Input：{2,1,3},1 Output：1
-Explanation：The first smallest element is 1.
+Input：{2,1,3},1 Output：1 Explanation：The first smallest element is 1.
   2
  / \
 1   3
 Challenge: What if the BST is modified (insert/delete operations) often and you need to find the kth smallest frequently? How would you optimize the kthSmallest routine?
+其他解法: tree_traversal
 """
     def kthSmallest(self, r, k):
         chldrn = {}
         self.dvcq(r, chldrn)
-        return self.dvcq2(r, chldrn, k).val
+        return self.dfs(r, chldrn, k).val
 
     def dvcq(self, n, chldrn):
         if not n:
@@ -452,7 +480,7 @@ Challenge: What if the BST is modified (insert/delete operations) often and you 
 
         return chldrn[n]
 
-    def dvcq2(self, n, chldrn, k):
+    def dfs(self, n, chldrn, k):
         if not n:
             return None
 
@@ -460,6 +488,194 @@ Challenge: What if the BST is modified (insert/delete operations) often and you 
 
         if l_chldrn + 1 == k:
             return n
-        if l_chldrn >= k:
-            return self.dvcq2(n.left, chldrn, k)
-        return self.dvcq2(n.right, chldrn, k - l_chldrn - 1)
+
+        return self.dfs(n.left, chldrn, k) if l_chldrn >= k else self.dfs(n.right, chldrn, k - l_chldrn - 1)
+"""
+551. Nested List Weight Sum
+Given a nested list of integers, return the sum of all integers in the list weighted by their depth. Each element is either an integer, or a list -- whose elements may also be integers or other lists.
+Example Input: the list [[1,1],2,[1,1]],  Output: 10.  four 1's at depth 2, one 2 at depth 1, 4 * 1 * 2 + 1 * 2 * 1 = 10
+其他解法：stack
+"""
+    def depthSum(self, nestedList):
+        return self.dvcq(nestedList, 1)
+
+    def dvcq(self, a, dpth):
+        ans = 0
+        for e in a:
+            ans += e.getInteger() * dpth if e.isInteger() else self.dvcq(e.getList(), dpth + 1)
+        return ans
+
+    def dfs(self, l, i):
+        return sum([e.getInteger() * i if e.isInteger() else self.dfs(e.getList(), i + 1) for e in l])
+"""
+570. Find the Missing Number II
+https://www.lintcode.com/problem/find-the-missing-number-ii/description
+Giving a string with number from 1-n in random order, but miss 1 number.Find that number.
+Example Input: n = 20 and str = 19201234567891011121314151618 Output: 17
+Explanation: 19'20'1'2'3'4'5'6'7'8'9'10'11'12'13'14'15'16'18
+Data guarantees have only one solution
+"""
+    def findMissing2(self, n, s):
+        return self.dvcq(s, n, set(), (1 + n) * n // 2, 0)
+
+    def dvcq(self, s, n, sn, t, i):
+        if i == len(s):
+            return t if 1 <= t <= n and t not in sn else -1
+
+        for j in range(i, min(len(s), i + 2)):
+            e = int(s[i:j + 1])
+
+            if e in sn or s[i] == '0':
+                continue
+
+            sn.add(e)
+            ans = self.dvcq(s, n, sn, t - e, j + 1)
+            sn.remove(e)
+
+            if ans != -1:
+                return ans
+        return -1
+"""
+104. Merge K Sorted Lists
+https://www.lintcode.com/problem/merge-k-sorted-lists/description
+Merge k sorted linked lists and return it as one sorted list.
+Example Input: [2->6->null,5->null,7->null] Output:  2->5->6->7->null
+#其他解法 heap, queue
+"""
+    #dvcq + merge sort
+    def mergeKLists(self, l):
+        return self.dvcq(l, 0, len(l) - 1)
+
+    def dvcq(self, l, s, e):
+        if l[s] == l[e]:
+            return l[s]
+
+        m = (s + e) // 2
+        return self.merge(self.dvcq(l, s, m), self.dvcq(l, m + 1, e))
+
+    def merge(self, l, r):
+        d = n = ListNode(sys.maxsize)
+
+        while l and r:
+            if l.val < r.val:
+                n.next, l = l, l.next
+            else:
+                n.next, r = r, r.next
+            n = n.next
+
+        n.next = l or r
+
+        return d.next
+"""
+793. Intersection of Arrays
+https://www.lintcode.com/problem/intersection-of-arrays/description
+Give a number of arrays, find their intersection, and output their intersection size.
+# Input:  [[1,2,3],[3,4,5],[3,9,10]] Output:  1 Explanation: Only '3' in all three array.
+# Input: [[1,2,3,4],[1,2,5,6,7][9,10,1,5,2,3]] 	Output: 2 Explanation: The set is [1,2].
+Notice
+The total number of all array elements is not more than 500000.
+There are no duplicated elements in each array.
+其他解法: set, heap
+"""
+	def intersectionOfArrays(self, arrs):
+		res = self.divideConquer(arrs)
+		return len(res)
+
+	def divideConquer(self, arrs):
+		if len(arrs) == 0:
+			return []
+		if len(arrs) == 1:
+			return arrs[0]
+		mid = len(arrs) / 2
+		left = self.divideConquer(arrs[:mid])
+		right = self.divideConquer(arrs[mid:])
+
+		return self.twoArrayIntersection(left, right)
+
+	def twoArrayIntersection(self, arr1, arr2):
+		if not arr1 or not arr2:
+			return []
+		res = []
+		c1 = collections.Counter(arr1)
+		c2 = collections.Counter(arr2)
+		c = c1 & c2
+		for num, count in c.items():
+			res += [num] * count
+
+		return res
+
+    def intersectionOfArrays(self, arrs):
+        intersection = set(arrs[0])
+        for nums in arrs[1:]:
+        	intersection &= set(nums)
+        return len(intersection)
+"""
+1297. Count of Smaller Numbers After Self
+https://www.lintcode.com/problem/count-of-smaller-numbers-after-self/description
+You are given an integer array nums and you have to return a new counts array.
+The counts array has the property where counts[i] is the number of smaller elements to the right of nums[i].
+Example 1: Input: [5, 2, 6, 1] Output: [2, 1, 1, 0] Explanation:
+To the right of 5 there are 2 smaller elements (2 and 1).
+To the right of 2 there is only 1 smaller element (1).
+To the right of 6 there is 1 smaller element (1).
+To the right of 1 there is 0 smaller element.
+Example 2: Input: [1, 2, 3, 4] Output: [0, 0, 0, 0]
+#其他解法: bit
+"""
+    def countSmaller(self, a):
+        a, ans = [(e, i) for i, e in enumerate(a)], [0] * len(a)
+        self.dvcq_mrg(ans, a, [None] * len(a), 0, len(a) - 1)
+        return ans
+
+    def dvcq_mrg(self, ans, a, t, l, r):
+        if l >= r:
+            return
+
+        m = (l + r) // 2
+        self.dvcq_mrg(ans, a, t, l, m)
+        self.dvcq_mrg(ans, a, t, m + 1, r)
+
+        p, i, j, cnt = l, l, m + 1, 0
+        while i <= m and j <= r:
+            if a[i][0] > a[j][0]:
+                cnt += 1
+                t[p], j = a[j], j + 1
+            else:
+                ans[a[i][1]] += cnt
+                t[p], i = a[i], i + 1
+            p += 1
+
+        while i <= m:
+            ans[a[i][1]] += cnt
+            t[p], i, p = a[i], i + 1, p + 1
+        while j <= r:
+            t[p], j, p = a[j], j + 1, p + 1
+        for k in range(l, r + 1):
+            a[k] = t[k]
+"""
+241. Different Ways to Add Parentheses
+https://leetcode.com/problems/different-ways-to-add-parentheses/
+Given a string of numbers and operators, return all possible results from computing all the different possible ways to group numbers and operators. The valid operators are +, - and *.
+Input: "2-1-1" Output: [0, 2] Explanation: ((2-1)-1) = 0 (2-(1-1)) = 2
+Input: "2*3-4*5" Output: [-34, -14, -10, -10, 10] Explanation: (2*(3-(4*5))) = -34 ((2*3)-(4*5)) = -14 ((2*(3-4))*5) = -10 (2*((3-4)*5)) = -10 (((2*3)-4)*5) = 10
+"""
+    def diffWaysToCompute(self, s: str) -> List[int]:
+        return self.dvcq({}, s)
+
+    def dvcq(self, f, s):
+        if s in f:
+            return f[s]
+
+
+
+        if s.isdigit():
+            return [int(s)]
+
+        ans = []
+        for i, c in enumerate(s):
+            if c not in '+-*':
+                continue
+            ans.extend(eval(str(x)+c+str(y)) for x in self.dvcq(f, s[: i]) for y in self.dvcq(f, s[i + 1:]))
+
+        f[s] = ans
+        return ans

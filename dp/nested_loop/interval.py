@@ -37,14 +37,12 @@ You may imagine nums[-1] = nums[n] = 1. They are not real therefore you can not 
 • 时间复杂度O(N3)，空间复杂度O(N2)
 """
     def maxCoins(self, a):
-        a, n = [1] + a + [1], len(a) + 2
-        f = [[0] * n for _ in range(n)]
+        a, f = [1] + a + [1], [[0] * (len(a) + 2) for _ in range(len(a) + 2)]
 
-        for lngth in range(3, n + 1):
-            for i in range(n - lngth + 1):
-                j = i + lngth - 1
-                for k in range(i + 1, j):
-                    f[i][j] = max(f[i][j], f[i][k] + a[i] * a[k] * a[j] + f[k][j])
+        for l in range(3, len(a) + 1):
+            for i in range(len(a) - l + 1):
+                j = i + l - 1
+                f[i][j] = max([f[i][k] + a[i] * a[k] * a[j] + f[k][j] for k in range(i + 1, j)])
 
         return f[0][-1]
 """
@@ -73,6 +71,18 @@ Challenge: O(n2) time is acceptable. Can you do it in O(n) time.
                     l, r = i, j
 
         return s[l : r + 1]
+
+    def longestPalindrome(self, s):
+        f, max_l, max_r = [[True if i >= j else False for j in range(len(s))] for i in range(len(s))], 0, 0
+
+        for l in range(2, len(s) + 1):
+            for i in range(len(s) - l + 1):
+                j = i + l - 1
+                f[i][j] = f[i + 1][j - 1] and s[i] == s[j]
+                if f[i][j] and l > max_r - max_l:
+                    max_l, max_r = i, j
+
+        return s[max_l : max_r + 1]
 """
 667. Longest Palindromic Subsequence
 https://www.lintcode.com/problem/longest-palindromic-subsequence/description
@@ -81,22 +91,35 @@ Input: "bbbab" Output: 4 Explanation: One possible longest palindromic subsequen
 Input: "bbbbb" Output: 5
 """
     def longestPalindromeSubseq(self, s):
-        n = len(s)
-        f = [[0] * n for _ in range(n)]
+        f = [[1 if i == j else 0 for j in range(len(s))] for i in range(len(s))]
 
-        for i in range(n):
-            f[i][i] = 1
+        for l in range(2, len(s) + 1):
+            for i in range(len(s) - l + 1):
+                j = i + l - 1
+                f[i][j] = max(f[i + 1][j - 1] + (2 if s[i] == s[j] else 0), f[i + 1][j], f[i][j - 1])
+
+        return f[0][-1] if s else 0
+"""
+647. Palindromic Substrings
+https://leetcode.com/problems/palindromic-substrings/
+Given a string, your task is to count how many palindromic substrings in this string.
+The substrings with different start indexes or end indexes are counted as different substrings even they consist of same characters.
+Input: "abc" Output: 3
+Input: "aaa" Output: 6
+"""
+    def countSubstrings(self, s: str) -> int:
+        n = len(s)
+        f, cnt = [[True if i >= j else False for j in range(n)] for i in range(n)], n
 
         for l in range(2, n + 1):
             for i in range(n - l + 1):
                 j = i + l - 1
-                if s[i] == s[j]:
-                    f[i][j] = f[i + 1][j - 1] + 2
-                else:
-                    f[i][j] = max(f[i + 1][j], f[i][j - 1])
+                f[i][j] = f[i + 1][j - 1] and s[i] == s[j]
+                if f[i][j]:
+                    cnt += 1
 
-        return f[0][-1] if s else 0
-"""
+        return cnt
+
 476. Stone Game
 https://www.lintcode.com/problem/stone-game/description
 There is a stone game.At the beginning of the game the player picks n piles of stones in a line.

@@ -43,25 +43,23 @@ Given the total number of courses and a list of prerequisite pairs, is it possib
 Input: n = 2, prerequisites = [[1,0]] Output: true
 Input: n = 2, prerequisites = [[1,0],[0,1]] Output: false
 """
-    def canFinish(self, numCourses, prerequisites):
-        n_to_indgrs, n_to_dpndnts = {i : 0 for i in range(numCourses)}, {i : [] for i in range(numCourses)}
-        cnt = 0
+    def canFinish(self, n, p):
+        ind, g, cnt = {i : 0 for i in range(n)}, collections.defaultdict(list), 0
 
-        for prqst in prerequisites:
-            n_to_indgrs[prqst[0]] += 1
-            n_to_dpndnts[prqst[1]].append(prqst[0])
+        for u, v in p:
+            ind[u], g[v] = ind[u] + 1, g[v] + [u]
 
-        queue = collections.deque([i for i in range(numCourses) if n_to_indgrs[i] == 0])
+        q = collections.deque([i for i in range(n) if ind[i] == 0])
 
-        while queue:
+        while q:
             cnt += 1
 
-            for dpndnt in n_to_dpndnts[queue.popleft()]:
-                n_to_indgrs[dpndnt] -= 1
-                if n_to_indgrs[dpndnt] == 0:
-                    queue.append(dpndnt)
+            for u in g[q.popleft()]:
+                ind[u] -= 1
+                if ind[u] == 0:
+                    q.append(u)
 
-        return numCourses == cnt
+        return cnt == n
 """
 616. Course Schedule II
 https://www.lintcode.com/problem/course-schedule-ii/description
@@ -72,24 +70,23 @@ There may be multiple correct orders, you just need to return one of them. If it
 Input: n = 2, prerequisites = [[1,0]]  Output: [0,1]
 Input: n = 4, prerequisites = [[1,0],[2,0],[3,1],[3,2]] Output: [0,1,2,3] or [0,2,1,3]
 """
-    def findOrder(self, numCourses, prerequisites):
-        n_to_indgrs, n_to_dpndnts = {i : 0 for i in range(numCourses)}, {i : [] for i in range(numCourses)}
+    def findOrder(self, n, p):
+        ind, g, ans = {i: 0 for i in range(n)}, collections.defaultdict(list), []
 
-        for prqst in prerequisites:
-            n_to_indgrs[prqst[0]] += 1
-            n_to_dpndnts[prqst[1]].append(prqst[0])
+        for u, v in p:
+            ind[u], g[v] = ind[u] + 1, g[v] + [u]
 
-        queue, order = collections.deque([i for i in range(numCourses) if n_to_indgrs[i] == 0]), []
+        q = collections.deque([i for i in range(n) if ind[i] == 0])
 
-        while queue:
-            order.append(queue.popleft())
+        while q:
+            ans.append(q.popleft())
 
-            for dpndnt in n_to_dpndnts[order[-1]]:
-                n_to_indgrs[dpndnt] -= 1
-                if n_to_indgrs[dpndnt] == 0:
-                    queue.append(dpndnt)
+            for u in g[ans[-1]]:
+                ind[u] -= 1
+                if ind[u] == 0:
+                    q.append(u)
 
-        return order if numCourses == len(order) else []
+        return ans if len(ans) == n else []
 """
 892. Alien Dictionary
 https://www.lintcode.com/problem/alien-dictionary/description

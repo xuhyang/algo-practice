@@ -1,3 +1,4 @@
+
 """
 并查集总结
 1. 合并两个集合
@@ -529,3 +530,295 @@ The length of accounts[i][j] will be in the range [1, 30].
             n = p
 
         return c
+"""
+547. Friend Circles
+https://leetcode.com/problems/friend-circles/
+There are N students in a class. Some of them are friends, while some are not.
+Their friendship is transitive in nature. For example, if A is a direct friend of B,
+and B is a direct friend of C, then A is an indirect friend of C.
+And we defined a friend circle is a group of students who are direct or indirect friends.
+Given a N*N matrix M representing the friend relationship between students in the class. If M[i][j] = 1, then the ith and jth students are direct friends with each other, otherwise not. And you have to output the total number of friend circles among all the students.
+Example 1: Input: [[1,1,0], [1,1,0], [0,0,1]]
+Output: 2 Explanation:The 0th and 1st students are direct friends, so they are in a friend circle. The 2nd student himself is in a friend circle. So return 2.
+"""
+    def findCircleNum(self, mtrx: List[List[int]]) -> int:
+        cnt = n = len(mtrx)
+        f = {}
+
+        for i in range(n):
+            for j in range(n):
+                if mtrx[i][j] != 1:
+                    continue
+
+                r_i, r_j = self.fnd(f, i), self.fnd(f, j)
+                if r_i != r_j:
+                    f[r_j], cnt = r_i, cnt - 1
+
+        return cnt
+
+    def fnd(self, f, i):
+        if i not in f:
+            f[i] = i
+            return f[i]
+
+        if f[i] == i:
+            return f[i]
+
+        f[i] = self.fnd(f, f[i])
+        return f[i]
+"""
+261. Maximum Connected Area
+1391. Making A Large Island
+https://www.lintcode.com/problem/maximum-connected-area/description
+There is a two-dimensional array, only consists of 00 and 11.
+You can change a 00 to 11 at most once, please calculate the maximum area of connected 1s1s.
+If two 1s1s are adjcent up to down or left to right, they are regrarded connected.
+the two-dimensional array has nn rows and mm columns, 1 \le n, m \le 5001≤n,m≤500.
+Have you met this question in a real interview?
+Clarification In example, change any 00 to 11, you can get a connection with an area 33.
+Example Input：[[0,1] ,[1,0]] Output：3
+# 其他解法:BFS
+"""
+    def maxArea(self, g):
+        f, cnt, n, m, max_island, s = {}, {}, len(g), len(g[0]), 0, set()
+
+        for i in range(n):
+            for j in range(m):
+                if g[i][j] == 0:
+                    continue
+                p = (i, j)
+                r_a = self.fnd(f, p)
+                cnt[r_a] = cnt.get(r_a, 1)
+                for dx, dy in ((0, -1), (-1, 0), (0, 1), (1, 0)):
+                    np = (nx, ny) = dx + i, dy + j
+                    if 0 <= nx < n and 0 <= ny < m and g[nx][ny] == 1:
+                        r_a, r_b = self.fnd(f, p), self.fnd(f, np)
+                        cnt[r_a], cnt[r_b] = cnt.get(r_a, 1), cnt.get(r_b, 1)
+                        if r_a != r_b:
+                            f[r_a] = r_b
+                            cnt[r_b] += cnt[r_a]
+
+        for i in range(n):
+            for j in range(m):
+                if g[i][j] == 1:
+                    max_island = max(max_island, cnt[self.fnd(f, (i, j))])
+                    continue
+                s.clear()
+                island = 1
+                for dx, dy in ((0, -1), (-1, 0), (0, 1), (1, 0)):
+                    p = (nx, ny) = dx + i, dy + j
+                    if 0 <= nx < n and 0 <= ny < m and g[nx][ny] == 1:
+                        r = self.fnd(f, p)
+                        if r in s:
+                            continue
+                        island += cnt[r]
+                        s.add(r)
+                max_island = max(max_island, island)
+
+        return max_island
+
+    def fnd(self, f, p):
+        if p not in f:
+            f[p] = p
+            return f[p]
+        if f[p] == p:
+            return f[p]
+
+        f[p] = self.fnd(f, f[p])
+        return f[p]
+"""
+1202. Smallest String With Swaps
+https://leetcode.com/problems/smallest-string-with-swaps/
+You are given a string s, and an array of pairs of indices in the string pairs where pairs[i] = [a, b] indicates 2 indices(0-indexed) of the string.
+You can swap the characters at any pair of indices in the given pairs any number of times.
+Return the lexicographically smallest string that s can be changed to after using the swaps.
+Example 1: Input: s = "dcab", pairs = [[0,3],[1,2]]
+Output: "bacd" Explaination: Swap s[0] and s[3], s = "bcad" Swap s[1] and s[2], s = "bacd"
+Example 2: Input: s = "dcab", pairs = [[0,3],[1,2],[0,2]] Output: "abcd"
+Explaination: Swap s[0] and s[3], s = "bcad" Swap s[0] and s[2], s = "acbd" Swap s[1] and s[2], s = "abcd"
+Example 3: Input: s = "cba", pairs = [[0,1],[1,2]] Output: "abc"
+Explaination: Swap s[0] and s[1], s = "bca" Swap s[1] and s[2], s = "bac" Swap s[0] and s[1], s = "abc"
+#其他解法 DFS
+"""
+    def smallestStringWithSwaps(self, s: str, prs: List[List[int]]) -> str:
+        f, d, ans = {}, defaultdict(list), []
+        for p in prs:
+            r_a, r_b = self.fnd(f, p[0]), self.fnd(f, p[1])
+            if r_a != r_b:
+                f[r_b] = r_a
+
+        for i in range(len(s)):
+            d[self.fnd(f, i)].append(s[i])
+        for v in d.values():
+            heapify(v)
+        for i in range(len(s)):
+            ans.append(heappop(d[self.fnd(f, i)]))
+        return ''.join(ans)
+
+    def fnd(self, f, n):
+        f[n] = f.get(n, n)
+        if f[n] == n:
+            return n
+        f[n] = self.fnd(f, f[n])
+        return f[n]
+"""
+399. Evaluate Division
+https://leetcode.com/problems/evaluate-division/
+Equations are given in the format A / B = k, where A and B are variables represented as strings,
+and k is a real number (floating point number). Given some queries, return the answers. If the answer does not exist, return -1.0.
+Example: Given a / b = 2.0, b / c = 3.0. queries are: a / c = ?, b / a = ?, a / e = ?, a / a = ?, x / x = ? . return [6.0, 0.5, -1.0, 1.0, -1.0 ].
+The input is: vector<pair<string, string>> equations, vector<double>& values, vector<pair<string, string>> queries , where equations.size() == values.size(), and the values are positive. This represents the equations. Return vector<double>.
+According to the example above:
+equations = [ ["a", "b"], ["b", "c"] ], values = [2.0, 3.0], queries = [ ["a", "c"], ["b", "a"], ["a", "e"], ["a", "a"], ["x", "x"] ].
+"""
+    def calcEquation(self, eqtns: List[List[str]], vls: List[float], qrs: List[List[str]]) -> List[float]:
+        f, m, ans = {}, {}, []
+
+        for i, eq in enumerate(eqtns):
+            a, b, v = (eq[0], eq[1], vls[i]) if vls[i] >= 1 else (eq[1], eq[0], 1 / vls[i])
+            f[a], m[a], f[b], m[b] = f.get(a, a), m.get(a, 1), f.get(b, b), m.get(b, 1)
+            (r_a, t_a), (r_b, t_b) = self.fnd(f, m, a), self.fnd(f, m, b)
+            f[r_a], m[r_a] = r_b, v * t_b / t_a
+
+        for a, b in qrs:
+            (r_a, t_a), (r_b, t_b) = self.fnd(f, m, a), self.fnd(f, m, b)
+            ans.append((t_a / t_b) if r_a == r_b and a in f and b in f else -1)
+        return ans
+
+    def fnd(self, f, m, n):
+        if n not in f:
+            return n, -sys.maxsize
+        if f[n] == n:
+            return n, 1
+        p, t = self.fnd(f, m, f[n])
+        f[n], m[n] = p, m[n] * t
+
+        return f[n], m[n]
+"""
+952. Largest Component Size by Common Factor
+https://leetcode.com/problems/largest-component-size-by-common-factor/
+Given a non-empty array of unique positive integers A, consider the following graph:
+There are A.length nodes, labelled A[0] to A[A.length - 1];
+There is an edge between A[i] and A[j] if and only if A[i] and A[j] share a common factor greater than 1.
+Return the size of the largest connected component in the graph
+"""
+    def largestComponentSize(self, a):
+        f, cnt = {}, {}
+
+        for e in a:
+            for k in range(2, int(math.sqrt(e) + 1)):
+                if e % k != 0:
+                    continue
+                self.union(f, e, k)
+                self.union(f, e, e // k)
+
+        for e in a:
+            p = self.fnd(f, e)
+            cnt[p] = cnt.get(p, 0) + 1
+
+        return max(cnt.values())
+
+    def union(self, f, a, b):
+        r_a, r_b = self.fnd(f, a), self.fnd(f, b)
+        if r_a != r_b:
+            f[r_a] = r_b
+
+    def fnd(self, f, n):
+        f[n] = f.get(n, n)
+
+        if f[n] == n:
+            return n
+        f[n] = self.fnd(f, f[n])
+        return f[n]
+"""
+990. Satisfiability of Equality Equations
+https://leetcode.com/problems/satisfiability-of-equality-equations/
+"""
+"""
+737. Sentence Similarity II
+https://leetcode.com/problems/sentence-similarity-ii/
+"""
+"""
+1088. Redundant Connection
+https://www.lintcode.com/problem/redundant-connection/description
+"""
+
+https://www.lintcode.com/problem/redundant-connection-ii/description
+
+https://leetcode.com/problems/regions-cut-by-slashes/
+
+
+"""
+1319. Number of Operations to Make Network Connected
+https://leetcode.com/problems/number-of-operations-to-make-network-connected/
+There are n computers numbered from 0 to n-1 connected by ethernet cables connections forming a network where connections[i] = [a, b]
+represents a connection between computers a and b. Any computer can reach any other computer directly or indirectly through the network.
+Given an initial computer network connections. You can extract certain cables between two directly connected computers,
+and place them between any pair of disconnected computers to make them directly connected.
+Return the minimum number of times you need to do this in order to make all the computers connected. If it's not possible, return -1.
+Example 1: Input: n = 4, connections = [[0,1],[0,2],[1,2]] Output: 1
+Explanation: Remove cable between computer 1 and 2 and place between computers 1 and 3.
+Example 2: Input: n = 6, connections = [[0,1],[0,2],[0,3],[1,2],[1,3]] Output: 2
+Example 3: Input: n = 6, connections = [[0,1],[0,2],[0,3],[1,2]] Output: -1 Explanation: There are not enough cables.
+Example 4: Input: n = 5, connections = [[0,1],[0,2],[3,4],[2,3]] Output: 0
+"""
+    def makeConnected(self, n: int, connections: List[List[int]]) -> int:
+        cnt, f, spares = n, {}, 0
+
+        for a, b in connections:
+            r_a, r_b = self.fnd(f, a), self.fnd(f, b)
+            if r_a != r_b:
+                f[r_a], cnt = r_b, cnt - 1
+            else:
+                spares += 1
+
+        return cnt - 1 if cnt - 1 <= spares else -1
+
+    def fnd(self, f, n):
+        f[n] = f.get(n, n)
+        if f[n] == n:
+            return n
+        f[n] = self.fnd(f, f[n])
+        return f[n]
+"""
+1718. Minimize Malware Spread
+https://www.lintcode.com/problem/minimize-malware-spread/description
+In a network of nodes, each node i is directly connected to another node j if and only if graph[i][j] = 1.
+Some nodes initial are initially infected by malware. Whenever two nodes are directly connected and at least one of those two nodes is infected by malware, both nodes will be infected by malware. This spread of malware will continue until no more nodes can be infected in this manner.
+Suppose M(initial) is the final number of nodes infected with malware in the entire network, after the spread of malware stops.
+We will remove one node from the initial list. Return the node that if removed, would minimize M(initial). If multiple nodes could be removed to minimize M(initial), return such a node with the smallest index.
+Note that if a node was removed from the initial list of infected nodes, it may still be infected later as a result of the malware spread.
+Example 1: Input: graph = [[1,1,0],[1,1,0],[0,0,1]], initial = [0,1] Output: 0
+Example 2: Input: graph = [[1,0,0],[0,1,0],[0,0,1]], initial = [0,2] Output: 0
+Example 3: Input: graph = [[1,1,1],[1,1,1],[1,1,1]], initial = [1,2] Output: 1
+"""
+    def minMalwareSpread(self, g, a):
+        f, sz = {}, {}
+
+        for i in range(len(g)):
+            for j in range(len(g[0])):
+                if g[i][j] == 0:
+                    continue
+                r_a, r_b = self.fnd(f, i), self.fnd(f, j)
+                sz[r_a], sz[r_b] = sz.get(r_a, 1), sz.get(r_b, 1)
+                if r_a != r_b:
+                    f[r_b], sz[r_a] = r_a, sz[r_a] + sz[r_b]
+
+        n, max_cmp_sz, cnt = min(a), 0, Counter([self.fnd(f, e) for e in a])
+
+        for e in a:
+            r = self.fnd(f, e)
+            if cnt[r] != 1:
+                continue
+            if sz[r] > max_cmp_sz:
+                max_cmp_sz, n = sz[r], e
+            elif sz[r] == max_cmp_sz:
+                n = min(n, e)
+        return n
+
+    def fnd(self, f, n):
+        f[n] = f.get(n, n)
+        if f[n] == n:
+            return n
+        f[n] = self.fnd(f, f[n])
+        return f[n]

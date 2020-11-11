@@ -22,6 +22,18 @@ Challenge: O(n2) time or better
 
         f[(i, j)] = (self.dvcq(f, s1, s2, s3, i + 1, j) if s1[i] == s3[i + j] else False) or (self.dvcq(f, s1, s2, s3, i, j + 1) if s2[j] == s3[i + j] else False)
         return f[(i, j)]
+
+    def dvcq(self, f, t, l, r, i, j):
+        if (i, j) in f:
+            return f[(i, j)]
+
+        if i == len(l):
+            f[(i, j)] = r[j :] == t[i + j :]
+        elif j == len(r):
+            f[(i, j)] = l[i :] == t[i + j :]
+        else:
+            f[(i, j)] = l[i] == t[i + j] and self.dvcq(f, t, l, r, i + 1, j) or r[j] == t[i + j] and self.dvcq(f, t, l, r, i, j + 1)
+        return f[(i, j)]
 """
 77. Longest Common Subsequence
 https://www.lintcode.com/problem/longest-common-subsequence/description
@@ -35,16 +47,14 @@ Clarification: What's the definition of Longest Common Subsequence?
         return self.dvcq({}, a, b, 0, 0)
 
     def dvcq(self, f, a, b, i, j):
-        if i == len(a) or j == len(b):
-            return 0
 
         if (i, j) in f:
             return f[(i, j)]
 
-        f[(i, j)] = 0
-        if a[i] == b[j]:
-            f[(i, j)] = self.dvcq(f, a, b, i + 1, j + 1) + 1
-        f[(i, j)] = max(f[(i, j)], self.dvcq(f, a, b, i + 1, j), self.dvcq(f, a, b, i, j + 1))
+        if i == len(a) or j == len(b):
+            return 0
+
+        f[(i, j)] = max(self.dvcq(f, a, b, i + 1, j + 1) + 1 if a[i] == b[j] else 0, self.dvcq(f, a, b, i + 1, j), self.dvcq(f, a, b, i, j + 1))
 
         return f[(i, j)]
 """
@@ -65,7 +75,7 @@ exection -> execution (insert 'u')
 """
     def minDistance(self, w1, w2):
         return self.dvcq({}, w1, w2, 0, 0)
-    
+
     def dvcq(self, f, w1, w2, i, j):
         if i == len(w1):
             return len(w2) - j

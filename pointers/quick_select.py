@@ -48,13 +48,12 @@ sort them so that objects of the same color are adjacent, with the colors in the
         self.sort(a, 1, k, 0, len(a) - 1)
 
     def sort(self, a, a_s, a_e, s, e):
-        if s == e or a_s == a_e:
+        if a_s == a_e:
             return a[s]
 
-        p = (a_s + a_e) // 2
-        l, r = s, e
-        while l <= r:
+        l, r, p = s, e, (a_s + a_e) // 2
 
+        while l <= r:
             if a[l] <= p:
                 l += 1
                 continue
@@ -69,7 +68,7 @@ sort them so that objects of the same color are adjacent, with the colors in the
         self.sort(a, a_s, p, s, r)
         self.sort(a, p + 1, a_e, l, e)
 """
-144. Interleaving Positive and Negative Numbers
+*144. Interleaving Positive and Negative Numbers
 https://www.lintcode.com/problem/interleaving-positive-and-negative-numbers/description
 Given an array with positive and negative integers.
 Re-range it to interleaving with positive and negative integers.
@@ -79,7 +78,6 @@ Input : [-1, -2, -3, 4, 5, 6] Outout : [-1, 5, -2, 4, -3, 6]
         l, r = 0, len(a) - 1
 
         while l <= r:
-
             if a[l] < 0:
                 l += 1
                 continue
@@ -117,7 +115,7 @@ Partition an integers array into odd number first and even number second.
                 continue
 
             a[l], a[r] = a[r], a[l]
-            l, r = l + 1, r - 1            
+            l, r = l + 1, r - 1
 """
 399. Nuts & Bolts Problem
 https://www.lintcode.com/problem/nuts-bolts-problem/description
@@ -198,6 +196,36 @@ Find the kth smallest number in an unsorted integer array.
         else:
             return a[k]
 """
+5. Kth Largest Element
+https://www.lintcode.com/problem/kth-largest-element/description
+Find K-th largest element in an array. Input: n = 3, nums = [9,3,2,4,8] Output: 4
+"""
+    def kthLargestElement(self, n, a):
+        k = len(a) - n
+        self.qck_slct(a, k, 0, len(a) - 1)
+        return a[k]
+
+    def qck_slct(self, a, k, s, e):
+        if s >= e:
+            return
+
+        l, r, p = s, e, a[(s + e) // 2]
+        while l <= r:
+            if a[l] < p:
+                l += 1
+                continue
+            if a[r] > p:
+                r -= 1
+                continue
+
+            a[l], a[r] = a[r], a[l]
+            l, r = l + 1, r - 1
+
+        if k <= r:
+            self.qck_slct(a, k, s, r)
+        elif k >= l:
+            self.qck_slct(a, k, l, e)
+"""
 464. Sort Integers II
 https://www.lintcode.com/problem/sort-integers-ii/description
 Given an integer array, sort it in ascending order in place.
@@ -253,7 +281,6 @@ Use quick sort, merge sort, heap sort or any O(nlogn) algorithm.
                 scnd += 1
 
             indx += 1
-
 
         while frst <= m:
             tmp[indx] = a[frst]

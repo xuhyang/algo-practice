@@ -31,3 +31,5 @@ Notice: This problem is the extention of House Robber and House Robber II
         r_rbbd, r_n_rbbd = self.dvcq(n.right)
 
         return n.val + l_n_rbbd + r_n_rbbd, max(l_rbbd, l_n_rbbd) + max(r_rbbd, r_n_rbbd)
+
+https://www.lintcode.com/problem/binary-tree-maximum-path-sum/description

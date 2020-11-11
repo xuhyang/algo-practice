@@ -17,8 +17,8 @@ Challenge Using trie to implement your algorithm.
         def __init__(self):
             self.w, self.chldrn = None, {}
 
-    def wordSearchII(self, b, wrds):
-        r, rslts = self.Node(), set()
+    def findWords(self, b: List[List[str]], wrds: List[str]) -> List[str]:
+        r, ans = self.Node(), set()
 
         for w in wrds:
             n = r
@@ -28,25 +28,27 @@ Challenge Using trie to implement your algorithm.
 
         for i in range(len(b)):
             for j in range(len(b[0])):
-                self.dfs(rslts, set([(i, j)]), r, b, i, j)
+                self.dfs(b, ans, set([(i, j)]), r, i, j)
 
-        return list(rslts)
+        return list(ans)
+
     #dfs, trie剪枝
-    def dfs(self, rslts, s, n, b, x, y):
-        n = n.chldrn.get(b[x][y])
+    def dfs(self, b, ans, s, n, ux, uy):
+        n = n.chldrn.get(b[ux][uy])
+
         if not n:
             return
 
         if n.w:
-            rslts.add(n.w)
+            ans.add(n.w)
 
         for dx, dy in ((0, -1), (-1, 0), (0, 1), (1, 0)):
-            nxt = (nx, ny) = x + dx, y + dy
-            if 0 <= nx < len(b) and 0 <= ny < len(b[0]) and nxt not in s:
+            v = (vx, vy) = ux + dx, uy + dy
 
-                s.add(nxt)
-                self.dfs(rslts, s, n, b, nx, ny)
-                s.remove(nxt)
+            if 0 <= vx < len(b) and 0 <= vy < len(b[0]) and v not in s:
+                s.add(v)
+                self.dfs(b, ans, s, n, vx, vy)
+                s.remove(v)
 """
 442. Implement Trie (Prefix Tree)
 https://www.lintcode.com/problem/implement-trie-prefix-tree/description

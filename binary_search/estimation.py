@@ -90,7 +90,7 @@ In order to ensure time complexity, the program will be executed repeatedly.
                 r = m
 
         return l if self.cnt(a_a, l) == k else r
-
+#sorted array中比t小的个数
     def cnt(self, a_a, t):
         cnt = 0
         for a in a_a:
@@ -128,29 +128,55 @@ Implement int sqrt(int x). Compute and return the square root of x.
                 l = m
         # r * r <= x r 跟接近 sqrt x， 求最近小于等于sqrt x的数
         return r if r * r <= x else l
-    def woodCut(self, L, k):
-        l, r = 0, max(L) if L else 0
+"""
+586. Sqrt(x) II
+https://www.lintcode.com/problem/sqrtx-ii/description
+Implement double sqrt(double x) and x >= 0.
+Compute and return the square root of x.
+Input: n = 2  Output: 1.41421356
+Input: n = 3 Output: 1.73205081
+Notice You do not care about the accuracy of the result, we will help you to output results.
+"""
+    def sqrt(self, x):
+        l, r = (1, x) if x >= 1 else (x, 1)
 
-        while l + 1 < r:
-            m = (l + r) // 2
-
-            if self.cnt(L, m) >= k:
+        while l + 1e-10 < r:
+            m = (l + r) / 2
+            if m * m <= x:
                 l = m
             else:
                 r = m
 
-        return r if self.cnt(L, r) >= k else l
+        return l
+"""
+633. Find the Duplicate Number
+https://www.lintcode.com/problem/find-the-duplicate-number/description
+Given an array nums containing n + 1 integers where each integer is between 1 and n (inclusive),
+guarantee that at least one duplicate number must exist. Assume that there is only one duplicate number, find the duplicate one.
+Input: [5,5,4,3,2,1] Output: 5
+Input: [5,4,4,3,2,1] Output: 4
+Notice
+You must not modify the array (assume the array is read only).
+You must use only constant, O(1) extra space.
+Your runtime complexity should be less than O(n^2).
+There is only one duplicate number in the array, but it could be repeated more than once.
+"""
+    @highlight
+    def findDuplicate(self, a):
+        l, r = 1, len(a) - 1
 
-    def cnt(self, L, lngth):
-        c = 0
+        while l + 1 < r:
+            m = (l + r) // 2
 
-        for l in L:
-            c += l // lngth
+            if len([e for e in a if e <= m]) > m:
+                r = m
+            else:
+                l = m
 
-        return c
+        return l if len([e for e in a if e <= l]) > l else r
 """
 183. Wood Cut
-https://www.lintcode.com/problem/wood-cut/description?_from=ladder&&fromId=1
+https://www.lintcode.com/problem/wood-cut/description
 Given n pieces of wood with length L[i] (integer array). Cut them into small pieces to guarantee you could have equal or more than k pieces with the same length.
 What is the longest length you can get from the n pieces of wood? Given L & k, return the maximum length of the small pieces.
 Input: L = [232, 124, 456] k = 7 Output: 114
@@ -162,25 +188,17 @@ Notice: You couldn't cut wood into float length.
 If you couldn't get >= k pieces, return 0.
 """
     def woodCut(self, L, k):
-        l, r = 0, max(L) if L else 0 #答案可以超过最小长度， 当最小长度wood不取，仍有k个
+        l, r = 0, max(L) if a else 0 #答案可以超过最小长度， 当最小长度wood不取，仍有k个
 
         while l + 1 < r:
             m = (l + r) // 2
 
-            if self.cnt(L, m) >= k:
+            if sum([e // m for e in a]) >= k:
                 l = m
             else:
                 r = m
 
-        return r if self.cnt(L, r) >= k else l
-
-    def cnt(self, L, lngth):
-        c = 0
-
-        for l in L:
-            c += l // lngth
-
-        return c
+        return r if sum([e // r for e in a]) >= k else l
 """
 437. Copy Books
 https://www.lintcode.com/problem/copy-books/description
@@ -220,6 +238,7 @@ means k people to copy the book and the i th integer is the time i th person to 
 You must distribute the continuous id books to one people to copy. (You can give book A[1],A[2] to one people,
 but you cannot give book A[1], A[3] to one people, because book A[1] and A[3] is not continuous.)
 Return the number of smallest minutes need to copy all the books.
+#其他解法:heap
 """
     def copyBooksII(self, n, times):
         l, r = 1, min(times) * n
@@ -237,40 +256,6 @@ Return the number of smallest minutes need to copy all the books.
         for i in times:
             num += tm // i
         return n <= num
-
-    def copyBooksII(self, n, times):
-        # write your code here
-        heap = []
-        for time in times:
-            heapq.heappush(heap, (time, time))
-
-        min_time = 0
-        while n > 0:
-            min_time, base = heapq.heappop(heap)
-            n -= 1
-            heapq.heappush(heap, (min_time + base, base))
-
-        return min_time
-"""
-586. Sqrt(x) II
-https://www.lintcode.com/problem/sqrtx-ii/description
-Implement double sqrt(double x) and x >= 0.
-Compute and return the square root of x.
-Input: n = 2  Output: 1.41421356
-Input: n = 3 Output: 1.73205081
-Notice You do not care about the accuracy of the result, we will help you to output results.
-"""
-    def sqrt(self, x):
-        l, r = (1, x) if x >= 1 else (x, 1)
-
-        while l + 1e-10 < r:
-            m = (l + r) / 2
-            if m * m <= x:
-                l = m
-            else:
-                r = m
-
-        return l
 """
 617. Maximum Average Subarray II
 https://www.lintcode.com/problem/maximum-average-subarray-ii/description
@@ -340,37 +325,169 @@ Input: [5] 1 Output: 5.000
 
         return r
 """
-633. Find the Duplicate Number
-https://www.lintcode.com/problem/find-the-duplicate-number/description
-Given an array nums containing n + 1 integers where each integer is between 1 and n (inclusive),
-guarantee that at least one duplicate number must exist. Assume that there is only one duplicate number, find the duplicate one.
-Input: [5,5,4,3,2,1] Output: 5
-Input: [5,4,4,3,2,1] Output: 4
-Notice
-You must not modify the array (assume the array is read only).
-You must use only constant, O(1) extra space.
-Your runtime complexity should be less than O(n^2).
-There is only one duplicate number in the array, but it could be repeated more than once.
+875. Koko Eating Bananas
+Koko loves to eat bananas.  There are N piles of bananas, the i-th pile has piles[i] bananas.  The guards have gone and will come back in H hours.
+Koko can decide her bananas-per-hour eating speed of K.  Each hour, she chooses some pile of bananas, and eats K bananas from that pile.  If the pile has less than K bananas, she eats all of them instead, and won't eat any more bananas during this hour.
+Koko likes to eat slowly, but still wants to finish eating all the bananas before the guards come back.
+Return the minimum integer K such that she can eat all the bananas within H hours.
+Example 1: Input: piles = [3,6,7,11], H = 8 Output: 4
+Example 2: Input: piles = [30,11,23,4,20], H = 5 Output: 30
+Example 3: Input: piles = [30,11,23,4,20], H = 6 Output: 23
 """
-    @highlight
-    def findDuplicate(self, a):
-        l, r = 1, len(a) - 1
+    def minEatingSpeed(self, a: List[int], h: int) -> int:
+        l, r = 1, max(a)
 
         while l + 1 < r:
             m = (l + r) // 2
 
-            if self.countSmallerOrEqual(a, m) > m:
-                r = m
-            else:
+            if sum([math.ceil(e / m) for e in a]) > h:
                 l = m
+            else:
+                r = m
 
-        return l if self.countSmallerOrEqual(a, l) > l else r
+        return l if sum([math.ceil(e / l) for e in a]) <= h else r
+"""
+1011. Capacity To Ship Packages Within D Days
+https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/
+A conveyor belt has packages that must be shipped from one port to another within D days.
+The i-th package on the conveyor belt has a weight of weights[i].  Each day, we load the ship with packages on the conveyor belt (in the order given by weights). We may not load more weight than the maximum weight capacity of the ship.
+Return the least weight capacity of the ship that will result in all the packages on the conveyor belt being shipped within D days.
+A conveyor belt has packages that must be shipped from one port to another within D days.
+Example 1: Input: weights = [1,2,3,4,5,6,7,8,9,10], D = 5 Output: 15
+Explanation: A ship capacity of 15 is the minimum to ship all the packages in 5 days like this:
+1st day: 1, 2, 3, 4, 5 2nd day: 6, 7 3rd day: 8 4th day: 9 5th day: 10
+Note that the cargo must be shipped in the order given, so using a ship of capacity 14 and splitting the packages into parts like (2, 3, 4, 5), (1, 6, 7), (8), (9), (10) is not allowed.
+Example 2: Input: weights = [3,2,2,4,1,4], D = 3 Output: 6 Explanation: A ship capacity of 6 is the minimum to ship all the packages in 3 days like this:
+1st day: 3, 2 2nd day: 2, 4 3rd day: 1, 4
+Example 3: Input: weights = [1,2,3,1,1], D = 4 Output: 3 Explanation: 1st day: 1 2nd day: 2 3rd day: 3 4th day: 1, 1
+"""
+    def shipWithinDays(self, a: List[int], t: int) -> int:
+        l, r = max(a), sum(a)
 
-    def countSmallerOrEqual(self, a, v):
-        cnt = 0
+        while l + 1 < r:
+            m = (l + r) // 2
+
+            if self.days(a, m) > t:
+                l = m
+            else:
+                r = m
+
+        return l if self.days(a, l) <= t else r
+
+    def days(self, a, m):
+        ans, cnt = 1, 0
 
         for e in a:
-            if e <= v:
-                cnt += 1
+            cnt += e
+            if cnt > m:
+                ans, cnt = ans + 1, e
+
+        return ans
+"""
+378. Kth Smallest Element in a Sorted Matrix
+https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/
+Given a n x n matrix where each of the rows and columns are sorted in ascending order, find the kth smallest element in the matrix.
+Note that it is the kth smallest element in the sorted order, not the kth distinct element.
+Example: matrix = [
+[ 1,  5,  9],
+[10, 11, 13],
+[12, 13, 15]
+], k = 8, return 13.
+"""
+    def kthSmallest(self, mtrx: List[List[int]], k: int) -> int:
+        l, r = mtrx[0][0], mtrx[-1][-1]
+
+        while l + 1 < r:
+            t = (l + r) // 2
+
+            if self.cnt(mtrx, t) < k:
+                l = t
+            else:
+                r = t
+
+        return l if self.cnt(mtrx, l) >= k else r
+
+    def cnt(self, mtrx, t):
+        n, m = len(mtrx), len(mtrx[0]) if mtrx else 0
+        i, j, cnt = n - 1, 0, 0
+
+        while i >= 0 and j < m:
+            if mtrx[i][j] <= t:
+                cnt += i + 1
+                j += 1
+            else:
+                i -= 1
 
         return cnt
+"""
+668. Kth Smallest Number in Multiplication Table
+https://leetcode.com/problems/kth-smallest-number-in-multiplication-table/
+Nearly every one have used the Multiplication Table. But could you find out the k-th smallest number quickly from the multiplication table?
+Given the height m and the length n of a m * n Multiplication Table, and a positive integer k, you need to return the k-th smallest number in this table.
+Example 1: Input: m = 3, n = 3, k = 5
+Output: Explanation: The Multiplication Table:
+1	2	3
+2	4	6
+3	6	9
+The 5-th smallest number is 3 (1, 2, 2, 3, 3).
+Example 2: Input: m = 2, n = 3, k = 6
+Output: Explanation:
+The Multiplication Table:
+1	2	3
+2	4	6
+The 6-th smallest number is 6 (1, 2, 2, 3, 4, 6).
+Note: The m and n will be in the range [1, 30000]. The k will be in the range [1, m * n]
+"""
+    def findKthNumber(self, m: int, n: int, k: int) -> int:
+        l, r = 1, m * n
+
+        while l + 1 < r:
+            mid = (l + r) // 2
+
+            if sum([min(n, mid // i) for i in range(1, m + 1)]) < k:
+                l = mid
+            else:
+                r = mid
+
+        return l if sum([min(n, l // i) for i in range(1, m + 1)]) == k else r
+"""
+719. Find K-th Smallest Pair Distance
+https://leetcode.com/problems/find-k-th-smallest-pair-distance/
+Given an integer array, return the k-th smallest distance among all the pairs. The distance of a pair (A, B) is defined as the absolute difference between A and B.
+Example 1: Input: nums = [1,3,1] k = 1 Output: 0 Explanation: Here are all the pairs:
+
+Then the 1st smallest distance pair is (1,1), and its distance is 0.
+"""
+    def smallestDistancePair(self, a: List[int], k: int) -> int:
+        a.sort()
+        l, r = 0, a[-1] - a[0]
+
+        while l + 1 < r:
+            m = (l + r) // 2
+
+            if self.cnt(a, m) < k:
+                l = m
+            else:
+                r = m
+        #(1,3) -> 2 (1,1) -> 0 (3,1) -> 2, k == 2 cnt == 3, 所以 >=k
+        return l if self.cnt(a, l) >= k else r
+
+    def cnt(self, a, m):
+        l, ans = 0, 0
+
+        for r in range(1, len(a)):
+            while a[r] - a[l] > m:
+                l += 1
+
+            ans += r - l
+
+        return ans
+"""
+786. K-th Smallest Prime Fraction
+https://leetcode.com/problems/k-th-smallest-prime-fraction/
+A sorted list A contains 1, plus some number of primes.  Then, for every p < q in the list, we consider the fraction p/q.
+What is the K-th smallest fraction considered?  Return your answer as an array of ints, where answer[0] = p and answer[1] = q.
+Examples: Input: A = [1, 2, 3, 5], K = 3 Output: [2, 5]
+Explanation: The fractions to be considered in sorted order are: 1/5, 1/3, 2/5, 1/2, 3/5, 2/3.
+The third fraction is 2/5. Input: A = [1, 7], K = 1 Output: [1, 7]
+"""

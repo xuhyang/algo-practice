@@ -44,3 +44,21 @@ Input: m = 2, n = 36 Output: 8
         return f[-1][-1]
 
 https://www.lintcode.com/problem/card-game-ii/
+https://www.lintcode.com/problem/traveling-salesman-problem/
+https://www.lintcode.com/problem/find-the-shortest-superstring/description
+https://leetcode.com/problems/partition-to-k-equal-sum-subsets/solution/
+"""
+343. Integer Break
+https://leetcode.com/problems/integer-break/
+Given a positive integer n, break it into the sum of at least two positive integers and maximize the product of those integers. Return the maximum product you can get.
+Example 1: Input: 2 Output: 1 Explanation: 2 = 1 + 1, 1 × 1 = 1.
+Example 2: Input: 10 Output: 36 Explanation: 10 = 3 + 3 + 4, 3 × 3 × 4 = 36.
+"""
+   def integerBreak(self, n: int) -> int:
+        f = [0] * (n + 1)
+
+        for i in range(2, n + 1):
+            for j in range(1, i):
+                f[i] = max(f[i], max(j, f[j]) * max(i - j, f[i - j]))
+                
+        return f[-1]

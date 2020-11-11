@@ -1,4 +1,6 @@
-class dualsequence:
+class dualsequence: 前缀型
+https://www.lintcode.com/problem/minimum-window-subsequence/description
+762 581 119 857 32 397, 77
 """
 29. Interleaving String
 https://www.lintcode.com/problem/interleaving-string/description
@@ -30,16 +32,37 @@ Challenge: O(n2) time or better
                 f[i][j] = f[i - 1][j] and s1[i - 1] == s3[i + j - 1] or f[i][j - 1] and s2[j - 1] == s3[i + j - 1]
 
         return f[-1][-1]
+
+    def isInterleave(self, l, r, t):
+        n, m = len(l), len(r)
+
+        if n + m != len(t):
+            return False
+
+        f = [[False] * (m + 1) for _ in range(n + 1)]
+        f[0][0] = True
+
+        for i in range(1, n + 1):
+            f[i][0] = l[i - 1] == t[i - 1]
+
+        for j in range(1, m + 1):
+            f[0][j] = r[j - 1] == t[j - 1]
+
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                f[i][j] = l[i - 1] == t[i + j - 1] and f[i - 1][j] or r[j - 1] == t[i + j - 1] and f[i][j - 1]
+
+        return f[-1][-1]
 """
-77. Longest Common Subsequence
-https://www.lintcode.com/problem/longest-common-subsequence/description
+77. Longest Common Subsequence 前缀型, 匹配型
+https://www.lintcode.com/problem/longest-common-sub sequence/description
 Given two strings, find the longest common subsequence (LCS).
 Your code should return the length of LCS.
-Input:  "ABCD" and "EDCA" Output: 1 Explanation: LCS is 'A' or  'D' or 'C'
-Input: "ABCD" and "EACB" Output:  2 Explanation: LCS is "AC"
+Input: "ABCD" and "EDCA" Output: 1 Explanation: LCS is 'A' or  'D' or 'C'
+Input: "ABCD" and "EACB" Output: 2 Explanation: LCS is "AC"
 Clarification: What's the definition of Longest Common Subsequence?
 """
-    def longestCommonSubsequence(self, a, b):
+    def longestCommonSubsequence( self, a, b):
         m, n = len(a), len(b)
         f = [[0] * (m + 1) for _ in range(n + 1)]
 
@@ -82,6 +105,20 @@ exection -> execution (insert 'u')
                 f[i][j] = min(f[i - 1][j - 1] + (0 if w1[i - 1] == w2[j - 1] else 1), f[i - 1][j] + 1, f[i][j - 1] + 1)
 
         return f[-1][-1]
+
+    def minDistance(self, w1, w2):
+        f, n, m = [[0] * (len(w2) + 1) for _ in range(len(w1) + 1)], len(w1), len(w2)
+
+        for i in range(n + 1):
+            f[i][0] = i
+        for j in range(m + 1):
+            f[0][j] = j
+
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                f[i][j] = min(f[i - 1][j - 1] + (0 if w1[i - 1] == w2[j - 1] else 1), f[i][j - 1] + 1, f[i - 1][j] + 1)
+
+        return f[-1][-1]
 """
 192. Wildcard Matching
 https://www.lintcode.com/problem/wildcard-matching/description
@@ -116,6 +153,19 @@ The matching should cover the entire input string (not partial).
                     f[i][j] = f[i - 1][j - 1] or f[i - 1][j] or f[i][j - 1]
 
         return f[-1][-1]
+
+    def isMatch(self, s, p):
+        f, n, m = [[False] * (len(p) + 1) for _ in range(len(s) + 1)], len(s), len(p)
+        f[0][0] = True
+
+        for j in range(1, m + 1):
+            f[0][j] = p[j - 1] == '*' and f[0][j - 1]
+
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                f[i][j] = (s[i - 1] == p[j - 1] or p[j - 1] == '?') and f[i - 1][j - 1] or p[j - 1] == '*' and (f[i - 1][j - 1] or f[i - 1][j] or f[i][j - 1])
+
+        return f[-1][-1]
 """
 154. Regular Expression Matching
 https://www.lintcode.com/problem/regular-expression-matching/description
@@ -134,29 +184,19 @@ isMatch("ab", ".*") → true
 isMatch("aab", "c*a*b") → true
 """
     def isMatch(self, s, p):
-        return self.dvcq({}, s, p, 0, 0)
+        f, n, m = [[False for i in range(len(p) + 1)] for j in range(len(s) + 1)], len(s), len(p)
+        f[0][0] = True   #dp[0][0]初始化为true，由此开始转移
 
-    def dvcq(self, f, s, p, i, j):
-        n, m = len(s), len(p)
-        f = [[False] * (m + 1) for _ in range(n + 1)]
-        f[0][0] = True
-
-        for j in range(1, m + 1):
-            if j < len(p) and p[j] == '*':
-                f[0][j] = f[0][j - 1]
+        for j in range(1, len(p) + 1):
+            f[0][j] = p[j - 1] == '*' and f[0][j - 2]
 
         for i in range(1, n + 1):
             for j in range(1, m + 1):
-
-                if s[i - 1] == p[j - 1] or p[j - 1] == '.':
-                    if j < len(p) and p[j] == '*':
-                        f[i][j] = f[i - 1][j - 1] or f[i - 1][j] or f[i][j - 1]
-                    else:
-                        f[i][j] = f[i - 1][j - 1]
+                if s[i - 1] == p[j - 1] or p[j - 1] == '.':  #如果两字符相同或者为.
+                    f[i][j] = f[i - 1][j - 1]    #当前状态由前一个转移而来
                 elif p[j - 1] == '*':
-                    f[i][j] = f[i][j - 1]
-                elif j < len(p) and p[j] == '*':
-                    f[i][j] = f[i - 1][j - 1]
+                    #能匹配但是不匹配 or 匹配0个或多个
+                    f[i][j] = (s[i - 1] == p[j - 2] or p[j - 2] == '.') and f[i - 1][j] or f[i][j - 2]
 
         return f[-1][-1]
 """
@@ -172,4 +212,3 @@ Example
 Given words = ["abc", "abd", "abcd", "adc"] and target = "ac", k = 1
 Return ["abc", "adc"]
 """
-*/

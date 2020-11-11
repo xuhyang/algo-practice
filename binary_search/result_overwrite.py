@@ -25,7 +25,7 @@ Input: [4,2,4,5,3,7] Output: 4 Explanation: LIS is [2,4,5,7]
 
         return max_i + 1
 """
-602. Russian Doll Envelopes
+** 602. Russian Doll Envelopes
 https://www.lintcode.com/problem/russian-doll-envelopes/description
 Give a number of envelopes with widths and heights given as a pair of integers (w, h).
 One envelope can fit into another if and only if both the width and height of one envelope is greater than the width and height of the other envelope.
@@ -35,8 +35,8 @@ Input：[[4,5],[4,6],[6,7],[2,3],[1,1]] Output：4 Explanation：the maximum num
 """
     @highlight
     def maxEnvelopes(self, envelopes):
-        envelopes.sort(key = lambda e: (e[0], -e[1])) # -e[1] 为了好处理 相同 e[0]
         rslt = [[sys.maxsize, sys.maxsize]]
+        envelopes.sort(key = lambda e: (e[0], -e[1])) # -e[1] 为了好处理 相同 e[0]
 
         for e in envelopes:
             if rslt[-1][1] < e[1]: #因为sorted，e[i - 1][0] < e[i - 1][0] 只需判断 e[i - 1][1] < e[i - 1][1]； e[i - 1][0] == e[i - 1][0] 因为e[i][1]反排序不满足rslt[-1][1] < e[1]

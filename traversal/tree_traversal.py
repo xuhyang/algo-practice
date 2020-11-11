@@ -118,7 +118,36 @@ The number of nodes does not exceed 20.
                 n = n.left
 
         return ans
+"""
+85. Insert Node in a Binary Search Tree
+https://www.lintcode.com/problem/insert-node-in-a-binary-search-tree/description
+Given a binary search tree and a new tree node, insert the node into the tree. You should keep the tree still be a valid binary search tree.
+Example 1: Input:  tree = {}, node = 1 Output:  1 Explanation: Insert node 1 into the empty tree, so there is only one node on the tree.
+Example 2: Input: tree = {2,1,4,3}, node = 6 Output: {2,1,4,3,6} Explanation: Like this:
+	  2             2
+	 / \           / \
+	1   4   -->   1   4
+	   /             / \
+	  3             3   6
+Challenge: Can you do it without recursion?
+Notice: You can assume there is no duplicate values in this tree + node.
+"""
+    def insertNode(self, r, t):
+        n = r
 
+        while n:
+            if n.val > t.val:
+                if not n.left:
+                    n.left = t
+                    break
+                n = n.left
+            else:
+                if not n.right:
+                    n.right = t
+                    break
+                n = n.right
+
+        return r if r else t
 """
 86. Binary Search Tree Iterator
 https://www.lintcode.com/problem/binary-search-tree-iterator/description
@@ -166,6 +195,132 @@ Super Star: Extra memory usage O(1)
                 n = n.left
 
             return nxt
+"""
+87. Remove Node in Binary Search Tree
+Given a root of Binary Search Tree with unique value for each node.
+Remove the node with given value. If there is no such a node with given value in the binary search tree, do nothing.
+You should keep the tree still a binary search tree after removal.
+Example 1 Input: Tree = {5,3,6,2,4} k = 3 Output: {5,2,6,#,4} or {5,4,6,2} Explanation: Given binary search tree:
+    5
+   / \
+  3   6
+ / \
+2   4
+Remove 3, you can either return:
+    5
+   / \
+  2   6
+   \
+    4
+or
+    5
+   / \
+  4   6
+ /
+2
+Example 2: Input: Tree = {5,3,6,2,4} k = 4 Output: {5,3,6,2} Explanation: Given binary search tree:
+    5
+   / \
+  3   6
+ / \
+2   4
+Remove 4, you should return:
+    5
+   / \
+  3   6
+ /
+2
+"""
+    def removeNode(self, r, v):
+        d = p = TreeNode(0)
+        d.left = n = r
+
+        while n:
+            if n.val == v:
+                break
+            elif n.val > v:
+                p, n = n, n.left
+            else:
+                p, n = n, n.right
+
+        if not n:
+            return r
+        t = n
+        if not t.right:
+            if p.left == t:
+                p.left = t.left
+            else:
+                p.right = t.left
+            return d.left
+
+        f, n = t, t.right
+        while n.left:
+            f, n = n, n.left
+
+        if f.right == n:
+            f.right = n.right
+        else:
+            f.left = n.right
+     # if p.left == t:
+     #        p.left = n
+     #    else:
+     #        p.right = n
+     #
+     #    n.left, n.right = t.left, t.right
+        t.val, n.left, n.right = n.val, None, None
+        return d.left
+"""
+691. Recover Binary Search Tree
+https://www.lintcode.com/problem/recover-binary-search-tree/description
+In a binary search tree, (Only) two nodes are swapped. Find out these nodes and swap them. If there no node swapped, return original root of tree.
+Example 1: Input: {4,5,2,1,3} Output: {4,2,5,1,3} Explanation:
+Given a binary search tree:
+    4
+   / \
+  5   2
+ / \
+1   3
+return
+    4
+   / \
+  2   5
+ / \
+1   3
+Example 2: Input: {1,2,5,4,3} Output: {4,2,5,1,3}
+Given a binary search tree:
+    1
+   / \
+  2   5
+ / \
+4   3
+return
+    4
+   / \
+  2   5
+ / \
+1   3
+"""
+    def bstSwappedNode(self, r):
+        vls, nds, s, n, i = [], [], [], r, 0
+
+        while n:
+            s.append(n)
+            n = n.left
+
+        while s:
+            vls.append(s[-1].val)
+            nds.append(s[-1])
+            n = s.pop().right
+
+            while n:
+                s.append(n)
+                n = n.left
+
+        vls.sort()
+        for n in nds:
+            n.val, i = vls[i], i + 1
+
+        return r
 """
 900. Closest Binary Search Tree Value
 https://www.lintcode.com/problem/closest-binary-search-tree-value/description
@@ -259,6 +414,35 @@ You are guaranteed to have only one unique set of k values in the BST that are c
             prv.append(n)
             n = n.right
 """
+902. Kth Smallest Element in a BST
+https://www.lintcode.com/problem/kth-smallest-element-in-a-bst/description
+Given a binary search tree, write a function kthSmallest to find the kth smallest element in it.
+Input：{1,#,2},2 Output：2 Explanation：The second smallest element is 2.
+	1
+	 \
+	  2
+Input：{2,1,3},1 Output：1 Explanation：The first smallest element is 1.
+  2
+ / \
+1   3
+Challenge: What if the BST is modified (insert/delete operations) often and you need to find the kth smallest frequently? How would you optimize the kthSmallest routine?
+其他解法: dvcq
+"""
+    def kthSmallest(self, r, k):
+        s, n, v = [], r, None
+
+        while n:
+            s.append(n)
+            n = n.left
+
+        for _ in range(k):
+            v, n = s[-1].val, s.pop().right
+            while n:
+                s.append(n)
+                n = n.left
+
+        return v
+"""
 915. Inorder Predecessor in BST
 https://www.lintcode.com/problem/inorder-predecessor-in-bst/description
 Given a binary search tree and a node in it, find the in-order predecessor of that node in the BST.
@@ -303,3 +487,79 @@ p and q are different and both values will exist in the BST.
                 n = n.right
 
         return n.val
+"""
+1359. Convert Sorted Array to Binary Search Tree
+https://www.lintcode.com/problem/convert-sorted-array-to-binary-search-tree/description
+Given an array where elements are sorted in ascending order, convert it to a height balanced BST.
+For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of
+the two subtrees of every node never differ by more than 1.
+Example 1: Input: [-10,-3,0,5,9] Output: [0,-3,9,-10,#,5]
+Explanation: One possible answer is: [0,-3,9,-10,null,5], which represents the following height balanced BST:
+      0
+     / \
+   -3   9
+   /   /
+ -10  5
+"""
+    def convertSortedArraytoBinarySearchTree(self, a):
+        return self.dvcq_pst(a, 0, len(a) - 1)
+
+    def dvcq_pst(self, a, l, r):
+        if l > r:
+            return None
+
+        m = (l + r) // 2
+        n = TreeNode(a[m])
+        n.left, n.right = self.dvcq_pst(a, l, m - 1), self.dvcq_pst(a, m + 1, r)
+        return n
+"""
+1203. Find Mode in Binary Search Tree
+https://www.lintcode.com/problem/find-mode-in-binary-search-tree/description
+Given a binary search tree (BST) with duplicates, find all the mode(s) (the most frequently occurred element) in the given BST.
+Assume a BST is defined as follows:
+The left subtree of a node contains only nodes with keys less than or equal to the node's key.
+The right subtree of a node contains only nodes with keys greater than or equal to the node's key.
+Both the left and right subtrees must also be binary search trees.
+Example 1: Input: {1,#,2,2} Output:[2]
+Explanation:
+1
+ \
+  2
+ /
+2
+Example 2: Input: {-2,-2,-2} Output: [-2]
+Explanation:
+   -2
+   /  \
+-2    -2
+Notice: If a tree has more than one mode, you can return them in any order.
+collection中找重复次数最多元素,
+unique:
+    sort + find_max_traverse, Time: o(nlogn) + o(n), Space o(1)
+    traverse_find_max: Time: o(n), Space o(n)
+multiple:
+    sort + find_max_traverse + traverse again, Time: o(nlogn) + o(n) + o(n), Space o(1)
+    traverse_dict_find_max + traverse dict: Time:  o(n) + o(n), Space o(n)
+"""
+    def findMode(self, r):
+        max_cnt, n, s, cnt, ans = 0, r, [], {}, []
+
+        while n:
+            s.append(n)
+            n = n.left
+
+        while s:
+            n = s.pop()
+            cnt[n.val] = cnt.get(n.val, 0) + 1
+            max_cnt = max(max_cnt, cnt[n.val])
+            n = n.right
+
+            while n:
+                s.append(n)
+                n = n.left
+
+        for k, v in cnt.items():
+            if v == max_cnt:
+                ans.append(k)
+
+        return ans

@@ -39,26 +39,24 @@ Input: source = "adobecodebanc", target = "abc" Output: "banc"
 考点：同向双指针, threshold 实现
 """
     def minWindow(self, s, t):
-        thrshld, cnt, k = collections.Counter(t), {}, 0
-        g_l, g_r, min_len = -1, -1, sys.maxsize
+        th, cnt, k, l, min_l, min_r = collections.Counter(t), {}, 0, 0, 0, sys.maxsize
 
-        l = 0
-        for r, c in enumerate(s):
-            cnt[c] = cnt.get(c, 0) + 1
-            if c in thrshld and cnt[c] == thrshld[c]:
+        for r in range(len(s)):
+            cnt[s[r]] = cnt.get(s[r], 0) + 1
+
+            if cnt[s[r]] == th[s[r]]:
                 k += 1
 
-            while k == len(thrshld):
-                if r - l + 1 < min_len:
-                    g_l, g_r, min_len = l, r, r - l + 1
+            while k == len(th):
+                if r - l < min_r - min_l:
+                    min_l, min_r = l, r
+                cnt[s[l]] -= 1
 
-                l_c = s[l]
-                cnt[l_c] -= 1
-                if l_c in thrshld and cnt[l_c] == thrshld[l_c] - 1:
+                if cnt[s[l]] == th[s[l]] - 1:
                     k -= 1
                 l += 1
 
-        return s[g_l: g_r + 1] if min_len < sys.maxsize else ''
+        return s[min_l : min_r + 1] if min_r != sys.maxsize else ''
 """
 101. Remove Duplicates from Sorted Array II
 https://www.lintcode.com/problem/remove-duplicates-from-sorted-array-ii/my-submissions
@@ -78,6 +76,18 @@ Input:  [1,1,1,2,2,3] Output: 5 Explanation: the length is 5: [1,1,2,2,3]
                 a[l] = a[r]
 
         return l + 1
+
+    def removeDuplicates(self, a):
+        l, cnt = 0, 1
+
+        for r in range(1, len(a)):
+            cnt = cnt + 1 if a[r - 1] == a[r] else 1
+
+            if cnt <= 2:
+                a[l] = a[r]
+                l += 1
+
+        return l if a else 0
 """
 102. Linked List Cycle
 https://www.lintcode.com/problem/linked-list-cycle/description
@@ -139,19 +149,17 @@ Example Input: [2->6->null,5->null,7->null] Output:  2->5->6->7->null
         m = (s + e) // 2
         return self.merge(self.dvcq(l, s, m), self.dvcq(l, m + 1, e))
 
-    def merge(self, p1, p2):
-        d = p = ListNode(sys.maxsize)
+    def merge(self, l, r):
+        d = n = ListNode(sys.maxsize)
 
-        while p1 and p2:
-            if p1.val <= p2.val:
-                p.next = p1
-                p1 = p1.next
+        while l and r:
+            if l.val < r.val:
+                n.next, l = l, l.next
             else:
-                p.next = p2
-                p2 = p2.next
-            p = p.next
+                n.next, r = r, r.next
+            n = n.next
 
-        p.next = p1 or p2
+        n.next = l or r
 
         return d.next
 
@@ -263,29 +271,6 @@ find its index in all the permutations of these numbers, which are ordered in le
 
         return idx
 """
-200. Longest Palindromic Substring
-https://www.lintcode.com/problem/longest-palindromic-substring/description
-Given a string S, find the longest palindromic substring in S.
-You may assume that the maximum length of S is 1000, and there exists one unique longest palindromic substring.
-"""
-    def longestPalindrome(self, s):
-        lngst = ''
-
-        for m in range(len(s)):
-            lngst = max([lngst, self.plndrm(s, m, m), self.plndrm(s, m, m + 1)],  key=len)
-
-        return lngst
-
-    def plndrm(self, s, l, r):
-        lngth = 0
-
-        while l >= 0 and r < len(s):
-            if s[l] != s[r]:
-                break
-            lngth, l, r = lngth + 1, l - 1, r + 1
-
-        return s[l + 1 : r]
-"""
 228. Middle of Linked List
 https://www.lintcode.com/problem/middle-of-linked-list/description
 Find the middle node of a linked list.
@@ -349,6 +334,20 @@ Input: "abcabcbb" Output: 3 Input: "bbbbb" Output: 1
             lngst = max(lngst, r - l + 1)
 
         return lngst
+
+    def lengthOfLongestSubstring(self, a):
+        l, s, lngst = 0, set(), 0
+
+        for r in range(len(a)):
+
+            while a[r] in s:
+                s.remove(a[l])
+                l += 1
+
+            s.add(a[r])
+            lngst = max(lngst, len(s))
+
+        return lngst
     #后驱，前轮探路
     def lengthOfLongestSubstring(self, a):
         r, s, lngst = 0, set(), 0
@@ -365,26 +364,27 @@ Input: "abcabcbb" Output: 3 Input: "bbbbb" Output: 1
         return lngst
 """
 386. Longest Substring with At Most K Distinct Characters
-https://www.lintcode.com/problem/longest-substring-with-at-most-k-distinct-characters/my-submissions
+https://www.lintcode.com/problem/longest-substring-with-at-most-k-distinct-characters/description
 Given a string S, find the length of the longest substring T that contains at most k distinct characters.
 """
     @hightlight
-    def lengthOfLongestSubstringKDistinct(self, a, k):
-        l, cntr, lngst = 0, {}, 0
+    def lengthOfLongestSubstringKDistinct(self, s, k):
+        l, cnt, ans = 0, {}, 0
 
-        for r in range(len(a)):
-            cntr[a[r]] = cntr.get(a[r], 0) + 1
+        for r in range(len(s)):
+            cnt[s[r]] = cnt.get(s[r], 0) + 1
 
-            if len(cntr) <= k:
-                lngst = max(lngst, r - l + 1)
+            while len(cnt) > k:
+                cnt[s[l]] -= 1
 
-            while len(cntr) > k:
-                cntr[a[l]] -= 1
-                if cntr[a[l]] == 0:
-                    cntr.pop(a[l])
+                if cnt[s[l]] == 0:
+                    cnt.pop(s[l])
                 l += 1
 
-        return lngst
+            ans = max(ans, r - l + 1)
+
+        return ans
+
 
     def lengthOfLongestSubstringKDistinct(self, a, k):
         r, cntr, lngst = 0, {}, 0
@@ -405,82 +405,25 @@ Given a string S, find the length of the longest substring T that contains at mo
 
         return lngst
 """
-404. Subarray Sum II
-https://www.lintcode.com/problem/subarray-sum-ii/description
-Given an positive integer array A and an interval. Return the number of subarrays whose sum is in the range of given interval.
-Input: A = [1, 2, 3, 4], start = 1, end = 3 Output: 4
-#思路：3指针 + win_sum 维持两个窗口 < start, <= end, 注意 < start, 等于start的交给end窗口
-"""
-    @highlight
-    def subarraySumII(self, a, start, end):
-        l, r, l_sum, r_sum, ans, n = 0, 0, 0, 0, 0, len(a)
-
-        for i in range(n):
-            l, r = max(i, l), max(i, r)
-
-            while l < n and l_sum + a[l] < start:
-                l_sum += a[l]
-                l += 1
-            while r < n and r_sum + a[r] <= end:
-                r_sum += a[r]
-                r += 1
-
-            if r > l:
-                ans += r - l
-
-            if l > i:
-                l_sum -= a[i]
-            if r > i:
-                r_sum -= a[i]
-
-        return ans
-"""
 406. Minimum Size Subarray Sum
 https://www.lintcode.com/problem/submatrix-sum/description
 Given an array of n positive integers and a positive integer s, find the minimal length of a subarray of which the sum ≥ s. If there isn't one, return -1 instead.
 Input: [2,3,1,2,4,3], s = 7 Output: 2
 # 2p + win_sum
 """
-    def minimumSize(self, a, s):
-        l = 0
-        win_sum = 0
-        min_lngth = sys.maxsize
+    def minimumSize(self, a, t):
+        l, s, ans = 0, 0, sys.maxsize
 
         for r in range(len(a)):
-            win_sum += a[r]
+            s += a[r]
 
-            while l <= r and win_sum >= s:
-                min_lngth = min(min_lngth, r - l + 1)
-                win_sum -= a[l]
-                l += 1
+            while s >= t:
+                ans, s, l = min(ans, r - l + 1), s - a[l], l + 1
 
-        return min_lngth if min_lngth != sys.maxsize else -1
-"""
-415. Valid Palindrome
-https://www.lintcode.com/problem/valid-palindrome/description
-Given a string, determine if it is a palindrome,
-considering only alphanumeric characters and ignoring cases.
-"""
-    def isPalindrome(self, s):
-        l, r = 0, len(s) - 1
-
-        while l < r:
-            if not s[l].isalnum():
-                l += 1
-                continue
-            if not s[r].isalnum():
-                r -= 1
-                continue
-
-            if s[l].lower() != s[r].lower():
-                return False
-            l, r = l + 1, r - 1
-
-        return True
-
+        return ans if ans != sys.maxsize else -1
 """
 521. Remove Duplicate Numbers in Array
-https://www.lintcode.com/problem/remove-duplicate-numbers-in-array/description
+https://www.lintcode.com/problem/two-sum-difference-equals-to-target/description
 Description：Given an array of integers, remove the duplicate numbers in it.
 You should: Do it in place in the array. Move the unique numbers to the front of the array.
 Return the total number of the unique numbers. You don't need to keep the original order of the integers.
@@ -509,13 +452,10 @@ Input: nums = [0, 0, 0, 3, 1], Output: [3, 1, 0, 0, 0].
 """
     def moveZeroes(self, a):
         l = 0
-        for r in range(len(a)):
-            if a[r] == 0:
-                continue
 
-            a[l], a[r] = a[r], a[l]
-            l += 1
-        return l
+        for r in range(len(a)):
+            if a[r] != 0:
+                a[l], a[r], l = a[r], a[l], l + 1
 """
 547. Intersection of Two Arrays
 https://www.lintcode.com/problem/intersection-of-two-arrays/description
@@ -719,15 +659,13 @@ You need to output the maximum average value.
 Notice: 1 <= k <= n <= 30,000. Elements of the given array will be in the range [-10,000, 10,000].
 """
     def findMaxAverage(self, a, k):
-        l, sum, max_sum = 0, 0, -sys.maxsize
+        max_sum, sum, l = -sys.maxsize, 0, 0
 
         for r in range(len(a)):
             sum += a[r]
 
             if r >= k - 1:
-                max_sum = max(max_sum, sum)
-                sum -= a[l]
-                l += 1
+                max_sum, sum, l = max(max_sum, sum), sum - a[l], l + 1
 
         return max_sum / k
 """
@@ -754,7 +692,6 @@ There is 1 substring whose length is 12, "abcabcabcabc" So the answer is 1 + 2 +
                 if cnt[s[l]] == 0:
                     cnt.pop(s[l])
                 l += 1
-
             ans += l
 
         return ans

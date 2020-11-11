@@ -45,6 +45,7 @@ Find all unique triplets in the array which gives the sum of zero.
         for i in range(n):
             if i > 0 and a[i - 1] == a[i]: #i剪枝
                 continue
+
             l, r = i + 1, n - 1
             while l < r:
                 sum = a[l] + a[r]
@@ -53,8 +54,8 @@ Find all unique triplets in the array which gives the sum of zero.
                 elif sum > -a[i] or r < n - 1 and a[r] == a[r + 1]: # r剪枝
                     r -= 1
                 else:
-                    rslt.append([a[i], a[l], a[r]])
-                    l, r = l + 1, r - 1
+                    rslt, l, r = rslt + [[a[i], a[l], a[r]]], l + 1, r - 1
+
         return rslt
 """
 58. 4Sum
@@ -118,26 +119,24 @@ Notice You may assume that each input would have exactly one solution.
         return ans
 """
 363. Trapping Rain Water
+https://www.lintcode.com/problem/trapping-rain-water/description
 Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it is able to trap after raining.
-Trapping Rain Water
 Input: [0,1,0] Output: 0
 Input: [0,1,0,2,1,0,1,3,2,1,2,1] Output: 6
-Challenge
-O(n) time and O(1) memory O(n) time and O(n) memory is also acceptable.
+Challenge: O(n) time and O(1) memory O(n) time and O(n) memory is also acceptable.
 """
     def trapRainWater(self, h):
         l, r, w = 0, len(h) - 1, 0
         l_max, r_max = (h[l], h[r]) if h else (0, 0)
 
-        while l <= r:
-
+        while l < r:
             if l_max <= r_max:
                 l_max = max(l_max, h[l])
                 w, l = w + l_max - h[l], l + 1
             else:
                 r_max = max(r_max, h[r])
                 w, r = w + r_max - h[r], r - 1
-            
+
         return w
 """
 382. Triangle Count
@@ -356,3 +355,27 @@ Notice: You only call flip function. Don't allow to use any sort function or oth
             if max_l != 0:
                 FlipTool.flip(a, max_l) #翻转到0
             FlipTool.flip(a, r) #反转到r
+"""
+200. Longest Palindromic Substring
+https://www.lintcode.com/problem/longest-palindromic-substring/description
+Given a string S, find the longest palindromic substring in S.
+You may assume that the maximum length of S is 1000, and there exists one unique longest palindromic substring.
+其他解法:dp
+"""
+    def longestPalindrome(self, s):
+        lngst = ''
+
+        for m in range(len(s)):
+            lngst = max([lngst, self.plndrm(s, m, m), self.plndrm(s, m, m + 1)],  key=len)
+
+        return lngst
+
+    def plndrm(self, s, l, r):
+        lngth = 0
+
+        while l >= 0 and r < len(s):
+            if s[l] != s[r]:
+                break
+            lngth, l, r = lngth + 1, l - 1, r + 1
+
+        return s[l + 1 : r]

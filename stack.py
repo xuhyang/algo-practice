@@ -11,18 +11,17 @@ All above should be in O(1) cost.
     class MinStack:
 
         def __init__(self):
-        self.s, self.min_s = [], []
+            self.s, self.min_s = [], [sys.maxsize]
 
         def push(self, e):
             self.s.append(e)
-            if len(self.min_s) == 0 or e <= self.min_s[-1]:
+            if e <= self.min_s[-1]:
                 self.min_s.append(e)
 
         def pop(self):
-            e = self.s.pop()
-            if e == self.min_s[-1]:
+            if self.s[-1] == self.min_s[-1]:
                 self.min_s.pop()
-            return e
+            return self.s.pop()
 
         def min(self):
             return self.min_s[-1]
@@ -206,21 +205,17 @@ Example Input: the list [[1,1],2,[1,1]],  Output: 10.  four 1's at depth 2, one 
 
         return ans
 
-      def depthSum(self, nestedList):
-        if len(nestedList) == 0:
-            return 0
-        stack = []
-        sum = 0
-        for n in nestedList:
-            stack.append((n, 1))
-        while stack:
-            next, d = stack.pop(0)
-            if next.isInteger():
-               sum += d * next.getInteger()
+    def depthSum(self, l):
+        s, ans = [(e, 1) for e in l], 0
+
+        while s:
+            e, d = s.pop()
+            if e.isInteger():
+                ans += e.getInteger() * d
             else:
-                for i in next.getList():
-                    stack.append((i, d+1))
-        return sum
+                s += [(i, d + 1) for i in e.getList()]
+
+        return ans
 """
 575. Decode String
 https://www.lintcode.com/problem/decode-string/description
@@ -252,3 +247,64 @@ Input: S = 3[2[ad]3[pf]]xyz Output: "adadpfpfpfadadpfpfpfadadpfpfpfxyz"
                     stck.append(rslt)
 
         return stck.pop() if stck else ""
+"""
+227. Basic Calculator II
+https://leetcode.com/problems/basic-calculator-ii/
+Implement a basic calculator to evaluate a simple expression string.
+The expression string contains only non-negative integers, +, -, *, / operators and empty spaces . The integer division should truncate toward zero.
+Input: "3+2*2" Output: 7
+Input: " 3/2 " Output: 1
+Input: " 3+5 / 2 " Output: 5
+"""
+       stck, d, s = [], 0, s
+
+        prv_op = '+'
+        for i, c in enumerate(s):
+            if c.isdigit():
+                d = d * 10 + int(c)
+            if (c.isdigit() or c == ' ') and i != len(s) - 1:
+                continue
+            if prv_op == '+':
+                stck.append(d)
+            elif prv_op == '-':
+                stck.append(-d)
+            elif prv_op == '*':
+                stck.append(stck.pop() * d)
+            elif prv_op == '/':
+                p = stck.pop()
+                stck.append(p // d if not p < 0 else -(abs(p) // d))
+
+            prv_op, d = c, 0
+
+        return sum(stck)
+"""
+385. Mini Parser
+https://leetcode.com/problems/mini-parser/
+Given a nested list of integers represented as a string, implement a parser to deserialize it.
+Each element is either an integer, or a list -- whose elements may also be integers or other lists.
+Note: You may assume that the string is well-formed:
+String is non-empty. String does not contain white spaces. String contains only digits 0-9, [, - ,, ].
+Example 1: Given s = "324", You should return a NestedInteger object which contains a single integer 324.
+Example 2: Given s = "[123,[456,[789]]]", Return a NestedInteger object containing a nested list with 2 elements:
+"""
+def deserialize(self, s: str) -> NestedInteger:
+        stck, d, pos = [NestedInteger()], sys.maxsize, True
+
+        for i, c in enumerate(s):
+            if c == '[':
+                n = NestedInteger()
+                stck[-1].add(n)
+                stck.append(n)
+                continue
+            if c == '-':
+                pos = False
+                continue
+            if c.isdigit():
+                d = int(c) if d == sys.maxsize else d * 10 + int(c)
+            if (c == ',' or c == ']' or i == len(s) - 1) and d != sys.maxsize:
+                stck[-1].add(NestedInteger(d if pos else -d))
+                d, pos = sys.maxsize, True
+            if c == ']':
+                stck.pop()
+        
+        return stck[0].getList()[0]

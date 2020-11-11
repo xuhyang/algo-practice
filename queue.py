@@ -29,7 +29,6 @@ That means you can not directly pop the last element in a queue.
         def __init__(self):
             self.q1, self.q2 = deque(), deque()
 
-
         def push(self, x):
             self.q1.append(x)
         """
@@ -168,3 +167,34 @@ Input: [
             ans.append(e)
         else:
             ans[-1].end = max(ans[-1].end, e.end)
+"""
+104. Merge K Sorted Lists
+https://www.lintcode.com/problem/merge-k-sorted-lists/description
+Merge k sorted linked lists and return it as one sorted list.
+Example Input: [2->6->null,5->null,7->null] Output:  2->5->6->7->null
+#其他解法: heap, dvcq_merge
+"""
+    #两两归并
+    def mergeKLists(self, l):
+        q = collections.deque(l)
+
+        while len(q) > 1:
+            q.append(self.merge(q.popleft(), q.popleft()))
+
+        return q[0]
+
+    def merge(self, p1, p2):
+        d = p = ListNode(sys.maxsize)
+
+        while p1 and p2:
+            if p1.val <= p2.val:
+                p.next = p1
+                p1 = p1.next
+            else:
+                p.next = p2
+                p2 = p2.next
+            p = p.next
+
+        p.next = p1 or p2
+
+        return d.next

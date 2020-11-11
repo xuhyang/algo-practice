@@ -1,4 +1,4 @@
- class game_theory:
+ class game:
 """
 394. Coins in a Line
 https://www.lintcode.com/problem/coins-in-a-line/description

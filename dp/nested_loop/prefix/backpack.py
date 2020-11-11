@@ -1,4 +1,6 @@
 class backpack:
+01 多重 完全
+91, 273,1538,700,740
 """
 89. k Sum
 https://www.lintcode.com/problem/k-sum/description
@@ -16,7 +18,7 @@ Explanation: There is only one method. 1 + 2 + 3 = 6
 
         for i in range(1, n + 1): #前i个
             f[i][0][0] = 1 #前i个中的0个能不能组成sum=0
-            for c in range(1, min(i + 1, k + 1)): #前i个选c个
+            for c in range(1, min(i + 1, k + 1)): #前i个选k个
                 for s in range(1, t + 1): #sum
                     f[i][c][s] = f[i - 1][c][s]
 
@@ -27,10 +29,7 @@ Explanation: There is only one method. 1 + 2 + 3 = 6
 
     def kSum(self, A, k, target):
         n = len(A)
-        dp = [
-            [[0] * (target + 1) for _ in range(k + 1)],
-            [[0] * (target + 1) for _ in range(k + 1)],
-        ]
+        dp = [[[0] * (target + 1) for _ in range(k + 1)], [[0] * (target + 1) for _ in range(k + 1)]]
 
         # dp[i][j][s]
         # 前 i 个数里挑出 j 个数，和为 s
@@ -190,6 +189,27 @@ Example: Given 4 items with size [2, 3, 5, 7] and value [1, 5, 2, 4], and a back
 
         max_v = max(f)
         return max_v if max_v != -1 else 0
+
+    def backPackIII(self, A, V, m):
+        n = len(A)
+        dp = [0] * (m + 1)
+
+        for i in range(n):
+            for j in range(A[i], m + 1):
+                dp[j] = max(dp[j], dp[j - A[i]] + V[i])
+
+        return dp[m]
+# 用dpi 表示用前i个物品，能拼出不超过重量j的最大value 对于物品i
+# 有三种情况： 1. 不出现在最优解中 dp[i-1][j] 2.出现，但是只是用一次在最优解中 dp[i-1][j-A[i-1]]+V[i-1] 3.出现，并且使用多次在最优解中 dp[i][j-A[i-1]]+V[i-1] 后面两种情况要求 j-Ai-1>=0 Base case dp0 = 0, dpi = 0
+    def backPackIII(self, A, V, m):
+        dp = [[0 for col in range(m+1)] for row in range(len(A)+1)]
+        for i in range(1, len(A)+1):
+            for j in range(1,m+1):
+                tmp = 0
+                if j - A[i-1] >= 0:
+                    tmp = max(dp[i][j-A[i-1]]+V[i-1], dp[i-1][j-A[i-1]]+V[i-1])
+                dp[i][j] = max(tmp, dp[i-1][j])
+        return dp[-1][-1]
 """
 Card Game
 https://www.lintcode.com/problem/card-game/description
@@ -206,7 +226,6 @@ Since this number may be large, you only need to return the solution number mod 
 0 <= totalCost <= 1000
 """
 
-
 """
 1538. Card Game II
 https://www.lintcode.com/problem/card-game-ii/description
@@ -219,3 +238,7 @@ And Each card can only be used once. Determine if you can win the game.
 # Input: cost = [1,2] damage = [3,4] totalMoney = 10 totalDamage = 10 Output: false
 # Explanation: We can only cause 7 damage at most.
 """
+
+https://www.lintcode.com/problem/minimum-partition/description
+Backpack V
+https://www.lintcode.com/problem/two-colors-tower/

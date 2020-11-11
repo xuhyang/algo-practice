@@ -29,33 +29,8 @@ Design an algorithm to find the nth ugly number. The first 10 ugly numbers are 1
 5. Kth Largest Element
 https://www.lintcode.com/problem/kth-largest-element/description
 Find K-th largest element in an array. Input: n = 3, nums = [9,3,2,4,8] Output: 4
+其他解法:quick_select
 """
-    def kthLargestElement(self, n, a):
-        k = len(a) - n
-        self.qck_slct(a, k, 0, len(a) - 1)
-        return a[k]
-
-    def qck_slct(self, a, k, s, e):
-        if s >= e:
-            return
-
-        l, r, p = s, e, a[(s + e) // 2]
-        while l <= r:
-            if a[l] < p:
-                l += 1
-                continue
-            if a[r] > p:
-                r -= 1
-                continue
-
-            a[l], a[r] = a[r], a[l]
-            l, r = l + 1, r - 1
-
-        if k <= r:
-            self.qck_slct(a, k, s, r)
-        elif k >= l:
-            self.qck_slct(a, k, l, e)
-
     def kthLargestElement(self, n, a):
         h = a[:n] # ∵ 求第k大， ∴ heap， 可以解决动态第K大/小问题
         heapify(h)
@@ -65,8 +40,42 @@ Find K-th largest element in an array. Input: n = 3, nums = [9,3,2,4,8] Output: 
 
         return h[0]
 """
+81. Find Median from Data Stream
+https://www.lintcode.com/problem/data-stream-median/
+Numbers keep coming, return the median of numbers at every time a new number added.
+Input: [1,2,3,4,5] Output: [1,1,2,2,3]
+Explanation:
+The medium of [1] and [1,2] is 1. The medium of [1,2,3] and [1,2,3,4] is 2. The medium of [1,2,3,4,5] is 3.
+Input: [4,5,1,3,2,6,0] Output: [4,4,4,3,3,3,3]
+Explanation:
+The medium of [4], [4,5], [4,5,1] is 4.
+The medium of [4,5,1,3], [4,5,1,3,2], [4,5,1,3,2,6] and [4,5,1,3,2,6,0] is 3.
+Challenge: Total run time in O(nlogn).
+Clarification What's the definition of Median?
+The median is not equal to median in math.
+Median is the number that in the middle of a sorted array. If there are n numbers in a sorted array A, the median is A[(n - 1) / 2]A[(n−1)/2].
+For example, if A=[1,2,3], median is 2. If A=[1,19], median is 1.
+"""
+    def medianII(self, a):
+        max_h, min_h, rslt = [], [], []
+
+        for e in a:
+            if not max_h or -max_h[0] >= e:
+                heappush(max_h, -e)
+            else:
+                heappush(min_h, e)
+
+            if len(max_h) > len(min_h) + 1:
+                heappush(min_h, -heappop(max_h))
+            elif len(min_h) > len(max_h):
+                heappush(max_h, -heappop(min_h))
+
+            rslt.append(-max_h[0])
+
+        return rslt
+"""
 130. Heapify
-https://www.jiuzhang.com/solution/heapify/#tag-highlight-lang-python
+https://www.lintcode.com/problem/heapify/description
 Given an integer array, heapify it into a min-heap array.
 For a heap array A, A[0] is the root of heap, and for each A[i],
 A[i * 2 + 1] is the left child of A[i] and A[i * 2 + 2] is the right child of A[i].
@@ -77,22 +86,21 @@ A[i * 2 + 1] is the left child of A[i] and A[i * 2 + 2] is the right child of A[
     def heapify(self, a):
         n = len(a)
 
-        for idx in range(n // 2, -1, -1):
-            i = idx
+        for i in range(n // 2, -1, -1):
+            j = i
 
-            while i < n:
-                min, l, r = i, i * 2 + 1, i * 2 + 2
+            while j < n:
+                min, l, r = j, j * 2 + 1, j * 2 + 2
 
                 if l < n and a[l] < a[min]:
                     min = l
                 if r < n and a[r] < a[min]:
                     min = r
 
-                if i == min:
+                if j == min:
                     break
 
-                a[i], a[min] = a[min], a[i]
-                i = min
+                a[j], a[min], j = a[min], a[j], min
 """
 364. Trapping Rain Water II
 https://www.lintcode.com/problem/trapping-rain-water-ii/description
@@ -176,42 +184,6 @@ Output: ["code", "lint", "baby"]
         heapq.heapify(h) #O(n)
         return [heapq.heappop(h)[1] for _ in range(k)] # O(klogn)
 """
-577. Merge K Sorted Interval Lists
-https://www.lintcode.com/problem/merge-k-sorted-interval-lists/description
-Merge K sorted interval lists into one sorted interval list.
-You need to merge overlapping intervals too.
-Input: [
-  [(1,3),(4,7),(6,8)],
-  [(1,2),(9,10)]
-] Output: [(1,3),(4,8),(9,10)]
-
-Input: [
-  [(1,2),(5,6)],
-  [(3,4),(7,8)]
-] Output: [(1,2),(3,4),(5,6),(7,8)]
-其他解法： queue两两合并, dvcq
-"""
-    def mergeKSortedIntervalLists(self, itrvls):
-        h, ans = [], []
-        for i, itrvl in enumerate(itrvls):
-            if itrvl:
-                h.append((itrvl[0].start, itrvl[0].end, i, 0))
-
-        heapify(h)
-
-        while h:
-            s, e, i, j = heappop(h)
-
-            if not ans or ans[-1].end < s:
-                ans.append(Interval(s, e))
-            else:
-                ans[-1].end = max(ans[-1].end, e)
-
-            if j < len(itrvls[i]) - 1:
-                heappush(h, (itrvls[i][j + 1].start, itrvls[i][j + 1].end, i, j + 1))
-
-        return ans
-"""
 606. Kth Largest Element II
 https://www.lintcode.com/problem/kth-largest-element-ii/description
 Find K-th largest element in an array. and N is much larger than k. Note that it is the kth largest element in the sorted order, not the kth distinct element.
@@ -268,14 +240,77 @@ Input: [[1,90],[1,90],[1,90],[1,90],[1,90],[1,90]] Output: 1: 90.00
 
         return {id : sum(values) / len(values) for id, values in d.items()}
 """
+104. Merge K Sorted Lists
+https://www.lintcode.com/problem/merge-k-sorted-lists/description
+Merge k sorted linked lists and return it as one sorted list.
+Example Input: [2->6->null,5->null,7->null] Output:  2->5->6->7->null
+#其他解法 queue, dvcq_merge
+#思路:看到K arrays 想到 dvcq_merge, heap, queue
+"""
+    def mergeKLists(self, l):
+        h = []
+        d = p = ListNode(sys.maxsize)
+        for n in l:
+            if n:
+                heapq.heappush(h, (n.val, n))
+
+        while h:
+            n = heapq.heappop(h)[1]
+            p.next = n
+            p = p.next
+            n = n.next
+            print(n.val)
+            if n:
+                heapq.heappush(h, (n.val, n))
+
+        return d.next
+"""
+577. Merge K Sorted Interval Lists
+https://www.lintcode.com/problem/merge-k-sorted-interval-lists/description
+Merge K sorted interval lists into one sorted interval list.
+You need to merge overlapping intervals too.
+Input: [
+  [(1,3),(4,7),(6,8)],
+  [(1,2),(9,10)]
+]
+Output: [(1,3),(4,8),(9,10)]
+Input: [
+  [(1,2),(5,6)],
+  [(3,4),(7,8)]
+]
+Output: [(1,2),(3,4),(5,6),(7,8)]
+其他解法： queue两两合并, dvcq
+#思路:看到K arrays/list 想到 dvcq_merge, heap, queue
+"""
+    def mergeKSortedIntervalLists(self, itrvls):
+        h, ans = [], []
+        for i, itrvl in enumerate(itrvls):
+            if itrvl:
+                h.append((itrvl[0].start, itrvl[0].end, i, 0))
+
+        heapify(h)
+
+        while h:
+            s, e, i, j = heappop(h)
+
+            if not ans or ans[-1].end < s:
+                ans.append(Interval(s, e))
+            else:
+                ans[-1].end = max(ans[-1].end, e)
+
+            if j < len(itrvls[i]) - 1:
+                heappush(h, (itrvls[i][j + 1].start, itrvls[i][j + 1].end, i, j + 1))
+
+        return ans
+"""
 793. Intersection of Arrays
 https://www.lintcode.com/problem/intersection-of-arrays/description
 Give a number of arrays, find their intersection, and output their intersection size.
 # Input:  [[1,2,3],[3,4,5],[3,9,10]] Output:  1 Explanation: Only '3' in all three array.
 # Input: [[1,2,3,4],[1,2,5,6,7][9,10,1,5,2,3]] 	Output: 2 Explanation: The set is [1,2].
-Notice
-The total number of all array elements is not more than 500000.
-There are no duplicated elements in each array.
+Notice: The total number of all array elements is not more than 500000. There are no duplicated elements in each array.
+#其他解法: dvcq, set
+#思路:看到K arrays 想到 dvcq_merge, heap, queue
 """
     def intersectionOfArrays(self, a):
         h, n, cnt, prv, rslt = [], len(a), 1, -sys.maxsize, 0
@@ -301,6 +336,13 @@ There are no duplicated elements in each array.
                 heappush(h, (a[i][j + 1], i, j + 1))
 
         return rslt
+
+    def intersectionOfArrays(self, arrs):
+        intersection = set(arrs[0])
+
+        for nums in arrs[1:]:
+        	intersection &= set(nums)
+        return len(intersection)
 """
 543. Kth Largest in N Arrays
 Find K-th largest element in N arrays.
@@ -309,32 +351,18 @@ In n=2 arrays [[9,3,2,4,7],[1,2,3,4,8]], the 3rd largest element is 7.
 In n=2 arrays [[9,3,2,4,8],[1,2,3,4,2]], the 1st largest element is 9, 2nd largest element is 8, 3rd largest element is 7 and etc.
 """
     #最大堆， 利用n array 倒 排序 性质，pop一个， push一个
-    def KthInArrays(self, arrays, k):
-        if not arrays:
-            return None
+    def KthInArrays(self, a, k):
+        srtd_a = [sorted(e, reverse=True) for e in a if e]
+        max_h = [(-e[0], i, 0) for i, e in enumerate(srtd_a)]
+        heapify(max_h)
 
-        # in order to avoid directly changing the original arrays
-        # and remove the empty arrays, we need a new sortedArrays
-        sortedArrays = []
-        for arr in arrays:
-            if not arr:
-                continue
-            sortedArrays.append(sorted(arr, reverse=True))
-
-        maxheap = [
-            (-arr[0], index, 0)
-            for index, arr in enumerate(sortedArrays)
-        ]
-        heapq.heapify(maxheap)
-
-        num = None
+        v = None
         for _ in range(k):
-            num, x, y = heapq.heappop(maxheap)
-            num = -num
-            if y + 1 < len(sortedArrays[x]):
-                heapq.heappush(maxheap, (-sortedArrays[x][y + 1], x, y + 1))
+            v, x, y = heappop(max_h)
+            if y + 1 < len(srtd_a[x]):
+                heappush(max_h, (-srtd_a[x][y + 1], x, y + 1))
 
-        return num
+        return -v
 """
 1439. Find the Kth Smallest Sum of a Matrix With Sorted Rows
 https://leetcode.com/problems/find-the-kth-smallest-sum-of-a-matrix-with-sorted-rows/
@@ -348,3 +376,139 @@ Input: mat = [[1,10,10],[1,4,5],[2,3,6]], k = 7 Output: 9 Explanation: Choosing 
 Input: mat = [[1,1,10],[2,2,9]], k = 7 Output: 12
 """
     #最小堆， 利用 n array排序 性质，pop一个， push 备选3 个
+"""
+438. Copy Books II **
+Given n books( the page number of each book is the same) and an array of integer with size k
+means k people to copy the book and the i th integer is the time i th person to copy one book).
+You must distribute the continuous id books to one people to copy. (You can give book A[1],A[2] to one people,
+but you cannot give book A[1], A[3] to one people, because book A[1] and A[3] is not continuous.)
+Return the number of smallest minutes need to copy all the books.
+#其他解法:binary search
+"""
+    def copyBooksII(self, n, times):
+        h = [(tm, tm) for tm in tms]
+        heapify(h)
+
+        min_tm = 0
+        while n > 0:
+            min_tm, tm = heappop(h)
+            heappush(h, (min_tm + tm, tm))
+            n -= 1
+
+        return min_tm
+"""
+360. Sliding Window Median
+https://www.lintcode.com/problem/sliding-window-median/description
+Given an array of n integer, and a moving window(size k), move the window at each iteration from the start of the array,
+find the median of the element inside the window at each moving. (If there are even numbers in the array, return the N/2-th number after sorting the element in the window. )
+Have you met this question in a real interview?
+Example 1: Input:[1,2,7,8,5] 3 Output: [2,7,7]
+Explanation: At first the window is at the start of the array like this `[ | 1,2,7 | ,8,5]` , return the median `2`;
+then the window move one step forward.`[1, | 2,7,8 | ,5]`, return the median `7`;
+then the window move one step forward again.`[1,2, | 7,8,5 | ]`, return the median `7`;
+Example 2: Input: [1,2,3,4,5,6,7] 4 Output: [2,3,4,5]
+Explanation: At first the window is at the start of the array like this `[ | 1,2,3,4, | 5,6,7]` , return the median `2`;
+then the window move one step forward.`[1,| 2,3,4,5 | 6,7]`, return the median `3`;
+then the window move one step forward again.`[1,2, | 3,4,5,6 | 7 ]`, return the median `4`;
+then the window move one step forward again.`[1,2,3,| 4,5,6,7 ]`, return the median `5`;
+"""
+class HashHeap:
+
+    def __init__(self, desc=False):
+        self.d, self.h, self.desc = dict(), [], desc
+
+    def __len__(self):
+        return len(self.h)
+
+    def push(self, e):
+        self.h.append(e)
+        self.d[e] = len(self.h) - 1
+        self._sft_up(len(self.h) - 1)
+
+    def pop(self):
+        e = self.h[0]
+        self.rmv(e)
+        return e
+
+    def rmv(self, e):
+        if e not in self.d:
+            return
+        i = self.d[e]
+
+        self._swp(i, len(self.h) - 1)
+        self.d.pop(e)
+        self.h.pop()
+        # in case of the removed item is the last item
+        if i < len(self.h):
+            self._sft_up(i)
+            self._sft_dwn(i)
+
+    def top(self):
+        return self.h[0]
+
+    def _smllr(self, l, r):
+        return r < l if self.desc else l < r
+
+    def _sft_up(self, i):
+
+        while i != 0:
+            p = i // 2
+            if self._smllr(self.h[p], self.h[i]):
+                break
+            self._swp(p, i)
+            i = p
+
+    def _sft_dwn(self, i):
+        n = len(self.h)
+
+        while i < n:
+            min, l, r =  i, i * 2, i * 2 + 1
+
+            if l < n and self._smllr(self.h[l], self.h[min]):
+                min = l
+            if r < n and self._smllr(self.h[r], self.h[min]):
+                min = r
+            if min == i:
+                break
+            self._swp(i, min)
+            i = min
+
+    def _swp(self, i, j):
+        self.h[i], self.h[j] = self.h[j], self.h[i]
+        self.d[self.h[i]], self.d[self.h[j]] = i, j
+
+class Solution:
+
+    def medianSlidingWindow(self, a, k):
+        if not a or len(a) < k:
+            return []
+
+        max_h, min_h, mdns = HashHeap(desc=True), HashHeap(), []
+
+        for i in range(k - 1):
+            self.add(max_h, min_h, (a[i], i))
+
+        for i in range(k - 1, len(a)):
+            e = (a[i], i)
+            self.add(max_h, min_h, e)
+            mdns.append(max_h.top()[0])
+
+            e = (a[i - k + 1], i - k + 1)
+            max_h.rmv(e)
+            min_h.rmv(e)
+
+            if len(max_h) < len(min_h):
+                max_h.push(min_h.pop())
+
+        return mdns
+
+    def add(self, max_h, min_h, e):
+        if len(max_h) == 0 or max_h.top()[0] >= e[0]:
+            max_h.push(e)
+        else:
+            min_h.push(e)
+
+        if len(max_h) > len(min_h) + 1:
+            min_h.push(max_h.pop())
+        elif len(max_h) < len(min_h):
+            max_h.push(min_h.pop())

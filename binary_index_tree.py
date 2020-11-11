@@ -54,38 +54,81 @@ You may assume that row1 ≤ row2 and col1 ≤ col2.
     def sumRegion(self, r1, c1, r2, c2):
         r1, c1 = r1 - 1, c1 - 1
         return self.p_sum(r2, c2) + self.p_sum(r1, c1) - self.p_sum(r1, c2) - self.p_sum(r2, c1)
-
+"""
 840. Range Sum Query - Mutable
-中文English
+https://www.lintcode.com/problem/range-sum-query-mutable/description
 Given an integer array nums, and then you need to implement two functions:
-
 update(i, val) Modify the element whose index is i to val.
 sumRange(l, r) Return the sum of elements whose indexes are in range of [l, r][l,r].
-Example
-Example 1:
+Example 1: Input: nums = [1, 3, 5] sumRange(0, 2) update(1, 2) sumRange(0, 2)
+Output: 9 8
+Example 2: Input: nums = [0, 9, 5, 7, 3] sumRange(4, 4) sumRange(2, 4) update(4, 5) update(1, 7) update(0, 8)sumRange(1, 2)
+Output: 3 15 12
+Notice: The array is only modifiable by the update function. You may assume the number of calls to update and sumRange function is distributed evenly.
+"""
+    class NumArray:
 
-Input:
-  nums = [1, 3, 5]
-  sumRange(0, 2)
-  update(1, 2)
-  sumRange(0, 2)
-Output:
-  9
-  8
-Example 2:
+        def __init__(self, a):
+            self.a, self.bit = a, [0] * (len(a) + 1)
 
-Input:
-  nums = [0, 9, 5, 7, 3]
-  sumRange(4, 4)
-  sumRange(2, 4)
-  update(4, 5)
-  update(1, 7)
-  update(0, 8)
-  sumRange(1, 2)
-Output:
-  3
-  15
-  12
-Notice
-The array is only modifiable by the update function.
-You may assume the number of calls to update and sumRange function is distributed evenly.
+            for i in range(len(a)):
+                self.add(i, self.a[i])
+
+        def update(self, i, v):
+            self.add(i, v - self.a[i])
+            self.a[i] = v
+
+        def sumRange(self, i, j):
+            return self.sum(j) - self.sum(i - 1)
+
+        def add(self, i, v):
+            i += 1
+
+            while i < len(self.bit):
+                self.bit[i] += v
+                i += -i & i
+
+        def sum(self, i):
+            ans, i = 0, i + 1
+
+            while i > 0:
+                ans += self.bit[i]
+                i -= -i & i
+
+            return ans
+"""
+1297. Count of Smaller Numbers After Self
+https://www.lintcode.com/problem/count-of-smaller-numbers-after-self/description
+You are given an integer array nums and you have to return a new counts array.
+The counts array has the property where counts[i] is the number of smaller elements to the right of nums[i].
+Example 1: Input: [5, 2, 6, 1] Output: [2, 1, 1, 0] Explanation:
+To the right of 5 there are 2 smaller elements (2 and 1).
+To the right of 2 there is only 1 smaller element (1).
+To the right of 6 there is 1 smaller element (1).
+To the right of 1 there is 0 smaller element.
+Example 2: Input: [1, 2, 3, 4] Output: [0, 0, 0, 0]
+#其他解法: bit
+"""
+    def countSmaller(self, a):
+        rnk, bit, ans = {e : i for i, e in enumerate(sorted(a))}, [0] * (len(a) + 1), [0] * len(a)
+
+        def getSum(i):
+            s, i = 0, i + 1
+
+            while i > 0:
+                s += bit[i]
+                i -= i & -i
+            return s
+
+        def update(i):
+            i += 1
+
+            while i < len(bit):
+                bit[i] += 1
+                i += i & -i
+
+        for i, e in enumerate(reversed(a)):
+            ans[-i - 1] = getSum(rnk[e] - 1)
+            update(rnk[e])
+
+        return ans

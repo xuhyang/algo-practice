@@ -22,23 +22,51 @@ Notice
 You may imagine nums[-1] = nums[n] = 1. They are not real therefore you can not burst them.
 0 ≤ n ≤ 500, 0 ≤ nums[i] ≤ 100
 """
-    #区间型: 先考虑最后一步可以形成的区间
+    #区间型: 先考虑最后一步才能形成的区间,
     def maxCoins(self, a):
         a = [1] + a + [1]
         return self.dvcq({}, a, 0, len(a) - 1)
 
     def dvcq(self, f, a, l, r):
-        if l == r:
-            return 0
 
         if (l, r) in f:
             return f[(l, r)]
-
-        f[(l, r)] = 0
-        for i in range(l + 1, r): # 小于3个数字不继续
-            f[(l, r)] = max(f[(l, r)], self.dvcq(f, a, l, i) + a[l] * a[i] * a[r] + self.dvcq(f, a, i, r))
+        # if r - l < 2:
+        #     return 0
+        f[(l, r)] = max([self.dvcq(f, a, l, i) + a[l]*a[i]*a[r] + self.dvcq(f, a, i, r) for i in range(l + 1, r)])  # 小于3个数字不继续
 
         return f[(l, r)]
+"""
+200. Longest Palindromic Substring
+https://www.lintcode.com/problem/longest-palindromic-substring/description
+Given a string S, find the longest palindromic substring in S. You may assume that the maximum length of S is 1000, and there exists one unique longest palindromic substring.
+Input:"abcdzdcab" Output:"cdzdc"
+Input:"aba" Output:"aba"
+Challenge: O(n2) time is acceptable. Can you do it in O(n) time.
+"""
+    def longestPalindrome(self, s):
+        ans = [0, 0]
+        self.dvcq({}, s, ans, 0, len(s) - 1)
+        return s[ans[0] : ans[1] + 1]
+
+    def dvcq(self, f, s, ans, l, r):
+
+        if l >= r:
+            return True
+        
+        if (l, r) in f:
+            return f[(l, r)]
+
+        f[(l, r)] = s[l] == s[r] and self.dvcq(f, s, ans, l + 1, r - 1)
+
+        if f[(l, r)] and r - l > ans[1] - ans[0]:
+            ans[0], ans[1] = l, r
+            return True
+
+        self.dvcq(f, s, ans, l + 1, r)
+        self.dvcq(f, s, ans, l, r - 1)
+
+        return False
 """
 476. Stone Game
 https://www.lintcode.com/problem/stone-game/description
@@ -54,16 +82,22 @@ Explanation:
   2. Merge the first two piles => [6, 4]，score = 8
   3. Merge the last two piles => [10], score = 18
 #思路：列举最后一刀， 列举最后归并的两个区间
+
+{4, [1, 1], 4}:  0
+{[4, 2], 4}:  2 + 0
+{[6, 4]}  6 + 2
+{10}  10 + 8
 """
     def stoneGame(self, a):
         return self.dvcq({}, a, 0, len(a) - 1)
     #方案总数 * 方案复杂度 = s, e 总数 * 每个s，e 复杂度 = O(n^2) * n
     def dvcq(self, f, a, s, e):
-        if s >= e:
-            return 0
 
         if (s, e) in f:
             return f[(s, e)]
+
+        if s == e:
+            return 0
 
         f[(s, e)] = sys.maxsize
         for i in range(s, e + 1):

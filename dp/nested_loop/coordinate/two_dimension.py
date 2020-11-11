@@ -1,4 +1,5 @@
-,class two_dimension:
+class two_dimension:
+1018, 640, longestCommonSubsequence, 1444
 """
 109. Triangle
 https://www.lintcode.com/problem/triangle/description
@@ -31,7 +32,7 @@ Notice: Bonus point if you are able to do this using only O(n) extra space, wher
 
         for i in range(1, len(t)):
             for j in range(len(t[i])):
-
+                #nested loop从哪里来, 上一层必定比上一层小, 需要检查边界
                 f[i][j] = min(f[i - 1][j] if j < len(f[i]) - 1 else sys.maxsize , f[i - 1][j - 1] if j > 0 else sys.maxsize) + t[i][j]
 
         return min(f[-1])
@@ -85,16 +86,12 @@ m and n will be at most 100. The answer is guaranteed to be in the range of 32-b
         f = [[0] * m for _ in range(n)]
 
         for i in range(n):
-            for j in range(m):
-                if i == 0 and j == 0:
-                    f[i][j] = 1
-                    continue
-                if i == 0:
-                    f[i][j] = f[i][j - 1]
-                    continue
-                if j == 0:
-                    f[i][j] = f[i - 1][j]
-                    continue
+            f[i][0] = 1
+        for j in range(m):
+            f[0][j] = 1
+
+        for i in range(1, n):
+            for j in range(1, m):
                 f[i][j] = f[i - 1][j] + f[i][j - 1]
 
         return f[-1][-1]
@@ -263,3 +260,39 @@ Notice: You can only put the bomb at an empty cell.
                     max_kills = max(max_kills, north[i][j] + west[i][j] + south[i][j] + east[i][j])
 
         return max_kills
+
+https://www.lintcode.com/problem/best-time-to-buy-and-sell-stock-iii/description
+https://www.lintcode.com/problem/minimum-rest-days/
+516. paint house ii
+514. paint fence
+
+"""
+679. Unique Paths III
+https://www.lintcode.com/problem/unique-paths-iii/description
+Follow up for "Unique Paths II": http://lintcode.com/en/problem/unique-paths-ii/
+Now each grid contains a value, so each path also has a value. Find the sum of all the unique values paths.
+Example 1 Input: [[1,1,2], [1,2,3], [3,2,4]] Output: 21 Explanation: There are 2 unique value path: [1,1,2,3,4] = 11 [1,1,2,2,4] = 10
+Example 2 Input: [[1,5], [4,6]] Output: 23 Explanation: There are 2 unique value path: [1,5,6] = 12 [1,4,6] = 11
+"""
+    def uniqueWeightedPaths(self, g):
+        n, m = len(g), len(g[0])
+        s = [[set() for _ in range(m)] for _ in range(n)]
+        if m == 0:
+            return 0
+        p = 0
+        for i in range(n):
+            p += g[i][0]
+            s[i][0].add(p)
+        p = 0
+        for j in range(m):
+            p += g[0][j]
+            s[0][j].add(p)
+
+        for i in range(1, n):
+            for j in range(1, m):
+                for e in s[i][j -1]:
+                    s[i][j].add(g[i][j] + e)
+                for e in s[i - 1][j]:
+                    s[i][j].add(g[i][j] + e)
+        
+        return sum(s[-1][-1])

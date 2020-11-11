@@ -248,21 +248,17 @@ The integer division should truncate toward zero.
 1 9 1 11
 """
     def divide(self, dividend, divisor):
-        neg = dividend < 0 and divisor > 0 or dividend > 0 and divisor < 0
-        a, b = abs(dividend), abs(divisor)
-        ans, cnt = 0, 1
+        sgn, ans, cnt, a, b = not (dvdnd < 0 and dvsr < 0) and (dvdnd < 0 or dvsr < 0), 0, 1, abs(dvdnd), abs(dvsr)
 
         while a >= b:
-            if a >= b << 1:
-                b <<= 1
-                cnt <<= 1
-            else:
-                a -= b
-                ans += cnt
-                b, cnt = abs(divisor), 1
 
-        ans = -ans if neg else ans
-        return ans if ans < (1 << 31) - 1 else (1 << 31) - 1
+            if a >= b << 1:
+                b, cnt = b << 1, cnt << 1
+            else:
+                a, b, ans, cnt = a - b, abs(dvsr), ans + cnt, 1
+
+        ans = -ans if sgn else ans
+        return min(ans, (1 << 31) - 1)
 """
 428. Pow(x, n)
 https://www.lintcode.com/problem/powx-n/description
@@ -655,3 +651,119 @@ Explanation：The left offset is 0, the right offset is 0, and the total offset 
             return s[lst + 1:] + s[:lst + 1]
         else:
             return s
+"""
+997. Find the Town Judge
+https://leetcode.com/problems/find-the-town-judge/
+In a town, there are N people labelled from 1 to N.  There is a rumor that one of these people is secretly the town judge.
+If the town judge exists, then:
+The town judge trusts nobody.
+Everybody (except for the town judge) trusts the town judge.
+There is exactly one person that satisfies properties 1 and 2.
+You are given trust, an array of pairs trust[i] = [a, b] representing that the person labelled a trusts the person labelled b.
+If the town judge exists and can be identified, return the label of the town judge.  Otherwise, return -1.
+Example 1: Input: N = 2, trust = [[1,2]] Output: 2
+Example 2: Input: N = 3, trust = [[1,3],[2,3]] Output: 3
+Example 3: Input: N = 3, trust = [[1,3],[2,3],[3,1]] Output: -1
+Example 4: Input: N = 3, trust = [[1,2],[2,3]] Output: -1
+Example 5: Input: N = 4, trust = [[1,3],[1,4],[2,3],[2,4],[4,3]] Output: 3
+"""
+    def findJudge(self, n:int, trust: List[List[int]]) -> int:
+        ind, outd = [0] * (n + 1), [0] * (n + 1)
+
+        for a, b in trust:
+            outd[a] += 1
+            ind[b] += 1
+
+        for i in range(1, n + 1):
+            if ind[i] == n - 1 and outd[i] == 0:
+                return i
+
+        return -1
+"""
+1209. Construct the Rectangle
+https://www.lintcode.com/problem/construct-the-rectangle/description
+For a web developer, it is very important to know how to design a web page's size. So, given a specific rectangular web page’s area, your job by now is to design a rectangular web page, whose length L and width W satisfy the following requirements:
+1. The area of the rectangular web page you designed must equal to the given target area.
+2. The width W should not be larger than the length L, which means L >= W.
+3. The difference between length L and width W should be as small as possible.
+You need to output the length L and the width W of the web page you designed in sequence.
+Example: Input: 4 Output: [2, 2]
+Explanation: The target area is 4, and all the possible ways to construct it are [1,4], [2,2], [4,1].
+But according to requirement 2, [1,4] is illegal; according to requirement 3,  [4,1] is not optimal compared to [2,2]. So the length L is 2, and the width W is 2.
+Notice
+1.The given area won't exceed 10,000,000 and is a positive integer
+2.The web page's width and length you designed must be positive integers.
+"""
+   def constructRectangle(self, a):
+        w = int(math.sqrt(a))
+
+        while a % w != 0:
+            w -= 1
+
+        return [a // w, w]
+"""
+1299. Bulls and Cows
+https://www.lintcode.com/problem/bulls-and-cows/description
+You are playing the following Bulls and Cows game with your friend: You write down a number and ask your friend to guess what the number is. Each time your friend makes a guess, you provide a hint that indicates how many digits in said guess match your secret number exactly in both digit and position (called "bulls") and how many digits match the secret number but locate in the wrong position (called "cows"). Your friend will use successive guesses and hints to eventually derive the secret number.
+Write a function to return a hint according to the secret number and friend's guess, use Ato indicate the bulls and B to indicate the cows.
+Please note that both secret number and friend's guess may contain duplicate digits.
+Example 1: Input：secret = "1807", guess = "7810" Output："1A3B"
+Explanation：1 bull and 3 cows. The bull is 8, the cows are 0, 1 and 7.
+Example 2: Input：secret = "1123", guess = "0111" Output："1A1B"
+Explanation：The 1st 1 in friend's guess is a bull, the 2nd or 3rd 1 is a cow.
+Notice: You may assume that the secret number and your friend's guess only contain digits, and their lengths are always equal.
+"""
+    def getHint(self, s: str, g: str) -> str:
+        a, b, d = 0, 0, {}
+
+        for i in range(len(s)):
+            if s[i] == g[i]:
+                a += 1
+            else:
+                if d.get(s[i], 0) < 0:
+                    b += 1
+                if d.get(g[i], 0) > 0:
+                    b += 1
+
+                d[s[i]] = d.get(s[i], 0) + 1
+                d[g[i]] = d.get(g[i], 0) - 1
+
+        return str(a) + 'A' + str(b) + 'B'
+"""
+524. Longest Word in Dictionary through Deleting
+https://leetcode.com/problems/longest-word-in-dictionary-through-deleting/
+Given a string and a string dictionary, find the longest string in the dictionary that can be formed by deleting some characters of the given string. If there are more than one possible results, return the longest word with the smallest lexicographical order. If there is no possible result, return the empty string.
+Input: s = "abpcplea", d = ["ale","apple","monkey","plea"] Output: "apple"
+Input: s = "abpcplea", d = ["a","b","c"] Output: "a"
+"""
+   def findLongestWord(self, s: str, d: List[str]) -> str:
+        d = sorted(d, key = lambda e : (-len(e), e))
+
+        for e in d:
+            i = 0
+
+            for c in s:
+                if c == e[i]:
+                    i += 1
+                if i == len(e):
+                    return e
+
+        return ''
+"""
+389. Find the Difference
+https://leetcode.com/problems/find-the-difference/
+You are given two strings s and t.
+String t is generated by random shuffling string s and then add one more letter at a random position.
+Return the letter that was added to t.
+Input: s = "abcd", t = "abcde" Output: "e"
+Input: s = "", t = "y" Output: "y"
+Input: s = "a", t = "aa" Output: "a"
+Input: s = "ae", t = "aea" Output: "a"
+"""
+    def findTheDifference(self, s: str, t: str) -> str:
+        s, t = sorted(s), sorted(t)
+
+        for i in range(len(t)):
+            if i >=  len(s) or s[i] != t[i]:
+                return t[i]
+        return ''

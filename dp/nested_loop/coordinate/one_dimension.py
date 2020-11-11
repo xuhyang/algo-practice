@@ -1,4 +1,5 @@
 class one_dimension:
+1093, 1645, 602,1565
 """
 76. Longest Increasing Subsequence
 https://www.lintcode.com/problem/longest-increasing-subsequence/description
@@ -9,6 +10,7 @@ Input: [4,2,4,5,3,7] Output: 4 Explanation: LIS is [2,4,5,7]
 暴力：O(2^n) 每个数字可以选或不选
 接龙型： 看成1*n矩阵， 任意一个点 都可以作为起点， 跳跃规则： 后一个点比前一个大
 坐标型dp,  input维度=状态维度
+其他解法:binary search
 """
     #left to right
     def longestIncreasingSubsequence(self, a):
@@ -93,6 +95,9 @@ Given an array of non-negative integers, you are initially positioned at the fir
 Each element in the array represents your maximum jump length at that position.
 Your goal is to reach the last index in the minimum number of jumps.
 Input : [2,3,1,1,4] Output : 2 Explanation : The minimum number of jumps to reach the last index is 2. (Jump 1 step from index 0 to 1, then 3 steps to the last index.)
+Challenge
+This problem have two method which is Greedy and Dynamic Programming.
+The time complexity of Greedy method is O(n). The time complexity of Dynamic Programming method is O(n^2).
 """
     def jump(self, a):
         f = [0] + [sys.maxsize] * (len(a) - 1)
@@ -156,7 +161,7 @@ Given a set of distinct positive integers, find the largest subset such that eve
 of elements in this subset satisfies: Si % Sj = 0 or Sj % Si = 0.
 """
     def largestDivisibleSubset(self, a):
-        a, n, ans, t = sorted(a), len(a), [], 0
+        a, n, ans, t = sorted(a), len(a), [], 0 #sort为了先计算完小数字的答案，因为大数字的答案从小数字得出
         f, p = [0] * n, [-1] * n
 
         for i in range(1, n):
@@ -173,7 +178,7 @@ of elements in this subset satisfies: Si % Sj = 0 or Sj % Si = 0.
 
         return ans
 """
-398. Longest Continuous Increasing Subsequence II
+398. Longest Continuous Increasing Subsequence II #好像不应该叫subsequence, 因为答案要要连续index，应该叫subarray
 https://www.lintcode.com/problem/longest-continuous-increasing-subsequence-ii/description
 Give you an integer matrix (with row size n, column size m)，
 find the longest increasing continuous subsequence in this matrix.
@@ -200,7 +205,7 @@ Challenge O(nm) time and memory.
             for j in range(m):
                 points.append((A[i][j], i, j))
 
-        points.sort()
+        points.sort() #nested loop 执行顺序: ,某一节点的结果取决于之前所有比当前节点小的结果, 所有较小节点的结果要先算出来所以sort, 相当于选择之前最优结果, 之前最优结果只能从最小的开始算
 
         longest_hash = {}
         for i in range(len(points)):
@@ -208,9 +213,7 @@ Challenge O(nm) time and memory.
             longest_hash[key] = 1
             for dx, dy in [(1, 0), (0, -1), (-1, 0), (0, 1)]:
                 x, y = points[i][1] + dx, points[i][2] + dy
-                if x < 0 or x >= n or y < 0 or y >= m:
-                    continue
-                if A[x][y] < points[i][0]:
+                if 0 <= x < n or 0 <= y < m and A[x][y] < points[i][0]: #周围的邻居且小于当前值
                     longest_hash[key] = max(longest_hash[key], longest_hash[(x, y)] + 1)
 
         return max(longest_hash.values())
@@ -230,224 +233,15 @@ The frog can jump to the last stone by jumping 1 unit to the 2nd stone, then 2 u
 Given stones = `[0,1,2,3,4,8,9,11]` Input: [0,1,2,3,4,8,9,11] Output: false Explanation:
 Return false. There is no way to jump to the last stone as the gap between the 5th and 6th stone is too large.
 """
-    def canCross(self, a):
         f = {e : set() for e in a}
-        f[a[0]].add(0)
+        f[0].add(0)
 
         for e in a:
-            for i in f[e]:
-                for j in (-1, 0, 1):
-                    n_e, n_i = e + i + j, i + j
-                    if n_e in f and n_i > 0:
-                        f[n_e].add(n_i)
+            for k in f[e]:
+                for i in (-1, 0, 1):
+                    n_e, n_k = e + k + i, k + i
+
+                    if n_e in f and n_k > 0:
+                        f[n_e].add(n_k)
 
         return len(f[a[-1]]) > 0
-"""
-41. Maximum Subarray
-https://www.lintcode.com/problem/maximum-subarray/description
-Given an array of integers, find a contiguous subarray which has the largest sum.
-# Input: [−2,2,−3,4,−1,2,1,−5,3] Output: 6 Explanation: the contiguous subarray [4,−1,2,1] has the largest sum = 6.
-# Input: [1,2,3,4] Output: 10 Explanation: the contiguous subarray [1,2,3,4] has the largest sum = 10.
-Challenge: Can you do it in time complexity O(n)?
-"""
-    def maxSubArray(self, a):
-        p, min_p, max_p = 0, 0, -sys.maxsize
-
-        for e in a:
-            p += e
-            max_p, min_p = max(max_p, p - min_p), min(min_p, p)
-
-        return max_p
-
-    def maxSubArray(self, a):
-        l = g = -sys.maxsize
-
-        for e in a:
-            l = max(l + e, e)
-            g = max(g, l)
-
-        return g
-"""
-42. Maximum Subarray II
-https://www.lintcode.com/problem/maximum-subarray-ii/description
-Given an array of integers, find two non-overlapping subarrays which have the largest sum.
-The number in each subarray should be contiguous. Return the largest sum.
-Example 1: Input: [1, 3, -1, 2, -1, 2] Output: 7 Explanation: the two subarrays are [1, 3] and [2, -1, 2] or [1, 3, -1, 2] and [2].
-Example 2: Input: [5,4] Output: 9 Explanation: the two subarrays are [5] and [4].
-Challenge Can you do it in time complexity O(n) ?
-Notice: The subarray should contain at least one number
-"""
-    def maxTwoSubArrays(self, a):
-        n, s = len(a), [0] * (len(a) - 1)
-
-        p, min_p, max_p = 0, 0, -sys.maxsize
-        for i in range(n - 1):
-            p += a[i]
-            max_p, min_p = max(max_p, p - min_p), min(min_p, p)
-            s[i] = max_p
-
-        p, min_p, max_p = 0, 0, -sys.maxsize
-        for i in range(n - 1, 0, -1):
-            p += a[i]
-            max_p, min_p = max(max_p, p - min_p), min(min_p, p)
-            s[i - 1] += max_p
-
-        return max(s)
-
-    def maxTwoSubArrays(self, a):
-        n, s = len(a), [0] * (len(a) - 1)
-
-        l = g = -sys.maxsize
-        for i in range(n - 1):#只需算到n-2， n-1 在第二段
-            l = max(l + a[i], a[i])
-            s[i] = g = max(g, l)
-
-        l = g = -sys.maxsize
-        for i in range(n - 1, 0, -1):
-            l = max(l + a[i], a[i])
-            g = max(g, l)
-            s[i - 1] += g
-
-        return max(s)
-"""
-620. Maximum Subarray IV
-https://www.lintcode.com/problem/maximum-subarray-iv/description
-Given an integer arrays, find a contiguous subarray which has the largest sum and length should be greater or equal to given length k.
-Return the largest sum, return 0 if there are fewer than k elements in the array.
-Input: [-2,2,-3,4,-1,2,1,-5,3] 5 Output: 5 Explanation: [2,-3,4,-1,2,1] sum=5
-Input: [5,-10,4] 2 Output: -1
-Notice: Ensure that the result is an integer type. k > 0
-"""
-    def maxSubarray4(self, a, k):
-        p, min_p, max_p = [0], 0, -sys.maxsize
-
-        for i in range(len(a)):
-            p.append(p[-1] + a[i])
-
-            if len(p) <= k:
-                continue
-
-            max_p, min_p = max(max_p, p[-1] - min_p), min(min_p, p[i + 1 - k + 1])
-
-        return max_p if k <= len(a) else 0
-"""
-139. Subarray Sum Closest
-https://www.lintcode.com/problem/subarray-sum-closest/description
-Given an integer array, find a subarray with sum closest to zero. Return the indexes of the first number and last number.
-Input: [-3,1,1,-3,5] Output: [0,2] Explanation: [0,2], [1,3], [1,1], [2,2], [0,4]
-"""
-    def subarraySumClosest(self, a):
-        s, p, min_diff, ans = 0, [[0, -1] for _ in range(len(a) + 1)], sys.maxsize, [-1, -1]
-
-        for i in range(len(a)):
-            s += a[i]
-            p[i][0], p[i][1] = s, i
-
-        p.sort()
-        for j in range(1, len(p)):
-            prv_s, prv_i, s, i = p[j - 1][0], p[j - 1][1], p[j][0], p[j][1]
-
-            if abs(s - prv_s) < min_diff:
-                min_diff, ans[0], ans[1] = abs(s - prv_s), min(prv_i, i) + 1, max(prv_i, i)
-
-        return ans
-"""
-402. Continuous Subarray Sum
-https://www.lintcode.com/problem/continuous-subarray-sum/description
-Given an integer array, find a continuous subarray where the sum of numbers is the biggest.
-Your code should return the index of the first number and the index of the last number.
-(If their are duplicate answer, return the minimum one in lexicographical order)
-Input: [-3, 1, 3, -3, 4] Output: [1, 4]
-Input: [0, 1, 0, 1] Output: [0, 3]
-Explanation: The minimum one in lexicographical order.
-"""
-    def continuousSubarraySum(self, a):
-        s, p, min_s, min_s_i, max_s, ans = 0, [0] * len(a), 0, -1, -sys.maxsize, [-1, -1]
-
-        for j in range(len(a)):
-            p[j] = s = s + a[j]
-            if s - min_s > max_s:
-                max_s, ans[0], ans[1] = s - min_s, min_s_i + 1, j
-            if s < min_s:
-                min_s, min_s_i = s, j
-
-        return ans
-"""
-403. Continuous Subarray Sum II
-https://www.jiuzhang.com/problem/continuous-subarray-sum-ii/#tag-highlight-lang-python
-Given an circular integer array (the next element of the last element is the first element),
-find a continuous subarray in it, where the sum of numbers is the biggest.
-Your code should return the index of the first number and the index of the last number.
-If duplicate answers exist, return any of them.
-Input: [3, 1, -100, -3, 4] Output: [4, 1]
-Input: [1,-1] Output: [0, 0]
-"""
-    def continuousSubarraySumII(self, A):
-        max_start, max_end, max_sum = self.find_maximum_subarray(A)
-        min_start, min_end, min_sum = self.find_maximum_subarray([-a for a in A])
-        min_sum = -min_sum  # *-1 after reuse find maximum array
-
-        total = sum(A)
-        if max_sum >= total - min_sum or min_end - min_start + 1 == len(A):
-            return [max_start, max_end]
-
-        return [min_end + 1, min_start - 1]
-
-    def find_maximum_subarray(self, nums):
-        max_sum = -sys.maxsize
-        curt_sum, start = 0, 0
-        max_range = []
-
-        for index, num in enumerate(nums):
-            if curt_sum < 0:
-                curt_sum = 0
-                start = index
-            curt_sum += num
-            if curt_sum > max_sum:
-                max_sum = curt_sum
-                max_range = [start, index]
-
-        return max_range[0], max_range[1], max_sum
-"""
-558 Sliding Window Matrix Maximum
-Given an array of n m matrix, and a moving matrix window (size k k),
-move the window from top left to botton right at each iteration,
-find the maximum sum of the elements inside the window at each moving. Return 0 if the answer does not exist.
-For matrix [ [1, 5, 3], [3, 2, 1], [4, 1, 9], ] The moving window size k = 2. return 13.
-At first the window is at the start of the array like this [ [|1, 5|, 3], [|3, 2|, 1], [4, 1, 9], ] ,get the sum 11;
-then the window move one step forward. [ [1, |5, 3|], [3, |2, 1|], [4, 1, 9], ],get the sum 11;
-then the window move one step forward again. [[1, 5, 3], [|3, 2|, 1], [|4, 1|, 9], ], get the sum 10;
-then the window move one step forward again. [ [1, 5, 3], [3, |2, 1|], [4, |1, 9|], ] ,get the sum 13;
-SO finally, get the maximum from all the sum which is 13.
-Challenge O(n^2) time.
-"""
-    def maxSlidingMatrix(self, mtrx, k):
-        n, m, s, max_s = len(mtrx), len(mtrx[0]), [0] * (len(mtrx) + 1), -10000
-        p = [0] * (n + 1)
-        for i in range(n):
-            for j in range(m):
-                s[j + 1] += mtrx[i][j]
-                p[j + 1] = s[j + 1] + p[j]
-
-                if j >= k - 1 and i >= k - 1:
-                    max_s = max(max_s, p[j + 1] - p[j + 1 - k])
-            if i >= k - 1:
-              for j in range(m):
-                s[j + 1] -= mtrx[i - k + 1][j]
-
-        return max_s
-
-    def maxSlidingMatrix(self, matrix, k):
-        n, m = len(matrix), len(matrix[0])
-        if n < k or m < k:
-            return 0
-        sum = [[0] * (m + 1) for _ in range(n + 1)]
-        for i in range(n):
-            for j in range(m):
-                # 二维前缀和
-                sum[i + 1][j + 1] = sum[i][j + 1] + sum[i + 1][j] - sum[i][j] + matrix[i][j]
-        ans = sum[k][k];
-        for i in range(1, n - k + 2):
-            for j in range(1, m - k + 2):
-                ans = max(ans, sum[i + k - 1][j + k - 1] - sum[i - 1][j + k - 1] - sum[i + k - 1][j - 1] + sum[i - 1][j - 1])
-        return ans

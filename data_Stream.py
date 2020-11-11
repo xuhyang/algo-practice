@@ -11,8 +11,50 @@ Finally, you need to return the data from each get.
 # Input：LRUCache(1) set(2, 1) get(2) set(3, 2) get(2) get(3) Output：[1,-1,2]
 # Explanation： cache cap is 1，set(2,1)，get(2) and return 1，set(3,2) and delete (2,1)，get(2) and return -1，get(3) and return 2.
 """
+class LRUCache:
 
+    class Node:
 
+        def __init__(self, k, v):
+            self.k, self.v, self.next = k, v, None
+
+    def __init__(self, cpcty):
+        self.cpcty, self.k_to_prv = cpcty, {}
+        self.d = self.t = self.Node(-sys.maxsize, -sys.maxsize)
+
+    def get(self, k):
+        if k not in self.k_to_prv:
+            return -1
+
+        self.update(self.k_to_prv[k])
+        return self.t.v
+
+    def set(self, k, v):
+        if k in self.k_to_prv:
+            self.update(self.k_to_prv[k])
+            self.t.v = v
+            return
+
+        self.t.next, self.k_to_prv[k] = self.Node(k, v), self.t
+        self.t = self.t.next
+
+        if len(self.k_to_prv) <= self.cpcty:
+            return
+
+        h = self.d.next
+        self.d.next = h.next
+        self.k_to_prv.pop(h.k)
+        self.k_to_prv[h.next.k] = self.d
+
+    def update(self, prv):
+        crnt, nxt = prv.next, prv.next.next
+
+        if self.t == crnt:
+            return
+
+        prv.next, self.k_to_prv[nxt.k] = nxt, prv
+        self.t.next, self.k_to_prv[crnt.k] = crnt, self.t
+        self.t = crnt
 """
 209. First Unique Character in a String
 https://www.lintcode.com/problem/first-unique-character-in-a-string/description

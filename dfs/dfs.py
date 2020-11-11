@@ -30,49 +30,49 @@ https://www.lintcode.com/problem/permutations/description
 Given a list of numbers, return all possible permutations.
 """
     def permute(self, a):
-        rslts =[]
-        self.dfs(sorted(a), set(), [], rslts)
+        rslts = []
+        self.dfs(sorted(a), rslts, [], set())
         return rslts
 
-    def dfs(self, a, seen, rslt, rslts):
-        if len(rslt) == len(a):
-            rslts.append(list(rslt))
+    def dfs(self, a, rslts, rslt, s):
+
+        if len(s) == len(a):
+            rslts.append(rslt[:])
             return
 
-        for i in range(len(a)):
-            if i in seen:
+        for j in range(len(a)):
+            if j in s:
                 continue
 
-            seen.add(i)
-            rslt.append(a[i])
-            self.dfs(a, seen, rslt, rslts)
-            seen.remove(i)
+            s.add(j)
+            rslt.append(a[j])
+            self.dfs(a, rslts, rslt, s)
             rslt.pop()
+            s.remove(j)
 """
 16. Permutations II
 https://www.lintcode.com/problem/permutations-ii/description
 Given a list of numbers with duplicate number in it. Find all unique permutations.
 """
     def permuteUnique(self, a):
-        rslts =[]
-        self.dfs(sorted(a), set(), [], rslts)
+        rslts = []
+        self.dfs(sorted(a), rslts, [], set())
         return rslts
 
+    def dfs(self, a, rslts, rslt, s):
 
-    def dfs(self, a, seen, rslt, rslts):
-        if len(rslt) == len(a):
-            rslts.append(list(rslt))
-            return
+        if len(s) == len(a):
+            rslts.append(rslt[:])
 
-        for i in range(len(a)):
-            if i in seen or (i > 0 and a[i - 1] == a[i] and i - 1 not in seen):
+        for j in range(len(a)):
+            if j in s or j > 0 and a[j - 1] == a[j] and j - 1 not in s:
                 continue
 
-            seen.add(i)
-            rslt.append(a[i])
-            self.dfs(a, seen, rslt, rslts)
-            seen.remove(i)
+            s.add(j)
+            rslt.append(a[j])
+            self.dfs(a, rslts, rslt, s)
             rslt.pop()
+            s.remove(j)
 """
 17. Subsets
 https://www.lintcode.com/problem/subsets/my-submissions
@@ -80,7 +80,7 @@ Given a set of distinct integers, return all possible subsets.
 """
     def subsets(self, a):
         rslts = []
-        self.dfs(sorted(a), [], rslts, 0)
+        self.dfs(sorted(a), [], rslts, 0) #sort 和 i 为了去重
         return rslts
 
     def dfs(self, a, rslt, rslts, i):
@@ -116,10 +116,10 @@ Given a collection of integers that might contain duplicates, nums, return all p
         return rslts
 
     def dfs(self, a, rslts, rslt, i):
-        rslts.append(list(rslt))
+        rslts.append(rslt[:])
 
         for j in range(i, len(a)):
-            if j > i and a[j - 1] == a[j]: #同一层不选相同数字
+            if j > i and a[j - 1] == a[j]: #同一层不选相同数字, > i not > 0 因为只跳过当前层重复数字
                 continue
 
             rslt.append(a[j])
@@ -140,7 +140,7 @@ Input: candidates = [2, 3, 6, 7], target = 7 Output: [[7], [2, 2, 3]]
 
     def dfs(self, a, t, rslt, rslts, i):
         if t == 0:
-            rslts.append(list(rslt))
+            rslts.append(rslt[:])
             return
         if t < 0:
             return
@@ -165,7 +165,6 @@ Find all unique combinations in num where the numbers sum to target.
         return rslts
 
     def dfs(self, a, rslts, rslt, t, i):
-
         if t == 0:
             rslts.append(list(rslt))
             return
@@ -179,8 +178,30 @@ Find all unique combinations in num where the numbers sum to target.
             rslt.append(a[j])
             self.dfs(a, rslts, rslt, t - a[j], j + 1)
             rslt.pop()
-            \
+"""
+216. Combination Sum III
+https://leetcode.com/problems/combination-sum-iii/
+Find all valid combinations of k numbers that sum up to n such that the following conditions are true:
+Only numbers 1 through 9 are used. Each number is used at most once.
+Return a list of all possible valid combinations. The list must not contain the same combination twice, and the combinations may be returned in any order.
+Example 1: Input: k = 3, n = 7 Output: [[1,2,4]] Explanation: 1 + 2 + 4 = 7 There are no other valid combinations.
+Example 2: Input: k = 3, n = 9 Output: [[1,2,6],[1,3,5],[2,3,4]] Explanation:1 + 2 + 6 = 9 1 + 3 + 5 = 9 2 + 3 + 4 = 9 There are no other valid combinations.
+"""
+    def combinationSum3(self, k: int, n: int) -> List[List[int]]:
+        ans = []
+        self.dfs(k, n, ans, [], 1)
+        return ans
 
+    def dfs(self, k, n, ans, rslt, i):
+        if len(rslt) == k:
+            if n == 0:
+                ans.append(rslt[:])
+            return
+
+        for j in range(i, 10):
+            rslt.append(j)
+            self.dfs(k, n - j, ans, rslt, j + 1)
+            rslt.pop()
 """
 33. N-Queens
 https://www.lintcode.com/problem/n-queens/description
@@ -197,7 +218,7 @@ Given an integer n, return all distinct solutions to the n-queens puzzle.
     def dfs(self, n, chssbrds, cols):
         r = len(cols)
         if r == n:
-            chssbrds.append([''.join(['Q' if c == i else '.' for i in range(n)]) for c in cols])
+            chssbrds.append([''.join(['Q' if c == j else '.' for j in range(n)]) for c in cols])
             return
 
         for c in range(n):
@@ -211,6 +232,36 @@ Given an integer n, return all distinct solutions to the n-queens puzzle.
                 cols.append(c)
                 self.dfs(n, chssbrds, cols)
                 cols.pop()
+"""
+34. N-Queens II
+https://www.lintcode.com/problem/n-queens-ii/description
+Follow up for N-Queens problem.
+Now, instead outputting board configurations, return the total number of distinct solutions.
+Have you met this question in a real interview?
+Example 1: Input: n=1 Output: 1 Explanation: 1: 1
+Example 2: Input: n=4 Output: 2 Explanation:
+"""
+    def totalNQueens(self, n):
+        return self.dfs([0] * n, 0)
+
+    def dfs(self, b, i):
+        if i == len(b):
+            return 1
+
+        ans = 0
+        for j in range(len(b)):
+            vld = True
+            for r, c in enumerate(b[:i]):
+                if c == j or r - c == i - j or r + c == i + j:
+                    vld = False
+                    break
+            if not vld:
+                continue
+            b[i] = j
+            ans += self.dfs(b, i + 1)
+            b[i] = 0
+
+        return ans
 """
 123. Word Search
 https://www.lintcode.com/problem/word-search/description
@@ -255,22 +306,48 @@ Given two integers n and k. Return all possible combinations of k numbers out of
 Input: n = 4, k = 2 Output: [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
 """
     def combine(self, n, k):
-        rslts= []
-        self.dfs(n + 1, rslts, [], k, 1)
+        rslts = []
+        self.dfs(n, rslts, [], k, 1)
         return rslts
 
-    def dfs(self, n, rslts, rslt, k, i): #i控制row, 下一层
-        if k == 0:
-            rslts.append(list(rslt))
+    def dfs(self, n, rslts, rslt, k, i):
+
+        if len(rslt) == k:
+            rslts.append(rslt[:])
             return
-        #j 控制col，同一层
-        for j in range(i, n):
+
+        for j in range(i, n + 1):
+            if j + k - len(rslt) - 1 > n:
+                continue
             rslt.append(j)
-            self.dfs(n, rslts, rslt, k - 1, j + 1)
+            self.dfs(n, rslts, rslt, k, j + 1)
             rslt.pop()
 """
+376. Binary Tree Path Sum
+https://www.lintcode.com/problem/binary-tree-path-sum/description
+Given a binary tree, find all paths that sum of the nodes in the path equals to a given number target.
+A valid path is from root node to any of the leaf nodes.
+"""
+    def binaryTreePathSum(self, r, t):
+        rslts = []
+        self.dfs(r, t, rslts, [])
+        return rslts
+
+    def dfs(self, n, t, rslts, rslt):
+        if not n:
+            return
+
+        rslt.append(n.val)
+        t -= n.val
+        if t == 0 and not n.left and not n.right:
+            rslts.append(rslt[:])
+
+        self.dfs(n.left, t, rslts, rslt)
+        self.dfs(n.right, t, rslts, rslt)
+        rslt.pop()
+"""
 246. Binary Tree Path Sum II
-https://www.lintcode.com/problem/binary-tree-path-sum-ii/my-submissions
+https://www.lintcode.com/problem/binary-tree-path-sum-ii/description
 Your are given a binary tree in which each node contains a value.
 Design an algorithm to get all paths which sum to a given value.
 The path does not need to start or end at the root or a leaf,
@@ -280,7 +357,6 @@ but it must go in a straight line down.
     def binaryTreePathSum2(self, r, t):
         rslts = []
         self.dfs1(r, t, rslts, [])
-
         return rslts
 
     def dfs1(self, n, t, rslts, rslt):
@@ -291,7 +367,6 @@ but it must go in a straight line down.
 
         self.dfs1(n.left, t, rslts, rslt)
         self.dfs1(n.right, t, rslts, rslt)
-
 
     def dfs2(self, n, t, rslts, rslt):
         if not n:
@@ -327,231 +402,6 @@ but it must go in a straight line down.
         self.dfs(n.left, p, rslts, l + 1, t)
         self.dfs(n.right, p, rslts, l + 1, t)
         p.pop()
-
-    def binaryTreePathSum(self, r, t):
-        rslts = []
-        self.dfs(r, t, rslts, [])
-
-        return rslts
-"""
-376. Binary Tree Path Sum
-https://www.lintcode.com/problem/binary-tree-path-sum/description
-Given a binary tree, find all paths that sum of the nodes in the path equals to a given number target.
-A valid path is from root node to any of the leaf nodes.
-"""
-    def dfs(self, n, t, rslts, rslt):
-        if not n:
-            return
-
-        rslt.append(n.val)
-        t -= n.val
-        if t == 0 and not n.left and not n.right:
-            rslts.append(rslt[:])
-
-        self.dfs(n.left, t, rslts, rslt)
-        self.dfs(n.right, t, rslts, rslt)
-        rslt.pop()
-    def letterCombinations(self, dgts):
-        rslts, kybrd = [], {'1': '', '2': 'abc', '3': 'def', '4': 'ghi', '5': 'jkl', '6': 'mno', '7': 'pqrs', '8': 'tuv', '9': 'wxyz'}
-        if len(dgts) > 0:
-            self.dfs(dgts, kybrd, rslts, '', 0)
-
-        return rslts
-"""
-425. Letter Combinations of a Phone Number
-https://www.lintcode.com/problem/letter-combinations-of-a-phone-number/description
-"""
-    def dfs(self, dgts, kybrd, rslts, rslt, i):
-        if i == len(dgts):
-            rslts.append(rslt)
-            return
-
-        for c in kybrd[dgts[i]]:
-            self.dfs(dgts, kybrd, rslts, rslt + c, i + 1)
-"""
-https://www.lintcode.com/problem/restore-ip-addresses/description
-https://www.lintcode.com/problem/restore-ip-addresses/description
-"""
-
-"""
-427. Generate Parentheses
-https://www.lintcode.com/problem/generate-parentheses/description
-Given n, and there are n pairs of parentheses,
-write a function to generate all combinations of well-formed parentheses.
-"""
-    @highlight
-    def generateParenthesis(self, n):
-        rslts = []
-        self.dfs(rslts, n, n, '')
-        return rslts
-
-    def dfs(self, rslts, l_cnt, r_cnt, rslt):
-
-        if l_cnt == 0 and r_cnt == 0:
-            rslts.append(rslt)
-
-        if l_cnt > 0:
-            self.dfs(rslts, l_cnt - 1, r_cnt, rslt + '(')
-        if r_cnt > 0 and l_cnt < r_cnt:
-            self.dfs(rslts, l_cnt, r_cnt - 1, rslt + ')')
-"""
-472. Binary Tree Path Sum III
-https://www.lintcode.com/problem/binary-tree-path-sum-iii/description
-Give a binary tree, and a target number, find all path that the sum of nodes equal to target, the path could be start and end at any node in the tree.
-Example Input: {1,2,3,4},6 Output: [[2, 4],[2, 1, 3],[3, 1, 2],[4, 2]]
-"""
-    def binaryTreePathSum3(self, r, t):
-        rslts = []
-        self.dfs_strt_n(r, t, rslts)
-
-        return rslts
-
-    def dfs_strt_n(self, n, t, rslts):
-        if not n:
-            return
-
-        self.dfs_rslt(n, t, [], rslts, set())
-
-        self.dfs_strt_n(n.left, t, rslts)
-        self.dfs_strt_n(n.right, t, rslts)
-
-    def dfs_rslt(self, n, t, rslt, rslts, s):
-        if not n or n in s:
-            return
-
-        s.add(n)
-        rslt.append(n.val)
-
-        t -= n.val
-        if t == 0:
-            rslts.append(list(rslt))
-
-        self.dfs_rslt(n.parent, t, rslt, rslts, s)
-        self.dfs_rslt(n.left, t, rslt, rslts, s)
-        self.dfs_rslt(n.right, t, rslt, rslts, s)
-
-        s.remove(n)
-        rslt.pop()
-"""
-551. Nested List Weight Sum
-https://www.lintcode.com/problem/nested-list-weight-sum/description
-Given a nested list of integers, return the sum of all integers in the list weighted by their depth. Each element is either an integer, or a list -- whose elements may also be integers or other lists.
-Example Input: the list [[1,1],2,[1,1]],  Output: 10.  four 1's at depth 2, one 2 at depth 1, 4 * 1 * 2 + 1 * 2 * 1 = 10
-其他解法：stack
-"""
-    def depthSum(self, nestedList):
-        return self.dfs(nestedList, 1)
-
-    def dfs(self, a, dpth):
-        ans = 0
-        for e in a:
-            ans += e.getInteger() * dpth if e.isInteger() else self.dfs(e.getList(), dpth + 1)
-        return ans
-
-    def findMissing2(self, n, s):
-        rslt = []
-        self.dfs(n, s, set(), (1 + n) * n // 2, rslt, 0)
-        return rslt[0]
-
-
-    def dfs(self, n, s, seen, t, rslt, i):
-        if len(seen) == n - 1 and i == len(s):
-            rslt.append(t)
-            return
-
-        for j in range(i, min(i + 2, len(s))):
-            num = int(s[i : j + 1])
-
-            if s[i] == '0' or num < 1 or num > n or num in seen:
-                continue
-
-            seen.add(num)
-            self.dfs(n, s, seen, t - num, rslt, j + 1)
-            seen.remove(num)
-
-        def findMissing2(self, n, s):
-        rslt = []
-        self.dfs(n, s, set(), (1 + n) * n // 2, rslt, 0)
-        return rslt[0]
-"""
-570. Find the Missing Number II
-https://www.lintcode.com/problem/find-the-missing-number-ii/description
-Giving a string with number from 1-n in random order, but miss 1 number.Find that number.
-Example Input: n = 20 and str = 19201234567891011121314151618 Output: 17
-Explanation: 19'20'1'2'3'4'5'6'7'8'9'10'11'12'13'14'15'16'18
-Data guarantees have only one solution
-"""
-    def findMissing2(self, n, s):
-        rslt = []
-        self.dfs(n, s, set(), (1 + n) * n // 2, rslt, 0)
-        return rslt[0]
-
-    def dfs(self, n, s, seen, t, rslt, i):
-        if len(seen) == n - 1 and i == len(s): #最后选的数字 一定要选满整个str ex: 13 "1110987654321213"
-            rslt.append(t)
-            return
-
-        for j in range(i, min(i + 2, len(s))):
-            num = int(s[i : j + 1])
-            #'09'
-            if s[i] == '0' or num < 1 or num > n or num in seen:
-                continue
-
-            seen.add(num)
-            self.dfs(n, s, seen, t - num, rslt, j + 1)
-            seen.remove(num)
-"""
-121. Word Ladder II
-https://www.lintcode.com/problem/word-ladder-ii/description
-Given two words (start and end), and a dictionary, find all shortest transformation sequence(s) from start to end, output sequence in dictionary order.
-Transformation rule such that: Only one letter can be changed at a time. Each intermediate word must exist in the dictionary
-Input：start = "a"，end = "c"，dict =["a","b","c"] Output：[["a","c"]] Explanation："a"->"c"
-Input：start ="hit"，end = "cog"，dict =["hot","dot","dog","lot","log"] Output：[["hit","hot","dot","dog","cog"],["hit","hot","lot","log","cog"]]
-Explanation： 1."hit"->"hot"->"dot"->"dog"->"cog" 2."hit"->"hot"->"lot"->"log"->"cog"
-The dictionary order of the first sequence is less than that of the second.
-Notice: All words have the same length. All words contain only lowercase alphabetic characters. At least one solution exists.
-"""
-    def findLadders(self, start, end, dict):
-        rslts, lookup = [], {}
-        dict.update([start, end])
-
-        for w in dict:
-            for i in range(len(w)):
-                k = w[:i] + '_' + w[i + 1:]
-                lookup[k] = lookup.get(k, [])
-                lookup[k].append(w)
-
-        self.dfs(lookup, self.bfs(end, lookup), end, start, [start], rslts)
-
-        return rslts
-    #用bfs得出一个每个点到终点的最短距离
-    def bfs(self, end, lookup):
-        q, stps = collections.deque([end]), {end : 0}
-
-        while q:
-            w = q.popleft()
-
-            for i in range(len(w)):
-                for nxt in lookup.get(w[:i] + '_' + w[i + 1:], []):
-                    if nxt not in stps:
-                        q.append(nxt)
-                        stps[nxt] = stps[w] + 1
-
-        return stps
-
-    def dfs(self, lookup, stps, end, start, rslt, rslts):
-        if start == end:
-            rslts.append(list(rslt))
-            return
-
-        for i in range(len(start)):
-            for w in lookup.get(start[:i] + '_' + start[i + 1:], []):
-                if stps[w] != stps[start] - 1: #当前起点离终点越来越近
-                    continue
-
-                rslt.append(w)
-                self.dfs(lookup, stps, end, w, rslt, rslts)
-                rslt.pop()
 """
 472. Binary Tree Path Sum III
 https://www.lintcode.com/problem/binary-tree-path-sum-iii/description
@@ -572,7 +422,6 @@ Input: {1,2,3,4},3 Output: [[1,2],[2,1],[3]] Explanation: The tree is look like 
     def binaryTreePathSum3(self, r, t):
         rslts = []
         self.dfs_strt_n(r, t, rslts)
-
         return rslts
 
     def dfs_strt_n(self, n, t, rslts):
@@ -583,7 +432,6 @@ Input: {1,2,3,4},3 Output: [[1,2],[2,1],[3]] Explanation: The tree is look like 
 
         self.dfs_strt_n(n.left, t, rslts)
         self.dfs_strt_n(n.right, t, rslts)
-
 
     def dfs_rslt(self, n, t, rslt, rslts, s):
         if not n or n in s:
@@ -602,58 +450,48 @@ Input: {1,2,3,4},3 Output: [[1,2],[2,1],[3]] Explanation: The tree is look like 
 
         s.remove(n)
         rslt.pop()
-
 """
-652. Factorization
-https://www.lintcode.com/problem/factorization/description
-A non-negative numbers can be regarded as product of its factors.
-Write a function that takes an integer n and return all possible combinations of its factors.
-Input: 8 Output: [[2,2,2],[2,4]] Explanation: 8 = 2 x 2 x 2 = 2 x 4
-Input: 1 Output: []
-Notice
-Elements in a combination (a1, a2, … , ak) must be in non-descending order. (ie, a1 ≤ a2 ≤ … ≤ ak).
-The solution set must not contain duplicate combination.
+425. Letter Combinations of a Phone Number
+https://www.lintcode.com/problem/letter-combinations-of-a-phone-number/description
 """
-    def getFactors(self, n):
-        rslts = []
-        self.dfs(n, [], rslts, 2)
+    def letterCombinations(self, dgts):
+        rslts, kybrd = [], {'1': '', '2': 'abc', '3': 'def', '4': 'ghi', '5': 'jkl', '6': 'mno', '7': 'pqrs', '8': 'tuv', '9': 'wxyz'}
+        if len(dgts) > 0:
+            self.dfs(dgts, kybrd, rslts, '', 0)
         return rslts
 
-    def dfs(self, n, rslt, rslts, frst_f):
-        if rslt:
-            rslt.append(n)
-            rslts.append(list(rslt))
-            rslt.pop()
-
-        for f in range(frst_f, int(math.sqrt(n)) + 1):
-            if n % f != 0:
-                continue
-
-            rslt.append(f)
-            self.dfs(n // f, rslt, rslts, f)
-            rslt.pop()
-"""
-680. Split String
-https://www.lintcode.com/problem/split-string/description
-Give a string, you can choose to split the string after one character or two adjacent characters,
-and make the string to be composed of only one character or two characters. Output all possible results.
-# Input: "123" Output: [["1","2","3"],["12","3"],["1","23"]]
-# Input: "12345" Output: [["1","23","45"],["12","3","45"],["12","34","5"],["1","2","3","45"],["1","2","34","5"],["1","23","4","5"],["12","3","4","5"],["1","2","3","4","5"]]
-"""
-    def splitString(self, s):
-        rslts = []
-        self.dfs(s, rslts, [], 0)
-        return rslts
-
-    def dfs(self, s, rslts, rslt, i):
-        if i == len(s):
-            rslts.append(list(rslt))
+    def dfs(self, dgts, kybrd, rslts, rslt, i):
+        if i == len(dgts):
+            rslts.append(rslt)
             return
 
-        for j in range(1, min(len(s) - i, 2) + 1):
-            rslt.append(s[i : i + j])
-            self.dfs(s, rslts, rslt, i + j)
-            rslt.pop()
+        for c in kybrd[dgts[i]]:
+            self.dfs(dgts, kybrd, rslts, rslt + c, i + 1)
+"""
+https://www.lintcode.com/problem/restore-ip-addresses/description
+"""
+
+"""
+427. Generate Parentheses
+https://www.lintcode.com/problem/generate-parentheses/description
+Given n, and there are n pairs of parentheses,
+write a function to generate all combinations of well-formed parentheses.
+"""
+    @highlight
+    def generateParenthesis(self, n):
+        ans = []
+        self.dfs(ans, '', n, n)
+        return ans
+
+    def dfs(self, ans, rslt, l_lft, r_lft):
+        if l_lft == r_lft == 0:
+            ans.append(rslt)
+            return
+
+        if l_lft > 0:
+            self.dfs(ans, rslt + '(', l_lft - 1, r_lft)
+        if l_lft < r_lft:
+            self.dfs(ans, rslt + ')', l_lft, r_lft - 1)
 """
 780. Remove Invalid Parentheses
 https://www.lintcode.com/problem/remove-invalid-parentheses/description
@@ -668,7 +506,7 @@ Notice: The input string may contain letters other than the parentheses ( and ).
         self.dfs(s, ans, l, r, 0)
         return ans
 
-    def dfs(self, s, ans, l, r, i):
+    def dfs(self, s, ans, l, r, i): #找i后面的括号, 去重
         if l == r == 0: #题目要求去除最少括号， 所以限制dfs深度到第一次左右括号数相等
             if self.is_blncd(s):#当前深度第一次左右括号数相等且当前substr平衡，则找到一个答案
                 ans.append(s)
@@ -699,3 +537,386 @@ Notice: The input string may contain letters other than the parentheses ( and ).
     def is_blncd(self, s):
         l, r = self.cnt(s)
         return l == r == 0
+"""
+121. Word Ladder II
+https://www.lintcode.com/problem/word-ladder-ii/description
+Given two words (start and end), and a dictionary, find all shortest transformation sequence(s) from start to end, output sequence in dictionary order.
+Transformation rule such that: Only one letter can be changed at a time. Each intermediate word must exist in the dictionary
+Input：start = "a"，end = "c"，dict =["a","b","c"] Output：[["a","c"]] Explanation："a"->"c"
+Input：start ="hit"，end = "cog"，dict =["hot","dot","dog","lot","log"] Output：[["hit","hot","dot","dog","cog"],["hit","hot","lot","log","cog"]]
+Explanation： 1."hit"->"hot"->"dot"->"dog"->"cog" 2."hit"->"hot"->"lot"->"log"->"cog"
+The dictionary order of the first sequence is less than that of the second.
+Notice: All words have the same length. All words contain only lowercase alphabetic characters. At least one solution exists.
+"""
+    def findLadders(self, s, e, d):
+        ans, g = [], defaultdict(list)
+
+        for w in d | set([s, e]):
+            for i in range(len(w)):
+                g[w[:i] + '_' + w[i + 1:]].append(w)
+
+        self.dfs(g, self.bfs(g, e), e, s, [s], ans)
+        return ans
+
+    def bfs(self, g, e):
+        q, stps = deque([e]), {e : 0}
+
+        while q:
+            u = q.popleft()
+
+            for i in range(len(u)):
+                for v in g[u[:i] + '_' + u[i + 1:]]:
+                    if v not in stps:
+                        q.append(v)
+                        stps[v] = stps[u] + 1
+
+        return stps
+
+    def dfs(self, g, stps, e, u, rslt, ans):
+        if u == e:
+            ans.append(rslt[:])
+            return
+
+        for i in range(len(u)):
+            for v in g[u[:i] + '_' + u[i + 1:]]:
+                if stps[v] != stps[u] - 1: #当前起点离终点越来越近
+                    continue
+
+                rslt.append(v)
+                self.dfs(g, stps, e, v, rslt, ans)
+                rslt.pop()
+
+    def findLadders(self, s, e, d):
+        g, d, ans = defaultdict(list), d | set([s, e]), []
+
+        for w in d:
+            for i in range(len(w)):
+                g[w[:i] + '_' + w[i + 1:]].append(w)
+        ans = []
+        self.dfs(g, self.bfs(g, s, e), e, ans, [s])
+        return ans
+
+    def dfs(self, g, lvls, e, ans, rslt):
+        u = rslt[-1]
+
+        if rslt[-1] == e:
+            ans.append(rslt)
+            return
+
+        for i in range(len(u)):
+            for v in g[u[:i] + '_' + u[i + 1:]]:
+                if lvls[u] + 1 == lvls[v]:
+                    self.dfs(g, lvls, e, ans, rslt + [v])
+
+    def bfs(self, g, s, e):
+        q, lvls = deque([s]), {s : 1}
+
+        while q:
+            u = q.popleft()
+
+            for i in range(len(u)):
+                for v in g[u[:i] + '_' + u[i + 1:]]:
+                    if v in lvls:
+                        continue
+                    lvls[v] = lvls[u] + 1
+                    q.append(v)
+
+        return lvls
+
+"""
+652. Factorization
+https://www.lintcode.com/problem/factorization/description
+A non-negative numbers can be regarded as product of its factors.
+Write a function that takes an integer n and return all possible combinations of its factors.
+Input: 8 Output: [[2,2,2],[2,4]] Explanation: 8 = 2 x 2 x 2 = 2 x 4
+Input: 1 Output: []
+Notice
+Elements in a combination (a1, a2, … , ak) must be in non-descending order. (ie, a1 ≤ a2 ≤ … ≤ ak).
+The solution set must not contain duplicate combination.
+"""
+    def getFactors(self, n):
+        rslts = []
+        self.dfs(rslts, [], n, 2)
+        return rslts
+
+    def dfs(self, rslts, rslt, n, i):
+        if rslt:
+            rslts.append(rslt + [n])
+
+        for j in range(i, int(math.sqrt(n)) + 1): #剪枝, 超过sqrt(n)的不可能是因子
+            if n % j != 0:
+                continue
+
+            rslt.append(j)
+            self.dfs(rslts, rslt, n // j, j)
+            rslt.pop()
+    #超时
+    def getFactors(self, n):
+        rslts = []
+        self.dfs(rslts, [], n, 2)
+        return rslts
+
+    def dfs(self, rslts, rslt, n, i):
+        if n == 1 and len(rslt) != 1: #算到n == 1 太慢
+            rslts.append(rslt[:])
+            return
+
+        for j in range(i, n + 1): # 当n 是质数, 要loop整个质数
+            if n % j != 0:
+                continue
+
+            rslt.append(j)
+            self.dfs(rslts, rslt, n // j, j)
+            rslt.pop()
+"""
+680. Split String
+https://www.lintcode.com/problem/split-string/description
+Give a string, you can choose to split the string after one character or two adjacent characters,
+and make the string to be composed of only one character or two characters. Output all possible results.
+# Input: "123" Output: [["1","2","3"],["12","3"],["1","23"]]
+# Input: "12345" Output: [["1","23","45"],["12","3","45"],["12","34","5"],["1","2","3","45"],["1","2","34","5"],["1","23","4","5"],["12","3","4","5"],["1","2","3","4","5"]]
+"""
+    def splitString(self, s):
+        rslts = []
+        self.dfs(s, rslts, [], 0)
+        return rslts
+
+    def dfs(self, s, rslts, rslt, i):
+        if i == len(s):
+            rslts.append(rslt[:])
+
+        for j in range(i, min(i + 2, len(s))):
+            rslt.append(s[i : j + 1])
+            self.dfs(s, rslts, rslt, j + 1)
+            rslt.pop()
+"""
+1202. Smallest String With Swaps
+https://leetcode.com/problems/smallest-string-with-swaps/
+You are given a string s, and an array of pairs of indices in the string pairs where pairs[i] = [a, b] indicates 2 indices(0-indexed) of the string.
+You can swap the characters at any pair of indices in the given pairs any number of times.
+Return the lexicographically smallest string that s can be changed to after using the swaps.
+Example 1: Input: s = "dcab", pairs = [[0,3],[1,2]]
+Output: "bacd" Explaination: Swap s[0] and s[3], s = "bcad" Swap s[1] and s[2], s = "bacd"
+Example 2: Input: s = "dcab", pairs = [[0,3],[1,2],[0,2]] Output: "abcd"
+Explaination: Swap s[0] and s[3], s = "bcad" Swap s[0] and s[2], s = "acbd" Swap s[1] and s[2], s = "abcd"
+Example 3: Input: s = "cba", pairs = [[0,1],[1,2]] Output: "abc"
+Explaination: Swap s[0] and s[1], s = "bca" Swap s[1] and s[2], s = "bac" Swap s[0] and s[1], s = "abc"
+#其他解法 DFS
+"""
+    def smallestStringWithSwaps(self, s: str, prs: List[List[int]]) -> str:
+        g, sn, pstnd, ans = defaultdict(list), set(), set(), [''] * len(s)
+
+        for u, v in prs:
+            g[u].append(v)
+            g[v].append(u)
+
+        for i in range(len(s)):
+            if i in pstnd:
+                continue
+            self.dfs(g, sn, i)
+            indc, chrs = list(sn), []
+
+            for j in indc:
+                chrs.append(s[j])
+            indc.sort()
+            chrs.sort()
+
+            for j, idx in enumerate(indc):
+                pstnd.add(idx)
+                ans[idx] = chrs[j]
+            sn.clear()
+
+        return ''.join(ans)
+
+    def dfs(self, g, s, i):
+        s.add(i)
+        for j in g[i]:
+            if j in s:
+                continue
+            self.dfs(g, s, j)
+"""
+1288. Reconstruct Itinerary
+https://www.lintcode.com/problem/reconstruct-itinerary/description
+Given a list of airline tickets represented by pairs of departure and arrival airports [from, to], reconstruct the itinerary in order. All of the tickets belong to a man who departs from JFK. Thus, the itinerary must begin with JFK.
+Example 1: Input: [["MUC", "LHR"], ["JFK", "MUC"], ["SFO", "SJC"], ["LHR", "SFO"]] Output: ["JFK", "MUC", "LHR", "SFO", "SJC"].
+Example 2: Input: [["JFK","SFO"],["JFK","ATL"],["SFO","ATL"],["ATL","JFK"],["ATL","SFO"]] Output: ["JFK","ATL","JFK","SFO","ATL","SFO"].
+Explanation: Another possible reconstruction is ["JFK","SFO","ATL","JFK","ATL","SFO"]. But it is larger in lexical order
+"""
+    def findItinerary(self, tckts):
+        g, d = defaultdict(list), defaultdict(dict)
+
+        for u, v in tckts:
+            g[u].append(v)
+            d[u][v] = d[u].get(v, 0) + 1
+
+        for v in g.values():
+            v.sort()
+
+        return self.dfs(g, len(tckts) + 1, d, ['JFK'])
+
+    def dfs(self, g, n, d, rslt):
+        if len(rslt) == n:
+            return rslt
+
+        u = rslt[-1]
+        for v in g[u]:
+            if d[u][v] == 0:
+                continue
+
+            d[u][v] -= 1
+            rslt.append(v)
+            if self.dfs(g, n, d, rslt):
+                return rslt
+            rslt.pop()
+            d[u][v] += 1
+
+        return None
+"""
+1192. Critical Connections in a Network
+https://www.lintcode.com/problem/critical-connections-in-a-network/description
+https://leetcode.com/problems/critical-connections-in-a-network/
+There are n servers numbered from 0 to n-1 connected by undirected server-to-server connections forming a network
+where connections[i] = [a, b] represents a connection between servers a and b. Any server can reach any other server directly or indirectly through the network.
+A critical connection is a connection that, if removed, will make some server unable to reach some other server.
+Return all critical connections in the network in any order.
+Example 1: Input: n = 4, connections = [[0,1],[1,2],[2,0],[1,3]] Output: [[1,3]] Explanation: [[3,1]] is also accepted.
+"""
+    def criticalConnections(self, n: int, a: List[List[int]]) -> List[List[int]]:
+        g = [[] for _ in range(n)]
+        for u, v in a:
+            g[u].append(v)
+            g[v].append(u)
+
+        return self.dfs(g, [0] * n, 1, 0, -1)
+
+    def dfs(self, g, lw, rnk, u, prv_u):
+        lw[u], ans = rnk, []
+
+        for v in g[u]:
+            if v == prv_u:
+                continue
+            if not lw[v]:
+                ans += self.dfs(g, lw, rnk + 1, v, u)
+            lw[u] = min(lw[u], lw[v])
+            if lw[v] >= rnk + 1:
+                ans.append([u, v])
+        return ans
+"""
+136. Palindrome Partitioning
+https://www.lintcode.com/problem/palindrome-partitioning/description
+Given a string s. Partition s such that every substring in the partition is a palindrome.
+Return all possible palindrome partitioning of s.
+Input: "a" Output: [["a"]] Explanation: Only 1 char in the string, only 1 way to split it (itself).
+Input: "aab"Output: [["aa", "b"], ["a", "a", "b"]]
+Explanation: There are 2 ways to split "aab".
+    1. Split "aab" into "aa" and "b", both palindrome.
+    2. Split "aab" into "a", "a", and "b", all palindrome.
+NoticeDifferent partitionings can be in any order. Each substring must be a continuous segment of s.
+"""
+    def partition(self, s):
+        f, n = [[True if i >= j else False for j in range(len(s))] for i in range(len(s))], len(s)
+
+        for l in range(2, n + 1):
+            for i in range(n - l + 1):
+                j = i + l - 1
+                f[i][j] = f[i + 1][j - 1] and s[i] == s[j]
+
+        ans = []
+        self.dfs(f, s, ans, [], 0)
+        return ans
+
+    def dfs(self, f, s, ans, rslt, i):
+        if i == len(s):
+            ans.append(rslt[:])
+            return
+
+        for j in range(i, len(s)):
+            if not f[i][j]:
+                continue
+            rslt.append(s[i : j + 1])
+            self.dfs(f, s, ans, rslt, j + 1)
+            rslt.pop()
+"""
+1032. Letter Case Permutation
+https://www.lintcode.com/problem/letter-case-permutation/description
+Given a string S, we can transform every letter individually to be lowercase or uppercase to create another string. Return a list of all possible strings we could create.
+Example 1: Input: S = "a1b2" Output: ["a1b2", "a1B2", "A1b2", "A1B2"]
+"""
+    def letterCasePermutation(self, s):
+        ans = []
+        self.dfs(s, ans, '', 0)
+        return ans
+
+    def dfs(self, s, ans, rslt, i):
+        if i == len(s):
+            ans.append(rslt)
+            return
+
+        if s[i].isalpha():
+            self.dfs(s, ans, rslt + s[i].upper(), i + 1)
+            self.dfs(s, ans, rslt + s[i].lower(), i + 1)
+        else:
+            self.dfs(s, ans, rslt + s[i], i + 1)
+"""
+426. Restore IP Addresses
+https://www.lintcode.com/problem/restore-ip-addresses/description
+Given a string containing only digits, restore it by returning all possible valid IP address combinations.
+(Your task is to add three dots to this string to make it a valid IP address. Return all possible IP address.)
+Example 1: Input: "25525511135" Output: ["255.255.11.135", "255.255.111.35"] Explanation: ["255.255.111.35", "255.255.11.135"] will be accepted as well.
+Example 2: Input: "1116512311" Output: ["11.165.123.11","111.65.123.11"]
+"""
+    def restoreIpAddresses(self, s):
+        ans = []
+        self.dfs(s, ans, [], 0)
+        return ans
+
+    def dfs(self, s, ans, rslt, i):
+
+        if i == len(s) or len(rslt) == 4:
+            if i == len(s) and len(rslt) == 4:
+                ans.append(''.join([e + ('.' if j < 3 else '') for j, e in enumerate(rslt)]))
+            return
+
+        for j in range(i, len(s)):
+            e = s[i : j + 1]
+            if int(e) > 255:
+                break
+
+            rslt.append(e)
+            self.dfs(s, ans, rslt, j + 1)
+            rslt.pop()
+
+            if int(e) == 0:
+                break
+    def addOperators(self, a, t):
+        ans = []
+        self.dfs(a, ans, t , '', 0, 0)
+        return ans
+"""
+653. Expression Add Operators
+https://www.lintcode.com/problem/expression-add-operators/description
+Given a string that contains only digits 0-9 and a target value, return all possibilities to add binary operators (not unary) +, -, or * between the digits so they evaluate to the target value.
+Example 1: Input: "123" 6 Output: ["1*2*3","1+2+3"]
+Example 2: Input: "232" 8 Output: ["2*3+2", "2+3*2"]
+Example 3: Input: "105" 5 Output: ["1*0+5","10-5"]
+Example 4: Input: "00"  0 Output: ["0+0", "0-0", "0*0"]
+Example 5: Input: "3456237490", 9191 Output: []
+"""
+    def dfs(self, a, ans, t, rslt, prv, i):
+        if i == len(a):
+            if t == 0:
+                ans.append(rslt)
+            return
+
+        for j in range(i, len(a)):
+            e = a[i: j + 1]
+
+            if i == 0:
+                self.dfs(a, ans, t - int(e), e, int(e), j + 1)
+            else:
+                self.dfs(a, ans, t - int(e), rslt + '+' + e, int(e), j + 1)
+                self.dfs(a, ans, t + int(e), rslt + '-' + e, -int(e), j + 1)
+                self.dfs(a, ans, t + prv - prv * int(e), rslt + '*' + e, prv * int(e), j + 1)
+
+            if int(a[i]) == 0:
+                break
