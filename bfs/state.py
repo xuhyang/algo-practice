@@ -11,25 +11,48 @@ Notice
 0 \leq graph[i].length < graph.length0≤graph[i].length<graph.length
 """
     def shortestPathLength(self, g):
-        q, d, n = collections.deque(), {}, len(g)
-
-        for u in range(n):
-            s = 1 << u
-            q.append((s, u))
-            d[(s, u)] = 0
+        q, lvl, n = deque([(n, 1 << n) for n in range(len(g))]), defaultdict(lambda: Counter()), len(g)
 
         while q:
-            s_u, u = q.popleft()
-            for v in g[u]:
-                s = s_u | (1 << v)
-                if (s, v) in d:
-                    continue
-                d[(s, v)] = d[(s_u, u)] + 1
-                if s == (1 << n) - 1:
-                    return d[(s, v)]
-                q.append((s, v))
+            u, msk = q.popleft()
 
-        return 0
+            if msk + 1 == 1 << n:
+                return lvl[msk][u]
+
+            for v in g[u]:
+                v_msk = msk | 1 << v
+                if lvl[v_msk][v]:
+                    continue
+                lvl[v_msk][v] = lvl[msk][u] + 1
+                q.append((v, v_msk))
+
+        return -1
+
+    def shortestPathLength(self, g):
+        q, s, n, stp = deque(), set(), len(g), 0
+
+        for i in range(n):
+            u = (i, 1 << i)
+            q.append(u)
+            s.add(u)
+
+        while q:
+            for _ in range(len(q)):
+                ue, msk = q.popleft()
+
+                if msk + 1 == 1 << n:
+                    return stp
+
+                for ve in g[ue]:
+                    v = (ve, msk | 1 << ve)
+
+                    if v in s:
+                        continue
+                    q.append(v)
+                    s.add(v)
+            stp += 1
+
+        return -1
 """
 1504. Shortest Path to Get All Keys
 https://www.lintcode.com/problem/shortest-path-to-get-all-keys/description
@@ -59,7 +82,7 @@ The number of keys is in [1, 6]. Each key has a different letter and opens exact
 
         while q:
             x, y, k = q.popleft()
-            
+
             for dx, dy in ((0, -1), (-1, 0), (0, 1), (1, 0)):
                 vx, vy = x + dx, y + dy
                 if vx < 0 or vx >= n or vy < 0 or vy >= m:
@@ -73,5 +96,37 @@ The number of keys is in [1, 6]. Each key has a different letter and opens exact
                 if vk == (1 << cnt) - 1:
                     return d[(vx, vy, vk)]
                 q.append((vx, vy, vk))
+
+        return -1
+
+    def shortestPathAllKeys(self, g):
+        q, s, t, k, n, m, ans = deque(), set(), 0, 0, len(g), len(g[0]), 0
+
+        for i in range(n):
+            for j in range(m):
+                if g[i][j] == '@':
+                    q.append((i, j, 0))
+                    s.add((i, j, 0))
+                elif g[i][j] in 'abcdef':
+                    t |= 1 << ord(g[i][j]) - ord('a')
+
+        while q:
+            for _ in range(len(q)):
+                x, y, k = q.popleft()
+
+                if g[x][y] in 'abcdef':
+                    k |= 1 << ord(g[x][y]) - ord('a')
+                    if k == t:
+                        return ans
+                elif g[x][y] in 'ABCDEF' and not k & 1 << ord(g[x][y].lower()) - ord('a'):
+                    continue
+
+                for dx, dy in ((0, -1), (-1, 0), (0, 1), (1, 0)):
+                    v = (vx, vy, k) = (dx + x, dy + y, k)
+                    if vx < 0 or vx >= n or vy < 0 or vy >= m or g[vx][vy] == '#' or v in s:
+                        continue
+                    q.append(v)
+                    s.add(v)
+            ans += 1
 
         return -1

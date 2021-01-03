@@ -42,7 +42,7 @@ You may imagine nums[-1] = nums[n] = 1. They are not real therefore you can not 
         for l in range(3, len(a) + 1):
             for i in range(len(a) - l + 1):
                 j = i + l - 1
-                f[i][j] = max([f[i][k] + a[i] * a[k] * a[j] + f[k][j] for k in range(i + 1, j)])
+                f[i][j] = max([f[i][k] + a[i] * a[k] * a[j] + f[k][j] for k in range(i + 1p, j)])
 
         return f[0][-1]
 """
@@ -73,19 +73,20 @@ Challenge: O(n2) time is acceptable. Can you do it in O(n) time.
         return s[l : r + 1]
 
     def longestPalindrome(self, s):
-        f, max_l, max_r = [[True if i >= j else False for j in range(len(s))] for i in range(len(s))], 0, 0
+        f, max_l, ans = [[i >= j for j in range(len(s))] for i in range(len(s))], 1, (0, 0)
 
         for l in range(2, len(s) + 1):
             for i in range(len(s) - l + 1):
                 j = i + l - 1
-                f[i][j] = f[i + 1][j - 1] and s[i] == s[j]
-                if f[i][j] and l > max_r - max_l:
-                    max_l, max_r = i, j
+                f[i][j] = s[i] == s[j] and f[i + 1][j - 1]
+                if f[i][j] and l > max_l:
+                    ans[0], ans[1], max_l = i, j, l
 
-        return s[max_l : max_r + 1]
+        return s[ans[0] : ans[1] + 1]
 """
 667. Longest Palindromic Subsequence
 https://www.lintcode.com/problem/longest-palindromic-subsequence/description
+https://leetcode.com/problems/longest-palindromic-substring/
 Given a string s, find the longest palindromic subsequence's length in s. You may assume that the maximum length of s is 1000.
 Input: "bbbab" Output: 4 Explanation: One possible longest palindromic subsequence is "bbbb".
 Input: "bbbbb" Output: 5
@@ -109,7 +110,7 @@ Input: "aaa" Output: 6
 """
     def countSubstrings(self, s: str) -> int:
         n = len(s)
-        f, cnt = [[True if i >= j else False for j in range(n)] for i in range(n)], n
+        f, cnt = [[i >= j for j in range(n)] for i in range(n)], n
 
         for l in range(2, n + 1):
             for i in range(n - l + 1):
@@ -119,7 +120,7 @@ Input: "aaa" Output: 6
                     cnt += 1
 
         return cnt
-
+"""
 476. Stone Game
 https://www.lintcode.com/problem/stone-game/description
 There is a stone game.At the beginning of the game the player picks n piles of stones in a line.

@@ -24,18 +24,16 @@ You may imagine nums[-1] = nums[n] = 1. They are not real therefore you can not 
 """
     #区间型: 先考虑最后一步才能形成的区间,
     def maxCoins(self, a):
-        a = [1] + a + [1]
-        return self.dvcq({}, a, 0, len(a) - 1)
+        return self.dfs(defaultdict(lambda: defaultdict(int)), [1] + a + [1], 0, len(a) + 1)
 
-    def dvcq(self, f, a, l, r):
+    def dfs(self, f, a, l, r):
 
-        if (l, r) in f:
-            return f[(l, r)]
-        # if r - l < 2:
-        #     return 0
-        f[(l, r)] = max([self.dvcq(f, a, l, i) + a[l]*a[i]*a[r] + self.dvcq(f, a, i, r) for i in range(l + 1, r)])  # 小于3个数字不继续
+        if f[l][r] or r - l < 2:
+            return f[l][r]
 
-        return f[(l, r)]
+        f[l][r] = max([self.dfs(f, a, l, i) + a[l]*a[i]*a[r] + self.dfs(f, a, i, r) for i in range(l + 1, r)])  # 小于3个数字不继续
+
+        return f[l][r]
 """
 200. Longest Palindromic Substring
 https://www.lintcode.com/problem/longest-palindromic-substring/description
@@ -53,7 +51,7 @@ Challenge: O(n2) time is acceptable. Can you do it in O(n) time.
 
         if l >= r:
             return True
-        
+
         if (l, r) in f:
             return f[(l, r)]
 
@@ -82,26 +80,23 @@ Explanation:
   2. Merge the first two piles => [6, 4]，score = 8
   3. Merge the last two piles => [10], score = 18
 #思路：列举最后一刀， 列举最后归并的两个区间
-
 {4, [1, 1], 4}:  0
 {[4, 2], 4}:  2 + 0
 {[6, 4]}  6 + 2
 {10}  10 + 8
 """
     def stoneGame(self, a):
-        return self.dvcq({}, a, 0, len(a) - 1)
-    #方案总数 * 方案复杂度 = s, e 总数 * 每个s，e 复杂度 = O(n^2) * n
-    def dvcq(self, f, a, s, e):
+        s = [0] * (len(a) + 1)
 
-        if (s, e) in f:
-            return f[(s, e)]
+        for i in range(1, len(s)):
+            s[i] = a[i - 1] + s[i - 1]
+            
+        return self.dfs(defaultdict(lambda: defaultdict(int)), s, 0, len(a) - 1) if a else 0
 
-        if s == e:
-            return 0
+    def dfs(self, f, s, l, r):
+        if f[l][r] or l == r:
+            return f[l][r]
 
-        f[(s, e)] = sys.maxsize
-        for i in range(s, e + 1):
-            f[(s, e)] = min(f[(s, e)], self.dvcq(f, a, s, i) + self.dvcq(f, a, i + 1, e))
-        f[(s, e)] += sum(a[s : e + 1])
+        f[l][r] = s[r + 1] - s[l] + min([self.dfs(f, s, l, j) + self.dfs(f, s, j + 1, r) for j in range(l, r)])
 
-        return f[(s, e)]
+        return f[l][r]

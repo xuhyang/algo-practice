@@ -18,23 +18,35 @@ Notice
 The first data is the root node, followed by the value of the left and right son nodes, and "#" indicates that there is no child node.
 The number of nodes does not exceed 20.
 """
-    def preorderTraversal(self, r):
-        n, s, ans = r, [], []
-
-        while n:
-            s.append(n)
-            ans.append(n.val)
-            n = n.left
+        ans, s = [], [r]
 
         while s:
-            n = s.pop().right
-            while n:
-                s.append(n)
-                ans.append(n.val)
-                n = n.left
+            n = s.pop()
+            if not n:
+                continue
+            ans.append(n.val)
+            s.append(n.right)
+            s.append(n.left)
 
         return ans
+"""
+589. N-ary Tree Preorder Traversal
+https://leetcode.com/problems/n-ary-tree-preorder-traversal/
+Given an n-ary tree, return the preorder traversal of its nodes' values.
+Nary-Tree input serialization is represented in their level order traversal, each group of children is separated by the null value (See examples).
+Recursive solution is trivial, could you do it iteratively?
+Example 1: Input: root = [1,null,3,2,4,null,5,6] Output: [1,3,5,6,2,4]
+Example 2: Input: root = [1,null,2,3,4,5,null,null,6,7,null,8,null,9,10,null,null,11,null,12,null,13,null,null,14] Output: [1,2,3,6,7,11,14,4,8,12,5,9,13,10]
+"""
+    def preorder(self, r: 'Node') -> List[int]:
+        ans, s = [], [r] if r else []
 
+        while s:
+            n = s.pop()
+            ans.append(n.val)
+            s.extend(n.children[::-1])
+
+        return ans
 """
 67. Binary Tree Inorder Traversal
 https://www.lintcode.com/problem/binary-tree-inorder-traversal/description
@@ -99,23 +111,41 @@ Challenge Can you do it without recursion?
 Notice: The first data is the root node, followed by the value of the left and right son nodes, and "#" indicates that there is no child node.
 The number of nodes does not exceed 20.
 """
-    def postorderTraversal(self, r):
-        n, ans, s = r, [], []
-
-        while n:
-            s.append(n)
-            n = n.left
+    def postorderTraversal(self, r: TreeNode) -> List[int]:
+        s, ans = [r, r] if r else [], []
 
         while s:
-            n = s[-1].right
-            #没有右子树， 或者右子树已经在答案里
-            if not n or n and ans and n.val == ans[-1]:
-                ans.append(s.pop().val)
-                continue
+            n = s.pop()
 
-            while n:
-                s.append(n)
-                n = n.left
+            if s and s[-1] == n:
+                if n.right:
+                    s.extend([n.right, n.right])
+                if n.left:
+                    s.extend([n.left, n.left])
+            else:
+                ans.append(n.val)
+
+        return ans
+"""
+590. N-ary Tree Postorder Traversal
+https://leetcode.com/problems/n-ary-tree-postorder-traversal/
+Given an n-ary tree, return the postorder traversal of its nodes' values.
+Nary-Tree input serialization is represented in their level order traversal, each group of children is separated by the null value (See examples).
+Follow up: Recursive solution is trivial, could you do it iteratively?
+Example 1: Input: root = [1,null,3,2,4,null,5,6] Output: [5,6,3,2,4,1]
+Example 2: Input: root = [1,null,2,3,4,5,null,null,6,7,null,8,null,9,10,null,null,11,null,12,null,13,null,null,14] Output: [2,6,14,11,7,3,12,8,4,13,9,10,5,1]
+"""
+    def postorder(self, r: 'Node') -> List[int]:
+        s, ans = [r, r] if r else [], []
+
+        while s:
+            n = s.pop()
+
+            if s and s[-1] == n:
+                for c in n.children[::-1]:
+                    s.extend([c, c])
+            else:
+                ans.append(n.val)
 
         return ans
 """
@@ -563,3 +593,145 @@ multiple:
                 ans.append(k)
 
         return ans
+"""
+606. Construct String from Binary Tree
+You need to construct a string consists of parenthesis and integers from a binary tree with the preorder traversing way.
+The null node needs to be represented by empty parenthesis pair "()". And you need to omit all the empty parenthesis pairs that don't affect the one-to-one mapping relationship between the string and the original binary tree.
+Example 1: Input: Binary tree: [1,2,3,4]  Output: "1(2(4))(3)" Explanation: Originallay it needs to be "1(2(4)())(3()())",
+       1
+     /   \
+    2     3
+   /
+  4
+but you need to omit all the unnecessary empty parenthesis pairs.  And it will be "1(2(4))(3)".
+Example 2: Input: Binary tree: [1,2,3,null,4] Output: "1(2()(4))(3)"
+       1
+     /   \
+    2     3
+     \
+      4
+"""
+    def tree2str(self, r: TreeNode) -> str:
+        s, ans = [r, r], []
+
+        while s:
+            n = s.pop()
+
+            if s and s[-1] == n:
+                ans.append('(')
+                if not n:
+                    continue
+                ans.append(str(n.val))
+                if n.right:
+                    s.extend([n.right, n.right])
+                if n.left or n.right:
+                    s.extend([n.left, n.left])
+            else:
+                ans.append(')')
+
+        return ''.join(ans[1:-1])
+
+    def tree2str(self, r: TreeNode) -> str:
+        ans = []
+        self.dfs(ans, r)
+        return ''.join(ans)
+
+    def dfs(self, ans, n):
+        if not n:
+            return
+
+        ans.append(str(n.val))
+
+        if not n.left and not n.right:
+            return
+
+        ans.append('(')
+        self.dfs(ans, n.left)
+        ans.append(')')
+
+        if not n.right:
+            return
+        ans.append('(')
+        self.dfs(ans, n.right)
+        ans.append(')')
+"""
+105. Construct Binary Tree from Preorder and Inorder Traversal
+https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/
+Given preorder and inorder traversal of a tree, construct the binary tree.
+Note: You may assume that duplicates do not exist in the tree.
+For example, given preorder = [3,9,20,15,7] inorder = [9,3,15,20,7]
+Return the following binary tree:
+    3
+   / \
+  9  20
+    /  \
+   15   7
+"""
+    def buildTree(self, po: List[int], io: List[int]) -> TreeNode:
+        return self.dvcq(po, io, {e:i for i, e in enumerate(io)}, 0, len(po) - 1, 0, len(io) - 1)
+
+    def dvcq(self, po, io, d, pl, pr, il, ir):
+        if il > ir:
+            return None
+
+        ii = d[po[pl]]
+        return TreeNode(po[pl], self.dvcq(po, io, d, pl + 1, pl + ii - il, il, ii - 1), self.dvcq(po, io, d, pl + ii - il + 1, pr, ii + 1, ir))
+"""
+106. Construct Binary Tree from Inorder and Postorder Traversal
+https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/
+Given inorder and postorder traversal of a tree, construct the binary tree.
+Note: You may assume that duplicates do not exist in the tree.
+For example, give inorder = [9,3,15,20,7] postorder = [9,15,7,20,3]
+Return the following binary tree:
+    3
+   / \
+  9  20
+    /  \
+   15   7
+"""
+    def buildTree(self, io: List[int], po: List[int]) -> TreeNode:
+        return self.dfs(io, po, {e: i for i, e in enumerate(io)}, 0, len(po) - 1, 0, len(io) - 1)
+
+    def dfs(self, io, po, d, pl, pr, il, ir):
+        if il > ir:
+            return None
+
+        ii = d[po[pr]]
+        return TreeNode(po[pr], self.dfs(io, po, d, pl, pl + ii - il - 1, il, ii - 1), self.dfs(io, po, d, pl + ii - il, pr - 1, ii + 1, ir))
+"""
+114. Flatten Binary Tree to Linked List
+https://leetcode.com/problems/flatten-binary-tree-to-linked-list/
+Given a binary tree, flatten it to a linked list in-place.
+For example, given the following tree:
+    1
+   / \
+  2   5
+ / \   \
+3   4   6
+The flattened tree should look like:
+1
+ \
+  2
+   \
+    3
+     \
+      4
+       \
+        5
+         \
+          6
+"""
+    def flatten(self, r: TreeNode) -> None:
+        return self.dfs(r)
+
+    def dfs(self, n):
+        if not n:
+            return None
+        
+        l, r = n.left, n.right
+        l_lf, r_l
+        f = self.dfs(n.left), self.dfs(n.right)
+        if l:
+            n.left, n.right, l_lf.right = None, l, r
+
+        return r_lf or l_lf or n

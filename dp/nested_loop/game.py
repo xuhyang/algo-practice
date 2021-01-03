@@ -41,10 +41,8 @@ There are n coins with different value in a line.
 Two players take turns to take one or two coins from left side until there are no more coins left. The player who take the coins with the most value wins.
 Could you please decide the first player will win or lose?
 If the first player wins, return true, otherwise return false.
-# Input: [1, 2, 2]
-# Output: true
-# Input: [1, 2, 4]
-# Output: false
+# Input: [1, 2, 2] # Output: true
+# Input: [1, 2, 4] # Output: false
 Explanation: Whether the first player takes 1 coin or 2, the second player will gain more value.
 """
 #先手的 总得分差 = m - 下一轮 后手的总得分差
@@ -87,3 +85,16 @@ Explanation: Whether the first player takes 1 coin or 2, the second player will 
             f[i] = max(v[i - 1] + ttl_v_lft[i - 1] - f[i - 1], v[i - 2] + v[i - 1] + ttl_v_lft[i - 2] - f[i - 2])
             #剩余i个coin时，当前先手总分= 1 或2 个coin的value和 + 剩余 i-1 or i -2 总分-前手之前总分
         return f[n] > ttl_v_lft[n] - f[n]
+
+    def firstWillWin(self, a):
+        n = len(a)
+        s, f = [0] * (n + 1), [0] * (n + 1)
+        f[-2] = a[-1]
+
+        for i in range(n - 1, -1, -1):
+            s[i] = a[i] + s[i + 1]
+            
+        for i in range(n - 2, -1, -1):
+            f[i] = s[i] - min(f[i + 1], f[i + 2])
+
+        return f[0] > s[0] - f[0]

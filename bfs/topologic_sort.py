@@ -1,4 +1,27 @@
 class topological_sort:
+    """
+    @param: graph: A list of Directed graph node
+    @return: Any topological order for the given graph.
+    """
+    def topSort(self, g):
+        indgr, rslt = {}, []
+
+        for n in g: #graph to indegree
+            for nxt in n.neighbors:
+                indgr[nxt] = indgr.get(nxt, 0) + 1
+        #start bfs with node have no indegree
+        q = collections.deque([n for n in g if n not in indgr])
+
+        while q:
+            n = q.popleft()
+
+            rslt.append(n)
+            for nxt in n.neighbors:
+                indgr[nxt] -= 1
+                if indgr[nxt] == 0:
+                    q.append(nxt)
+
+        return rslt
 """
 605. Sequence Reconstruction
 https://www.lintcode.com/problem/sequence-reconstruction/description
@@ -36,7 +59,7 @@ Input:org = [4,1,5,2,6,3], seqs = [[5,2,6,3],[4,1,5,2]] Output:true
         return rslt == org
 """
 615. Course Schedule
-https://www.lintcode.com/problem/course-schedule/description
+https://www.lintcode.com/problem/course-schedule/descr’iption
 There are a total of n courses you have to take, labeled from 0 to n - 1.
 Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]
 Given the total number of courses and a list of prerequisite pairs, is it possible for you to finish all courses?

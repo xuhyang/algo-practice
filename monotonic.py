@@ -1,5 +1,53 @@
 class Monotonic:
 """
+496. Next Greater Element I
+https://leetcode.com/problems/next-greater-element-i/
+You are given two arrays (without duplicates) nums1 and nums2 where nums1’s elements are subset of nums2. Find all the next greater numbers for nums1's elements in the corresponding places of nums2.
+The Next Greater Number of a number x in nums1 is the first greater number to its right in nums2. If it does not exist, output -1 for this number.
+Example 1: Input: nums1 = [4,1,2], nums2 = [1,3,4,2]. Output: [-1,3,-1]
+Explanation:
+    For number 4 in the first array, you cannot find the next greater number for it in the second array, so output -1.
+    For number 1 in the first array, the next greater number for it in the second array is 3.
+    For number 2 in the first array, there is no next greater number for it in the second array, so output -1.
+Example 2: Input: nums1 = [2,4], nums2 = [1,2,3,4]. Output: [3,-1]
+Explanation:
+    For number 2 in the first array, the next greater number for it in the second array is 3.
+    For number 4 in the first array, there is no next greater number for it in the second array, so output -1.
+Note:
+All elements in nums1 and nums2 are unique.
+The length of both nums1 and nums2 would not exceed 1000.
+"""
+    def nextGreaterElement(self, a: List[int], b: List[int]) -> List[int]:
+        ans, d, s = [-1] * len(a), {e : i for i, e in enumerate(a)}, []
+
+        for i, e in enumerate(b):
+            while s and s[-1] < e:
+                p = s.pop()
+                if p in d:
+                    ans[d[p]] = e
+            s.append(e)
+
+        return ans
+"""
+503. Next Greater Element II
+https://leetcode.com/problems/next-greater-element-ii/
+Given a circular array (the next element of the last element is the first element of the array), print the Next Greater Number for every element. The Next Greater Number of a number x is the first greater number to its traversing-order next in the array, which means you could search circularly to find its next greater number. If it doesn't exist, output -1 for this number.
+Example 1: Input: [1,2,1] Output: [2,-1,2]
+Explanation: The first 1's next greater number is 2;
+The number 2 can't find next greater number;
+The second 1's next greater number needs to search circularly, which is also 2.
+"""
+    def nextGreaterElements(self, a: List[int]) -> List[int]:
+        n, s, ans = len(a), [], [-1] * len(a)
+
+        for i in range(n * 2):
+            j = i % n
+            while s and a[s[-1]] < a[j]:
+                ans[s.pop()] = a[j]
+            s.append(j)
+
+        return ans
+"""
 122. Largest Rectangle in Histogram
 https://www.lintcode.com/problem/largest-rectangle-in-histogram/description
 Given n non-negative integers representing the histogram's bar height where the width of each bar is 1, find the area of largest rectangle in the histogram.
@@ -25,20 +73,23 @@ Given a 2D boolean matrix filled with False and True, find the largest rectangle
 containing all True and return its area.
 """
     def maximalRectangle(self, mtrx):
-        n, m = len(mtrx), len(mtrx[0]) if mtrx else 0
-        h, s, max_area = [0] * (m + 1), [], 0  # (m + 1) 需要最有一个0，结算当前row
+        ans, n, m = 0, len(mtrx), len(mtrx[0]) if mtrx else 0
+        a, s = [0] * (m + 1), []   # (m + 1) 需要最有一个0，结算当前row
 
         for i in range(n):
             for j in range(m):
-                h[j] = h[j] + 1 if mtrx[i][j] == 1 else 0
+                a[j] = a[j] + 1 if mtrx[i][j] != '0' else 0
 
-            for j in range(len(h)):
-                while s and h[s[-1]] >= h[j]:
-                    max_area = max(max_area, h[s.pop()] * (j - 1 - (s[-1] + 1 if s else 0) + 1))
-                s.append(j)
-            s.pop()
+            for r in range(m + 1):
+                while s and a[s[-1]] > a[r]:
+                    h = a[s.pop()]
+                    l = s[-1] + 1 if s else 0 # 0,0,2,[1],0: l = 2, r = 4, 0,0,[1],0: l = 2, r = 3
+                    ans = max(ans, (r - l) * h)
+                s.append(r)
+            s.clear()
 
-        return max_area
+        return ans
+
 """
 126. Max Tree
 https://www.lintcode.com/problem/max-tree/description
@@ -128,3 +179,59 @@ Challenge o(n) time and O(k) memory
             q.pop()
 
         q.append(e)
+"""
+42. Trapping Rain Water
+Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.
+Example 1: Input: height = [0,1,0,2,1,0,1,3,2,1,2,1] Output: 6
+Explanation: The above elevation map (black section) is represented by array [0,1,0,2,1,0,1,3,2,1,2,1]. In this case, 6 units of rain water (blue section) are being trapped.
+Example 2: Input: height = [4,2,0,3,2,5] Output: 9
+"""
+    def trap(self, a: List[int]) -> int:
+        ans, s = 0, []
+
+        for r in range(len(a)):
+
+            while s and a[s[-1]] <= a[r]:
+                b = s.pop()
+                l = s[-1]
+                ans += (min(a[r], a[l]) - a[b]) * (r - l - 1)
+
+            s.append(r)
+
+        return ans
+"""
+456. 132 Pattern
+https://leetcode.com/problems/132-pattern/
+Given an array of n integers nums, a 132 pattern is a subsequence of three integers nums[i], nums[j] and nums[k] such that i < j < k and nums[i] < nums[k] < nums[j].
+Return true if there is a 132 pattern in nums, otherwise, return false.
+Follow up: The O(n^2) is trivial, could you come up with the O(n logn) or the O(n) solution?
+Example 1: Input: nums = [1,2,3,4] Output: false Explanation: There is no 132 pattern in the sequence.
+Example 2: Input: nums = [3,1,4,2] Output: true Explanation: There is a 132 pattern in the sequence: [1, 4, 2].
+Example 3: Input: nums = [-1,3,2,0] Output: true Explanation: There are three 132 patterns in the sequence: [-1, 3, 2], [-1, 3, 0] and [-1, 2, 0].
+"""
+    def find132pattern(self, a: List[int]) -> bool:
+        s, k = [], -sys.maxsize
+
+        for i in a[::-1]:
+            if i < k:
+                return True
+
+            while s and s[-1] < i:
+                k = s.pop()
+            s.append(i)
+
+        return False
+
+
+1130. Minimum Cost Tree From Leaf Values
+907. Sum of Subarray Minimums
+901. Online Stock Span
+856. Score of Parentheses
+503. Next Greater Element II
+496. Next Greater Element I
+84. Largest Rectangle in Histogram
+42. Trapping Rain Water
+496. Next Greater Element I
+503. Next Greater Element II
+739. Daily Temperatures
+84. Largest Rectangle in Histogram

@@ -31,6 +31,20 @@ For a given source string and a target string, you should output the first index
             if j - i == len_t:
                 return i
         return -1
+            if t == '':
+            return 0
+
+    def strStr(self, s: str, t: str) -> int:
+        if t == '':
+            return 0
+
+        for r in range(len(t) - 1, len(s)):
+
+            if s[r] == t[-1]:
+                l = r + 1 - len(t)
+                if s[l : r + 1] == t:
+                    return l
+        return -1
 """
 32. Minimum Window Substring
 https://www.lintcode.com/problem/minimum-window-substring/description
@@ -88,6 +102,16 @@ Input:  [1,1,1,2,2,3] Output: 5 Explanation: the length is 5: [1,1,2,2,3]
                 l += 1
 
         return l if a else 0
+
+    def removeDuplicates(self, a: List[int]) -> int:
+        l = 1
+
+        for r in range(2, len(a)):
+            if a[l] != a[r] or a[l - 1] != a[l]:
+                l += 1
+                a[l] = a[r]
+
+        return l + 1        
 """
 102. Linked List Cycle
 https://www.lintcode.com/problem/linked-list-cycle/description
@@ -405,23 +429,6 @@ Given a string S, find the length of the longest substring T that contains at mo
 
         return lngst
 """
-406. Minimum Size Subarray Sum
-https://www.lintcode.com/problem/submatrix-sum/description
-Given an array of n positive integers and a positive integer s, find the minimal length of a subarray of which the sum ≥ s. If there isn't one, return -1 instead.
-Input: [2,3,1,2,4,3], s = 7 Output: 2
-# 2p + win_sum
-"""
-    def minimumSize(self, a, t):
-        l, s, ans = 0, 0, sys.maxsize
-
-        for r in range(len(a)):
-            s += a[r]
-
-            while s >= t:
-                ans, s, l = min(ans, r - l + 1), s - a[l], l + 1
-
-        return ans if ans != sys.maxsize else -1
-"""
 521. Remove Duplicate Numbers in Array
 https://www.lintcode.com/problem/two-sum-difference-equals-to-target/description
 Description：Given an array of integers, remove the duplicate numbers in it.
@@ -547,30 +554,6 @@ Explanation：
 
         return ans
 """
-610. Two Sum - Difference equals to target
-https://www.lintcode.com/problem/two-sum-difference-equals-to-target/description
-Given an array of integers, find two numbers that their difference equals to a target value.
-where index1 must be less than index2. Please note that your returned answers (both index1 and index2) are NOT zero-based.
-Input: a = [2, 7, 15, 24], t = 5  Output: [1, 2]  Explanation: (7 - 2 = 5)
-Input: a = [1, 0, -1], t = 2 Output: [1, 3] Explanation: (1 - (-1) = 2)
-"""
-    def twoSum7(self, a, t):
-        a, t, l = sorted([(e, i) for i, e in enumerate(a)], key=lambda e: e[0]), abs(t), 0
-
-        for r in range(1, len(a)):
-            (l_v, i), (r_v, j) = a[l], a[r]
-            diff = r_v - l_v
-            # 可以省略 if diff < t: continue
-            while l + 1 < r and diff > t:
-                l += 1
-                l_v, i = a[l]
-                diff = r_v - l_v
-
-            if diff == t:
-                return sorted([i + 1, j + 1])
-
-        return None
-"""
 821: Time intersection
 https://www.jiuzhang.com/solution/time-intersection/#tag-other-lang-python
 Give two users' ordered online time series, and each section records the user's login time point x
@@ -695,3 +678,69 @@ There is 1 substring whose length is 12, "abcabcabcabc" So the answer is 1 + 2 +
             ans += l
 
         return ans
+"""
+1248. Count Number of Nice Subarrays
+https://leetcode.com/problems/count-number-of-nice-subarrays/
+Given an array of integers nums and an integer k. A continuous subarray is called nice if there are k odd numbers on it.
+Return the number of nice sub-arrays.
+Example 1: Input: nums = [1,1,2,1,1], k = 3 Output: 2 Explanation: The only sub-arrays with 3 odd numbers are [1,1,2,1] and [1,2,1,1].
+Example 2: Input: nums = [2,4,6], k = 1 Output: 0 Explanation: There is no odd numbers in the array.
+Example 3: Input: nums = [2,2,2,1,2,2,1,2,2,2], k = 2 Output: 16
+"""
+    def numberOfSubarrays(self, a: List[int], k: int) -> int:
+        l, ans, cnt = 0, 0, 0
+
+        for r in range(len(a)):
+
+            if a[r] & 1:
+                cnt += 1
+                if cnt == 1:
+                    m = r
+
+            if cnt > k:
+                l = m = m + 1
+                cnt -= 1
+                while not a[m] & 1:
+                    m += 1
+
+            if cnt == k:
+                ans += m - l + 1
+
+        return ans
+
+    def numberOfSubarrays(self, A, k):
+        i = count = res = 0
+        for j in xrange(len(A)):
+            if A[j] & 1:
+                k -= 1
+                count = 0
+            while k == 0:
+                k += A[i] & 1
+                i += 1
+                count += 1
+            res += count
+        return res
+
+    def numberOfSubarrays(self, A, k):
+        def atMost(k):
+            res = i = 0
+            for j in xrange(len(A)):
+                k -= A[j] % 2
+                while k < 0:
+                    k += A[i] % 2
+                    i += 1
+                res += j - i + 1
+            return res
+
+        return atMost(k) - atMost(k - 1)
+
+Number of Substrings Containing All Three Characters
+Count Number of Nice Subarrays
+Replace the Substring for Balanced String
+Max Consecutive Ones III
+Binary Subarrays With Sum
+Subarrays with K Different Integers
+Fruit Into Baskets
+Shortest Subarray with Sum at Least K
+Minimum Size Subarray Sum
+https://leetcode.com/problems/longest-substring-with-at-least-k-repeating-characters/

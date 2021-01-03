@@ -6,77 +6,73 @@ Given two words (start and end), and a dictionary, find the shortest transformat
 Transformation rule such that: Only one letter can be changed at a time
 Each intermediate word must exist in the dictionary. (Start and end words do not need to appear in the dictionary )
 """
-    def ladderLength(self, start, end, dict):
-        lookup = {}
-        dict.update([start, end])
+    def ladderLength(self, s, e, d):
+        g, d, sq, ss, eq, es, ans, n = defaultdict(set), d | set([s, e]), deque([s]), set([s]), deque([e]), set([e]), 1, len(s)
 
-        for w in dict:
+        for w in d:
             for i in range(len(w)):
-                pattern = w[:i] + '*' + w[i + 1:]
-                lookup[pattern] = lookup.get(pattern, set())
-                lookup[pattern].add(w)
+                g[w[:i] + '*' + w[i + 1:]].add(w)
 
-        q1, s1 = collections.deque([start]), set([start])
-        q2, s2 = collections.deque([end]), set([end])
-        steps = 1
+        while sq and eq:
+            ans += 1 #先加lvl 因为可能在pop下一层之前return
+            for _ in range(len(sq)):
+                u = sq.popleft()
 
-        while q1 and q2:
-
-            steps += 1
-            for _ in range(len(q1)):
-                for nxt in self.getTransformations(q1.popleft(), lookup):
-                    if nxt in s2:
-                        return steps
-                    if nxt in s1:
+                for v in [v for i in range(n) for v in g[u[:i] + '*' + u[i + 1:]]]:
+                    if v in es:
+                        return ans
+                    if v in ss:
                         continue
-                    q1.append(nxt)
-                    s1.add(nxt)
+                    sq.append(v)
+                    ss.add(v)
 
-            steps += 1
-            for _ in range(len(q2)):
-                for nxt in self.getTransformations(q2.popleft(), lookup):
-                    if nxt in s1:
-                        return steps
-                    if nxt in s2:
+            ans += 1
+            for _ in range(len(eq)):
+                u = eq.popleft()
+
+                for v in [v for i in range(n) for v in g[u[:i] + '*' + u[i + 1:]]]:
+                    if v in ss:
+                        return ans
+                    if v in es:
                         continue
-                    q2.append(nxt)
-                    s2.add(nxt)
+                    eq.append(v)
+                    es.add(v)
 
         return -1
 
+    def ladderLength(self, s, e, d):
+        g, d, sq, ss, eq, es, ans, n = defaultdict(set), d | set([s, e]), deque([s]), set(), deque([e]), set(), 0, len(s)
 
-    def getTransformations(self, w, lookup):
-        results = set()
-        for i in range(len(w)):
-            results.update(lookup[w[:i] + '*' + w[i + 1:]])
+        for w in d:
+            for i in range(len(w)):
+                g[w[:i] + '*' + w[i + 1:]].add(w)
 
-        results.remove(w)
-        return results
+        while sq and eq:
 
-    """
-    @param: graph: A list of Directed graph node
-    @return: Any topological order for the given graph.
-    """
-    def topSort(self, g):
-        indgr, rslt = {}, []
+            for _ in range(len(sq)):
+                u = sq.popleft()
 
-        for n in g: #graph to indegree
-            for nxt in n.neighbors:
-                indgr[nxt] = indgr.get(nxt, 0) + 1
+                if u in ss:
+                    continue
+                if u in es:
+                    return ans
 
-        #start bfs with node have no indegree
-        q = collections.deque([n for n in g if n not in indgr])
+                ss.add(u)
+                sq.extend([v for i in range(n) for v in g[u[:i] + '*' + u[i + 1:]]])
+            ans += 1#后加lvl 因为可能在pop下一层之后return
 
-        while q:
-            n = q.popleft()
+            for _ in range(len(eq)):
+                u = eq.popleft()
 
-            rslt.append(n)
-            for nxt in n.neighbors:
-                indgr[nxt] -= 1
-                if indgr[nxt] == 0:
-                    q.append(nxt)
+                if u in es:
+                    continue
+                if u in ss:
+                    return ans
 
-        return rslt
+                es.add(u)
+                eq.extend([v for i in range(n) for v in g[u[:i] + '*' + u[i + 1:]]])
+            ans += 1
+        return -1
 """
 137. Clone Graph
 https://www.lintcode.com/problem/clone-graph/description
@@ -99,32 +95,7 @@ Nodes are labeled uniquely.
                     q.append(nghbr)
 
         return d[r] if r else None
-"""
-178. Graph Valid Tree
-https://www.lintcode.com/problem/graph-valid-tree/description
-Given n nodes labeled from 0 to n - 1 and a list of undirected edges
-(each edge is a pair of nodes), write a function to check whether these edges make up a valid tree.
-# union-find解法
-考点：n个点有n-1条边，且能遍历到每个点 则无环
-"""
-    @highlight
-    def validTree(self, n, edges):
-        if len(edges) != n - 1:
-            return False
 
-        g = {}
-        for u, v in edges:
-            g[u], g[v] = g.get(u, []) + [v], g.get(v, []) + [u]
-
-        q, s = collections.deque([0]), set([0])
-
-        while q:
-            for node in g.get(q.popleft(), []) :
-                if node not in s:
-                    q.append(node)
-                    s.add(node)
-
-        return len(s) == n
 """
 242. Convert Binary Tree to Linked Lists by Depth
 https://www.lintcode.com/problem/convert-binary-tree-to-linked-lists-by-depth/description
@@ -1416,6 +1387,7 @@ Explanation: We can turn the last wheel in reverse to move from "0000" -> "0009"
                     return lvl
 
                 for i, c in enumerate(u):
+
                     for d in (-1, 1):
                         v = u[:i] + str((int(c) + d + 10) % 10) + u[i + 1:]
                         if v in s:
@@ -1501,5 +1473,42 @@ Example 2: Input：[[1,2,3],[0,0,0],[7,6,5]] Output：-1 Explanation：unable to
 
             if not fnd:
                 return -1
-                
+
         return stps
+"""
+1718. Minimize Malware Spread
+https://www.lintcode.com/problem/minimize-malware-spread/description
+In a network of nodes, each node i is directly connected to another node j if and only if graph[i][j] = 1.
+Some nodes initial are initially infected by malware. Whenever two nodes are directly connected and at least one of those two nodes is infected by malware, both nodes will be infected by malware. This spread of malware will continue until no more nodes can be infected in this manner.
+Suppose M(initial) is the final number of nodes infected with malware in the entire network, after the spread of malware stops.
+We will remove one node from the initial list. Return the node that if removed, would minimize M(initial). If multiple nodes could be removed to minimize M(initial), return such a node with the smallest index.
+Note that if a node was removed from the initial list of infected nodes, it may still be infected later as a result of the malware spread.
+Example 1: Input: graph = [[1,1,0],[1,1,0],[0,0,1]], initial = [0,1] Output: 0
+Example 2: Input: graph = [[1,0,0],[0,1,0],[0,0,1]], initial = [0,2] Output: 0
+Example 3: Input: graph = [[1,1,1],[1,1,1],[1,1,1]], initial = [1,2] Output: 1
+"""
+    def minMalwareSpread(self, g, a):
+        q, sn, s, init, ans, max_sz = deque(), set(), set(), set(a), min(a), 0
+
+        for n in sorted(a):
+            if n in s:
+                continue
+
+            q.append(n)
+            sn.add(n)
+            while q:
+                u = q.popleft()
+
+                for v in range(len(g[u])):
+                    if g[u][v] == 0 or v in sn:
+                        continue
+                    q.append(v)
+                    sn.add(v)
+
+            if len(sn & init) == 1 and len(sn) > max_sz:
+                ans, max_sz = n, len(sn)
+
+            s |= sn
+            sn.clear()
+
+        return ans

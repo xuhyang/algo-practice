@@ -136,7 +136,7 @@ Input: [
   [1, 0, 0, 1, 0]
 ] Output: 4
 Input: [
-  [0, 0, 0],
+  [0, 0, 0], 
   [1, 1, 1]
 ] Output: 1
 """
@@ -294,5 +294,5 @@ Example 2 Input: [[1,5], [4,6]] Output: 23 Explanation: There are 2 unique value
                     s[i][j].add(g[i][j] + e)
                 for e in s[i - 1][j]:
                     s[i][j].add(g[i][j] + e)
-        
+
         return sum(s[-1][-1])

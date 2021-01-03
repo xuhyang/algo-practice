@@ -42,7 +42,7 @@ Input: A = [1,2,3,4,5,6] B = [2,3,4,5] Output: 3.5
             else:
                 r = m
 
-        return l if self.cnt(a, l) + self.cnt(b, l) == k else r
+        return l if self.cnt(a, l) + self.cnt(b, l) >= k else r
 
     def cnt(self, a, v):
         l, r = 0, len(a) - 1

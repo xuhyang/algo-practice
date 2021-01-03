@@ -97,24 +97,27 @@ Challenge O(n^2) time, O(1) extra space
 Notice You may assume that each input would have exactly one solution.
 """
     def threeSumClosest(self, a, t):
-        a, ans, n = sorted(a), sys.maxsize, len(a)
+        a.sort()
+        ans, n, min_diff = sys.maxsize, len(a), sys.maxsize
 
         for i in range(n):
             if i > 0 and a[i - 1] == a[i]:
                 continue
+
             l, r = i + 1, len(a) - 1
             while l < r:
                 s = a[i] + a[l] + a[r]
+                diff = abs(s - t)
 
-                if abs(s - t) < abs(ans - t):
-                    ans = s
+                if diff < min_diff:
+                    ans, min_diff = s, diff
 
                 if s < t or l > i + 1 and a[l - 1] == a[l]:
                     l += 1
                 elif s > t or r < n - 1 and a[r] == a[r + 1]:
                     r -= 1
                 else:
-                    break
+                    return ans
 
         return ans
 """
@@ -125,19 +128,22 @@ Input: [0,1,0] Output: 0
 Input: [0,1,0,2,1,0,1,3,2,1,2,1] Output: 6
 Challenge: O(n) time and O(1) memory O(n) time and O(n) memory is also acceptable.
 """
-    def trapRainWater(self, h):
-        l, r, w = 0, len(h) - 1, 0
-        l_max, r_max = (h[l], h[r]) if h else (0, 0)
+    def trap(self, a: List[int]) -> int:
+        l, r, ans = 0, len(a) - 1, 0
+        max_l, max_r = 0, a[-1] if a else 0
 
         while l < r:
-            if l_max <= r_max:
-                l_max = max(l_max, h[l])
-                w, l = w + l_max - h[l], l + 1
-            else:
-                r_max = max(r_max, h[r])
-                w, r = w + r_max - h[r], r - 1
 
-        return w
+            if a[l] < a[r]:
+                max_l = max(max_l, a[l])
+                ans += max_l - a[l]
+                l += 1
+            else:
+                max_r = max(max_r, a[r])
+                ans += max_r - a[r]
+                r -= 1
+
+        return ans
 """
 382. Triangle Count
 Given an array of integers, how many three numbers can be found in the array,
@@ -379,3 +385,69 @@ You may assume that the maximum length of S is 1000, and there exists one unique
             lngth, l, r = lngth + 1, l - 1, r + 1
 
         return s[l + 1 : r]
+"""
+11. Container With Most Water
+https://leetcode.com/problems/container-with-most-water/
+Given n non-negative integers a1, a2, ..., an , where each represents a point at coordinate (i, ai).
+n vertical lines are drawn such that the two endpoints of the line i is at (i, ai) and (i, 0).
+Find two lines, which, together with the x-axis forms a container, such that the container contains the most water.
+Notice that you may not slant the container.
+Example 1: Input: height = [1,8,6,2,5,4,8,3,7] Output: 49
+Explanation: The above vertical lines are represented by array [1,8,6,2,5,4,8,3,7]. In this case, the max area of water (blue section) the container can contain is 49.
+Example 2: Input: height = [1,1] Output: 1
+Example 3: Input: height = [4,3,2,1,4] Output: 16
+Example 4: Input: height = [1,2,1]
+Output: 2
+"""
+   def maxArea(self, a: List[int]) -> int:
+        l, r, ans = 0, len(a) - 1, 0
+        #移动较大边, 下次面积肯定比这次下, 因为面积取决于较小边，
+        while l < r:
+            ans = max(ans, (r - l) * min(a[l], a[r]))
+            if a[l] < a[r]:
+                l += 1
+            else:
+                r -= 1
+        return ans
+"""
+881. Boats to Save People
+https://leetcode.com/problems/boats-to-save-people/
+The i-th person has weight people[i], and each boat can carry a maximum weight of limit.
+Each boat carries at most 2 people at the same time, provided the sum of the weight of those people is at most limit.
+Return the minimum number of boats to carry every given person.  (It is guaranteed each person can be carried by a boat.)
+Example 1: Input: people = [1,2], limit = 3 Output: 1 Explanation: 1 boat (1, 2)
+Example 2: Input: people = [3,2,2,1], limit = 3 Output: 3 Explanation: 3 boats (1, 2), (2) and (3)
+Example 3: Input: people = [3,5,3,4], limit = 5 Output: 4 Explanation: 4 boats (3), (3), (4), (5)
+"""
+    def numRescueBoats(self, a: List[int], t: int) -> int:
+        a.sort()
+        l, r = 0, len(a) - 1
+        cnt = 0
+
+        while l < r:
+            if a[l] + a[r] <= t:
+                l += 1
+            cnt, r = cnt + 1, r - 1
+
+        return cnt + 1 if l == r else cnt
+"""
+977. Squares of a Sorted Array
+https://leetcode.com/problems/squares-of-a-sorted-array/
+Given an integer array nums sorted in non-decreasing order, return an array of the squares of each number sorted in non-decreasing order.
+Example 1: Input: nums = [-4,-1,0,3,10] Output: [0,1,9,16,100] Explanation: After squaring, the array becomes [16,1,0,9,100].
+Example 2: Input: nums = [-7,-3,2,3,11] Output: [4,9,9,49,121]
+"""
+    def sortedSquares(self, a: List[int]) -> List[int]:
+        l, r = 0, len(a) - 1
+        ans, i  = [0] * len(a), len(a) - 1
+
+        while l <= r:
+
+            if abs(a[l]) > abs(a[r]):
+                ans[i] = a[l] ** 2
+                l += 1
+            else:
+                ans[i] = a[r] ** 2
+                r -= 1
+            i -= 1
+        return ans 

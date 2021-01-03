@@ -178,24 +178,6 @@ Given two strings, write a method to decide if one is a permutation of the other
 
         return th == 0
 """
-235. Prime Factorization
-https://www.lintcode.com/problem/prime-factorization/my-submissions
-Prime factorize a given integer.
-Example Input: 10 Output: [2, 5] Input: 660 Output: [2, 2, 3, 5, 11]
-"""
-    def primeFactorization(self, a):
-        up, f, ans = math.sqrt(a), 2, []
-
-        while a != 1 and f <= up:
-
-            if a % f == 0:
-                ans.append(f)
-                a //= f
-            else:
-                f += 1
-
-        return ans + [a] if a != 1 else ans
-"""
 400. Maximum Gap
 https://www.lintcode.com/problem/maximum-gap/description
 Given an unsorted array, find the maximum difference between the successive elements in its sorted form.
@@ -232,65 +214,7 @@ Notice: You may assume all elements in the array are non-negative integers and f
                 max_gap, last_max = max(max_gap, b_min - last_max), b_max
 
         return max_gap
-"""
-414. Divide Two Integers
-https://www.lintcode.com/problem/divide-two-integers/description
-Divide two integers without using multiplication, division and mod operator.
-If it will overflow(exceeding 32-bit signed integer representation range), return 2147483647
-The integer division should truncate toward zero.
-#思路：倍增被除数和计数器直到超过被除数， 减去被除数reset被除数 计数器 然后继续
-100 18 2 0
-100 36 4 0
-100 72 8 0
-28 9 1 8
-28 18 2 8
-10 9 1 10
-1 9 1 11
-"""
-    def divide(self, dividend, divisor):
-        sgn, ans, cnt, a, b = not (dvdnd < 0 and dvsr < 0) and (dvdnd < 0 or dvsr < 0), 0, 1, abs(dvdnd), abs(dvsr)
 
-        while a >= b:
-
-            if a >= b << 1:
-                b, cnt = b << 1, cnt << 1
-            else:
-                a, b, ans, cnt = a - b, abs(dvsr), ans + cnt, 1
-
-        ans = -ans if sgn else ans
-        return min(ans, (1 << 31) - 1)
-"""
-428. Pow(x, n)
-https://www.lintcode.com/problem/powx-n/description
-Implement pow(x, n). (n is an integer.)
-Input: x = 9.88023, n = 3 Output: 964.498
-Input: x = 8.84372, n = -5 Output: 0.000
-"""
-    def myPow(self, x, n):
-        if n == 0:
-            return 1
-        if n < 0: #注意 负指数
-            x, n = 1 / x, -n
-
-        rslt = self.myPow(x, n // 2)
-        if n % 2 == 0:
-            return rslt * rslt
-
-        return rslt * rslt * x
-
-    def myPow(self, x, n):
-        if n < 0:
-            x = 1 / x
-            n = -n
-
-        ans, tmp = 1, x
-        while n != 0:
-            if n % 2 == 1:
-                ans *= tmp
-            #x^n = x^(n/2) * x^(n/2)
-            tmp *= tmp
-            n = n // 2
-        return ans
 """
 526. Load Balancer
 https://www.lintcode.com/problem/load-balancer/description
@@ -679,28 +603,6 @@ Example 5: Input: N = 4, trust = [[1,3],[1,4],[2,3],[2,4],[4,3]] Output: 3
                 return i
 
         return -1
-"""
-1209. Construct the Rectangle
-https://www.lintcode.com/problem/construct-the-rectangle/description
-For a web developer, it is very important to know how to design a web page's size. So, given a specific rectangular web page’s area, your job by now is to design a rectangular web page, whose length L and width W satisfy the following requirements:
-1. The area of the rectangular web page you designed must equal to the given target area.
-2. The width W should not be larger than the length L, which means L >= W.
-3. The difference between length L and width W should be as small as possible.
-You need to output the length L and the width W of the web page you designed in sequence.
-Example: Input: 4 Output: [2, 2]
-Explanation: The target area is 4, and all the possible ways to construct it are [1,4], [2,2], [4,1].
-But according to requirement 2, [1,4] is illegal; according to requirement 3,  [4,1] is not optimal compared to [2,2]. So the length L is 2, and the width W is 2.
-Notice
-1.The given area won't exceed 10,000,000 and is a positive integer
-2.The web page's width and length you designed must be positive integers.
-"""
-   def constructRectangle(self, a):
-        w = int(math.sqrt(a))
-
-        while a % w != 0:
-            w -= 1
-
-        return [a // w, w]
 """
 1299. Bulls and Cows
 https://www.lintcode.com/problem/bulls-and-cows/description

@@ -56,7 +56,7 @@ Explanation: Whether the first player takes 1 coin or 2, the second player will 
 
         v = self.dvcq({}, s, 0)
         return s[0] - v < v
-        
+
     def dvcq(self, f, s, i):
 
         if i in f:
