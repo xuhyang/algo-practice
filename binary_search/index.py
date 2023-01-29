@@ -73,11 +73,11 @@ Given a sorted array of n integers, find the starting and ending position of a g
 If the target is not found in the array, return [-1, -1].
 """
     def searchRange(self, a, t):
-        rslt = [-1, -1]
+        ans = [-1, -1]
 
         l, r = 0, len(a) - 1
         if l > r:
-            return rslt
+            return ans
 
         while l + 1 < r:
             m = (l + r) // 2
@@ -88,11 +88,11 @@ If the target is not found in the array, return [-1, -1].
                 r = m
 
         if a[l] == t:
-            rslt[0] = l
+            ans[0] = l
         elif a[r] == t:
-            rslt[0] = r
+            ans[0] = r
         else:
-            return rslt
+            return ans
 
         l, r = 0, len(a) - 1
         while l + 1 < r:
@@ -104,13 +104,13 @@ If the target is not found in the array, return [-1, -1].
                 r = m
 
         if a[r] == t:
-            rslt[1] = r
+            ans[1] = r
         elif a[l] == t:
-            rslt[1] = l
+            ans[1] = l
         else:
-            rslt[1] = rslt[0]
+            ans[1] = ans[0]
 
-        return rslt
+        return ans
 """
 462. Total Occurrence of Target
 https://www.lintcode.com/problem/total-occurrence-of-target/description

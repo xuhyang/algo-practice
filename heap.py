@@ -7,25 +7,6 @@ from heapq import *
 """
 class Heap:
 """
-4. Ugly Number II
-https://www.lintcode.com/problem/ugly-number-ii/description
-Ugly number is a number that only have prime factors 2, 3 and 5.
-Design an algorithm to find the nth ugly number. The first 10 ugly numbers are 1, 2, 3, 4, 5, 6, 8, 9, 10, 12...
-"""
-    def nthUglyNumber(self, n):
-        h, s = [1], set([1]) # ∵ 下一个prime由当前最小prime*factor算得 ∴ heap，解决动态求最大/小值
-
-        for i in range(n - 1):
-            e = heappop(h)
-            for f in [2, 3, 5]:
-                p = e * f
-                if p in s:# 剪枝，ex: 2 * 3, 3 * 2
-                    continue
-                heappush(h, p)
-                s.add(p)
-
-        return h[0]
-"""
 5. Kth Largest Element
 https://www.lintcode.com/problem/kth-largest-element/description
 Find K-th largest element in an array. Input: n = 3, nums = [9,3,2,4,8] Output: 4
@@ -57,7 +38,7 @@ Median is the number that in the middle of a sorted array. If there are n number
 For example, if A=[1,2,3], median is 2. If A=[1,19], median is 1.
 """
     def medianII(self, a):
-        max_h, min_h, rslt = [], [], []
+        max_h, min_h, ans = [], [], []
 
         for e in a:
             if not max_h or -max_h[0] >= e:
@@ -65,14 +46,14 @@ For example, if A=[1,2,3], median is 2. If A=[1,19], median is 1.
             else:
                 heappush(min_h, e)
 
-            if len(max_h) > len(min_h) + 1:
+            if len(max_h) - len(min_h) > 1:
                 heappush(min_h, -heappop(max_h))
             elif len(min_h) > len(max_h):
                 heappush(max_h, -heappop(min_h))
 
-            rslt.append(-max_h[0])
+            ans.append(-max_h[0])
 
-        return rslt
+        return ans
 """
 130. Heapify
 https://www.lintcode.com/problem/heapify/description
@@ -101,57 +82,6 @@ A[i * 2 + 1] is the left child of A[i] and A[i * 2 + 2] is the right child of A[
                     break
 
                 a[j], a[min], j = a[min], a[j], min
-"""
-364. Trapping Rain Water II
-https://www.lintcode.com/problem/trapping-rain-water-ii/description
-Given n x m non-negative integers representing an elevation map 2d where the area
-of each cell is 1 x 1, compute how much water it is able to trap after raining.
-#思路: 拓展364， heap在2d找 min value 边  heap用法1 解决动态求最大/小值
-"""
-    def trapRainWater(self, h):
-        n, m, hp, s, w = len(h), len(h[0]), [], set(), 0
-
-        for i in range(n):
-            for j in range(m):
-                if i == 0 or i == n - 1 or j == 0 or j == m - 1:
-                    heappush(hp, (h[i][j], i, j))
-                    s.add((i, j))
-
-        while hp:
-            v, x, y = heappop(hp)
-
-            for dx, dy in ((0, -1), (-1, 0), (0, 1), (1, 0)):
-                p = (nx, ny) = x + dx, y + dy
-                if 0 <= nx < n and 0 <= ny < m and p not in s:
-                    max_v = max(v, h[nx][ny]) #先更新max_v
-                    w += max_v - h[nx][ny] #算容积 可能为0
-                    heappush(hp, (max_v, nx, ny))
-                    s.add(p)
-
-        return w
-"""
-401. Kth Smallest Number in Sorted Matrix
-Find the kth smallest number in a row and column sorted matrix.
-Each row and each column of the matrix is incremental.
-思路：k smallest联想到heap,或qck_slct, 因为row和col sorted所以每次加入 右和下
-老王走两步：最小a[0][0]开始，下一个 min(a[0][1], a[1][0]), 假如a[0][1]第二个,
-候选min(a[1][0], a[0][2], a[1][1]),依此类推候选数字越来越多,
-符合heap使用的第一条件 解决 动态 求最大/小值
-写起来像bfs。
-"""
-    def kthSmallest(self, a, k):
-        n, m, s, h = len(a), len(a[0]), set((0, 0)), [(a[0][0], 0, 0)]
-
-        for _ in range(k - 1):
-            v, x, y = heappop(h)
-
-            for dx, dy in ((0, 1), (1, 0)):
-                nxt = (nx, ny) = x + dx, y + dy
-                if 0 <= nx < n and 0 <= ny < m and nxt not in s:
-                    heappush(h, (a[nx][ny], nx, ny))
-                    s.add(nxt)
-
-        return h[0][0]
 """
 471. Top K Frequent Words
 https://www.lintcode.com/problem/top-k-frequent-words/description
@@ -200,6 +130,27 @@ Notice: You can swap elements in the array
             heappushpop(h, e)
 
         return h[0]
+"""
+347. Top K Frequent Elements
+https://leetcode.com/problems/top-k-frequent-elements/
+Given a non-empty array of integers, return the k most frequent elements.
+Example 1: Input: nums = [1,1,1,2,2,3], k = 2 Output: [1,2]
+Example 2: Input: nums = [1], k = 1 Output: [1]
+"""
+    def topKFrequent(self, a: List[int], k: int) -> List[int]:
+        b = [(c, v) for v, c in Counter(a).items()]
+        h = b[:k]
+        heapify(h)
+
+        for i in range(k, len(b)):
+            heappushpop(h, b[i])
+        return [ v  for c, v in h]
+        
+    def topKFrequent(self, a: List[int], k: int) -> List[int]:
+        h = [(-c, v) for v, c in Counter(a).items()]
+        heapify(h)
+
+        return [heappop(h)[1] for _ in range(k)]
 """
 612. K Closest Points
 https://www.lintcode.com/problem/k-closest-points/description
@@ -259,7 +210,6 @@ Example Input: [2->6->null,5->null,7->null] Output:  2->5->6->7->null
             p.next = n
             p = p.next
             n = n.next
-            print(n.val)
             if n:
                 heapq.heappush(h, (n.val, n))
 
@@ -270,15 +220,13 @@ https://www.lintcode.com/problem/merge-k-sorted-interval-lists/description
 Merge K sorted interval lists into one sorted interval list.
 You need to merge overlapping intervals too.
 Input: [
-  [(1,3),(4,7),(6,8)],
-  [(1,2),(9,10)]
-]
-Output: [(1,3),(4,8),(9,10)]
+[(1,3),(4,7),(6,8)],
+[(1,2),(9,10)]
+] Output: [(1,3),(4,8),(9,10)]
 Input: [
-  [(1,2),(5,6)],
-  [(3,4),(7,8)]
-]
-Output: [(1,2),(3,4),(5,6),(7,8)]
+[(1,2),(5,6)],
+[(3,4),(7,8)]
+] Output: [(1,2),(3,4),(5,6),(7,8)]
 其他解法： queue两两合并, dvcq
 #思路:看到K arrays/list 想到 dvcq_merge, heap, queue
 """
@@ -363,39 +311,6 @@ In n=2 arrays [[9,3,2,4,8],[1,2,3,4,2]], the 1st largest element is 9, 2nd large
                 heappush(max_h, (-srtd_a[x][y + 1], x, y + 1))
 
         return -v
-"""
-1439. Find the Kth Smallest Sum of a Matrix With Sorted Rows
-https://leetcode.com/problems/find-the-kth-smallest-sum-of-a-matrix-with-sorted-rows/
-You are given an m * n matrix, mat, and an integer k, which has its rows sorted in non-decreasing order.
-You are allowed to choose exactly 1 element from each row to form an array. Return the Kth smallest array sum among all possible arrays.
-Input: mat = [[1,3,11],[2,4,6]], k = 5 Output: 7 Explanation: Choosing one element from each row, the first k smallest sum are:
-[1,2], [1,4], [3,2], [3,4], [1,6]. Where the 5th sum is 7.
-Input: mat = [[1,3,11],[2,4,6]], k = 9 Output: 17
-Input: mat = [[1,10,10],[1,4,5],[2,3,6]], k = 7 Output: 9 Explanation: Choosing one element from each row, the first k smallest sum are:
-[1,1,2], [1,1,3], [1,4,2], [1,4,3], [1,1,6], [1,5,2], [1,5,3]. Where the 7th sum is 9.
-Input: mat = [[1,1,10],[2,2,9]], k = 7 Output: 12
-"""
-    #最小堆， 利用 n array排序 性质，pop一个， push 备选3 个
-"""
-438. Copy Books II **
-Given n books( the page number of each book is the same) and an array of integer with size k
-means k people to copy the book and the i th integer is the time i th person to copy one book).
-You must distribute the continuous id books to one people to copy. (You can give book A[1],A[2] to one people,
-but you cannot give book A[1], A[3] to one people, because book A[1] and A[3] is not continuous.)
-Return the number of smallest minutes need to copy all the books.
-#其他解法:binary search
-"""
-    def copyBooksII(self, n, times):
-        h = [(tm, tm) for tm in tms]
-        heapify(h)
-
-        min_tm = 0
-        while n > 0:
-            min_tm, tm = heappop(h)
-            heappush(h, (min_tm + tm, tm))
-            n -= 1
-
-        return min_tm
 """
 360. Sliding Window Median
 https://www.lintcode.com/problem/sliding-window-median/description

@@ -1,0 +1,122 @@
+Hard 10        Regular Expression Matching   
+23        Merge k Sorted Lists   
+301        Remove Invalid Parentheses  
+297        Serialize and Deserialize Binary Tree  
+282        Expression Add Operators
+273        Integer to English Words   
+239        Sliding Window Maximum   
+158        Read N Characters Given Read4 II - Call multiple times
+154        Find Minimum in Rotated Sorted Array II   
+140        Word Break II   
+139        Word Break   
+127        Word Ladder   
+126        Word Ladder II
+52        N-Queens II   
+32        Longest Valid Parentheses   
+340        Longest Substring with At Most K Distinct Characters   
+940        Distinct Subsequences II   
+329        Longest Increasing Path in a Matrix   
+Medium 5        Longest Palindromic Substring   
+27        Remove Element   
+443        String Compression  
+930        Binary Subarrays With Sum
+1574        Shortest Subarray to be Removed to Make Array Sorted
+1570        Dot Product of Two Sparse Vectors
+1428        Leftmost Column with at Least a One
+1249        Minimum Remove to Make Valid Parentheses   
+1197        Minimum Knight Moves
+1123        Lowest Common Ancestor of Deepest Leaves  
+1029        Two City Scheduling   
+1026        Maximum Difference Between Node and Ancestor
+1004        Max Consecutive Ones III  
+987        Vertical Order Traversal of a Binary Tree
+986        Interval List Intersections
+977        Squares of a Sorted Array
+973        K Closest Points to Origin   
+958        Check Completeness of a Binary Tree  
+953        Verifying an Alien Dictionary
+938        Range Sum of BST   
+921        Minimum Add to Make Parentheses Valid   
+919        Complete Binary Tree Inserter   
+824        Goat Latin
+785        Is Graph Bipartite?   
+766        Toeplitz Matrix
+680        Valid Palindrome II   
+674        Longest Continuous Increasing Subsequence  
+637        Average of Levels in Binary Tree
+621     ***Task Scheduler   
+560        Subarray Sum Equals K   
+547        Friend Circles   
+540        Single Element in a Sorted Array   
+528        Random Pick with Weight   
+498        Diagonal Traverse   
+485        Max Consecutive Ones
+468        Validate IP Address   
+438        Find All Anagrams in a String   
+415        Add Strings   
+408        Valid Word Abbreviation   
+392        Is Subsequence   
+378        Kth Smallest Element in a Sorted Matrix   
+348        Design Tic-Tac-Toe
+339        Nested List Weight Sum  
+333       ?Largest BST Subtree
+322        Coin Change
+278        First Bad Version
+246        Strobogrammatic Number
+238        Product of Array Except Self   
+236        Lowest Common Ancestor of a Binary Tree   
+235        Lowest Common Ancestor of a Binary Search Tree
+227        Basic Calculator II   
+215        **Kth Largest Element in an Array   
+211        Design Add and Search Words Data Structure  
+210        Course Schedule II   
+200        Number of Islands   
+199        Binary Tree Right Side View   
+173        Binary Search Tree Iterator   
+163        Missing Ranges
+155        Min Stack
+138        Copy List with Random Pointer   
+136        Single Number   
+130        Surrounded Regions   
+125        Valid Palindrome   
+124        Binary Tree Maximum Path Sum   
+114        Flatten Binary Tree to Linked List   
+98        Validate Binary Search Tree   
+92        Reverse Linked List II   
+88        Merge Sorted Array   
+69        Sqrt(x)   
+67        Add Binary   
+57        Insert Interval  
+56        Merge Intervals
+40        Combination Sum II   
+39        Combination Sum   
+29        Divide Two Integers   
+33        Search in Rotated Sorted Array   
+1047        Remove All Adjacent Duplicates In String
+426        Convert Binary Search Tree to Sorted Doubly Linked List   
+https://www.1point3acres.com/bbs/thread-679908-1-1.html
+230        Kth Smallest Element in a BST   
+1498. Number of Subsequences That Satisfy the Given Sum Condition
+26. Remove Duplicates from Sorted Array
+695. Max Area of Island
+20. Valid Parentheses
+https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/
+31. Next Permutation
+203
+23
+670
+1209. Remove All Adjacent Duplicates in String II
+935
+152. Maximum Product Subarray
+670. Maximum Swap
+311. Sparse Matrix Multiplication
+1570. Dot Product of Two Sparse Vectors
+65. Valid Number
+https://leetcode.com/problems/trapping-rain-water/
+1297. Maximum Number of Occurrences of a Substring
+767. Reorganize String
+string 总结
+
+
+5，10，23*，27，29，32，38，39，40，52，56*，57，67，69，88，92，98，114，124*，125，126，127，130，136，138，139，140，154，155，158*，163，173，199*，200，210，211*，215*，227*，235，236*，238*，239，246，273，278，282*，297，301，322，333，339*，348*，378，392*，408，415，438*，468，485，498，528，540，547，560*（变体，全是正数和带有负数两种情况），621，637，674，680，766，785，824，919，921，938*，940，953*，958，973，977，986，987，1004，1026，1029，1123，1197，1249*，1428*，1570*，1574
+https://leetcode.com/problems/swim-in-rising-water/

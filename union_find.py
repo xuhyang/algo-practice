@@ -641,18 +641,19 @@ Explaination: Swap s[0] and s[1], s = "bca" Swap s[1] and s[2], s = "bac" Swap s
 #其他解法 DFS
 """
     def smallestStringWithSwaps(self, s: str, prs: List[List[int]]) -> str:
-        f, d, ans = {}, defaultdict(list), []
-        for p in prs:
-            r_a, r_b = self.fnd(f, p[0]), self.fnd(f, p[1])
+        f, m, ans = {}, defaultdict(list), []
+
+        for a, b in p:
+            r_a, r_b = self.fnd(f, a), self.fnd(f, b)
             if r_a != r_b:
                 f[r_b] = r_a
 
         for i in range(len(s)):
-            d[self.fnd(f, i)].append(s[i])
-        for v in d.values():
+            m[self.fnd(f, i)].append(s[i])
+        for v in m.values():
             heapify(v)
         for i in range(len(s)):
-            ans.append(heappop(d[self.fnd(f, i)]))
+            ans.append(heappop(m[self.fnd(f, i)]))
         return ''.join(ans)
 
     def fnd(self, f, n):
@@ -660,7 +661,9 @@ Explaination: Swap s[0] and s[1], s = "bca" Swap s[1] and s[2], s = "bac" Swap s
         if f[n] == n:
             return n
         f[n] = self.fnd(f, f[n])
+
         return f[n]
+
 """
 399. Evaluate Division
 https://leetcode.com/problems/evaluate-division/

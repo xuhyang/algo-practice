@@ -376,3 +376,155 @@ Notice: You can swap elements in the array
         elif k <= r:
             return self.qck_slct(a, k, s, r)
         return a[k]
+"""
+215. Kth Largest Element in an Array
+Medium
+
+5050
+
+326
+
+Add to List
+
+Share
+Find the kth largest element in an unsorted array. Note that it is the kth largest element in the sorted order, not the kth distinct element.
+
+Example 1:
+
+Input: [3,2,1,5,6,4] and k = 2
+Output: 5
+Example 2:
+
+Input: [3,2,3,1,2,4,5,5,6] and k = 4
+Output: 4
+"""
+    def findKthLargest(self, a: List[int], k: int) -> int:
+        k = len(a) - k
+        self.qs(a, k, 0, len(a) - 1)
+        return a[k]
+
+    def qs(self, a, k, s, e):
+        if s >= e:
+            return
+
+        l, r, p = s, e, a[(s + e) // 2]
+
+        while l <= r:
+
+            if a[l] < p:
+                l += 1
+                continue
+            if a[r] > p:
+                r -= 1
+                continue
+            a[l], a[r] = a[r], a[l]
+            l, r = l + 1, r - 1
+
+        if k <= r:
+            self.qs(a, k, s, r)
+        else:
+            self.qs(a, k, l, e)
+"""
+973. K Closest Points to Origin
+Medium
+
+2661
+
+139
+
+Add to List
+
+Share
+We have a list of points on the plane.  Find the K closest points to the origin (0, 0).
+
+(Here, the distance between two points on a plane is the Euclidean distance.)
+
+You may return the answer in any order.  The answer is guaranteed to be unique (except for the order that it is in.)
+
+
+
+Example 1:
+
+Input: points = [[1,3],[-2,2]], K = 1
+Output: [[-2,2]]
+Explanation:
+The distance between (1, 3) and the origin is sqrt(10).
+The distance between (-2, 2) and the origin is sqrt(8).
+Since sqrt(8) < sqrt(10), (-2, 2) is closer to the origin.
+We only want the closest K = 1 points from the origin, so the answer is just [[-2,2]].
+Example 2:
+
+Input: points = [[3,3],[5,-1],[-2,4]], K = 2
+Output: [[3,3],[-2,4]]
+(The answer [[-2,4],[3,3]] would also be accepted.)
+"""
+
+
+
+    def kClosest(self, p: List[List[int]], k: int) -> List[List[int]]:
+        a = [(e[0] ** 2 + e[1] ** 2, i) for i, e in enumerate(p)]
+        self.qs(k, a, 0, len(a) - 1)
+        return [p[a[i][1]] for i in range(k)]
+
+    def qs(self, k, a, s, e):
+        if s >= e:
+            return
+
+        l, r, p = s, e, a[(s + e) // 2][0]
+        while l <= r:
+            if a[l][0] < p:
+                l += 1
+                continue
+
+            if a[r][0] > p:
+                r -= 1
+                continue
+
+            a[l], a[r] = a[r], a[l]
+            l, r = l + 1, r - 1
+
+        if l - s + 1 <= k:
+            self.qs(k - (l - s), a, l, e)
+        elif r - s + 1 >= k:
+            self.qs(k, a, s, r)
+        else:
+            return
+
+    def kClosest(self, p: List[List[int]], k: int) -> List[List[int]]:
+        a = [(e[0] ** 2 + e[1] ** 2, i) for i, e in enumerate(p)]
+        self.qs(k - 1, a, 0, len(a) - 1)
+        return [p[a[i][1]] for i in range(k)]
+
+    def qs(self, k, a, s, e):
+        if s >= e:
+            return
+
+        l, r, p = s, e, a[(s + e) // 2][0]
+        while l <= r:
+            if a[l][0] < p:
+                l += 1
+                continue
+
+            if a[r][0] > p:
+                r -= 1
+                continue
+
+            a[l], a[r] = a[r], a[l]
+            l, r = l + 1, r - 1
+
+        if l <= k:
+            self.qs(k, a, l, e)
+        elif r >= k:
+            self.qs(k, a, s, r)
+        else:
+            return
+            
+    def kClosest(self, a: List[List[int]], k: int) -> List[List[int]]:
+        h = [(-a[i][0] ** 2 -a[i][1] ** 2, a[i]) for i in range(k)]
+
+        heapify(h)
+
+        for i in range(k, len(a)):
+            heappushpop(h, (- a[i][0] ** 2 - a[i][1] ** 2 , a[i]))
+
+        return [e[1] for e in h]

@@ -159,26 +159,24 @@ At first, the state of the window is as follows: ` [,2,3,1,2,1 | , 3] `, a maxim
 And then the window to the right one. ` [1, | 2,3,1,2,3 |] `, a maximum of ` 3 `;
 Challenge o(n) time and O(k) memory
 """
-    def maxSlidingWindow(self, a, k):
-        q, ans = collections.deque(), []
+    def maxSlidingWindow(self, a: List[int], k: int) -> List[int]:
+        q, ans = deque(), []
 
-        for i in range(min(k, len(a))):
-            self.push(q, a[i])
+        for i in range(len(a)):
+            self.push(q, a, i)
 
-        for i in range(max(0, k - 1), len(a)):
-            self.push(q, a[i])
-            ans.append(q[0])
-            if a[i - k + 1] == q[0]:
+            if i + 1 >= k:
+                ans.append(a[q[0]])
+            if i - k + 1 >= q[0]:
                 q.popleft()
 
         return ans
 
-    def push(self, q, e):
-
-        while q and q[-1] < e:
+    def push(self, q, a, i):
+        while q and a[q[-1]] < a[i]:
             q.pop()
 
-        q.append(e)
+        q.append(i)
 """
 42. Trapping Rain Water
 Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.

@@ -326,3 +326,15 @@ Input: [2,3,1,2,4,3], s = 7 Output: 2
                 l += 1
 
         return ans if ans != sys.maxsize else 0
+2) the similar questions are:
+
+https://leetcode.com/problems/minimum-window-substring/
+https://leetcode.com/problems/longest-substring-without-repeating-characters/
+https://leetcode.com/problems/substring-with-concatenation-of-all-words/
+https://leetcode.com/problems/longest-substring-with-at-most-two-distinct-characters/
+https://leetcode.com/problems/find-all-anagrams-in-a-string/
+
+3) I will give my solution for these questions use the above template one by one
+
+Minimum-window-substring
+https://leetcode.com/problems/minimum-window-substring/

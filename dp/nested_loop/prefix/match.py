@@ -195,9 +195,8 @@ isMatch("aab", "c*a*b") → true
                 if s[i - 1] == p[j - 1] or p[j - 1] == '.':  #如果两字符相同或者为.
                     f[i][j] = f[i - 1][j - 1]    #当前状态由前一个转移而来
                 elif p[j - 1] == '*':
-                    #能匹配但是不匹配 or 匹配0个或多个
+                                                                            #匹配0个或多个 or 能匹配但是不匹配 
                     f[i][j] = (s[i - 1] == p[j - 2] or p[j - 2] == '.') and f[i - 1][j] or f[i][j - 2]
-
         return f[-1][-1]
 """
 623. K Edit Distance

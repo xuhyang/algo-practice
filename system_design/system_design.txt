@@ -1,0 +1,8 @@
+system design：design search status，要求尽量做到realtime。只考虑text的post。之前没准备过原题，但是感觉跟twitter search差不多，重点谈论了如何shard index。
+
+Design: realtime aggregation system。假设我们要统计汇总每个广告的点击量以及其他的数据。输入是从client来的很多log，每个log包括(ad_id, user_id)，输出是给dashboard提供汇总数据。一些基本的要求
+存储2年的数据
+每天会有200B个log，并且会有peak
+有50M不同的ad_id
+可以接受30s的latency
+我的设计大概就是一堆api servers用来接收从各种client传来的log数据，这些api servers全都在load balancer之后。然后api servers把数据放进不同的kafka topic，每个topic负责一部分ad_id。kafka的另一头一方面接入raw log store去存储所有full history raw log，另一方面接入Hadoop cluster用map-reduce去做micro batch每30秒统计过去30秒内的数据。统计完的数据一方面放进data store，用来存储过去2年的数据，另一方面放进cache用来存储过去一小段时间的数据（比如过去10天），因为最近这段时间的数据更常被访问。最后dashboard就从两个地方读取数据。面试官要求计算大概需要多少api servers。200B这个量级着实有点大，可能因为只是log数量的缘故，算一下每秒要处理230K个log。面试官提示说可以假设每台机子每秒可以处理100K个log，我就说最少需要3个，为了redundancy需要再多一两个来handle peak。

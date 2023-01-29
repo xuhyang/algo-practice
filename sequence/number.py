@@ -94,7 +94,7 @@ Example 1: Input: nums = [1,1,1], k = 2 Output: 2
 Example 2: Input: nums = [1,2,3], k = 3 Output: 2
 """
      def subarraySum(self, a: List[int], k: int) -> int:
-        p, d, ans = 0, collections.Counter({0 : 1}), 0
+        p, d, ans = 0, collections.Counter([0]), 0
 
         for e in a:
             p += e

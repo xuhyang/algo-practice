@@ -116,3 +116,37 @@ Input: [1, 2, 2, 1, 3, 4] 3 Output: 3
                 return d.next.val if d.next else -1
 
         return -1
+"""
+81. Find Median from Data Stream
+https://www.lintcode.com/problem/data-stream-median/
+Numbers keep coming, return the median of numbers at every time a new number added.
+Input: [1,2,3,4,5] Output: [1,1,2,2,3]
+Explanation:
+The medium of [1] and [1,2] is 1. The medium of [1,2,3] and [1,2,3,4] is 2. The medium of [1,2,3,4,5] is 3.
+Input: [4,5,1,3,2,6,0] Output: [4,4,4,3,3,3,3]
+Explanation:
+The medium of [4], [4,5], [4,5,1] is 4.
+The medium of [4,5,1,3], [4,5,1,3,2], [4,5,1,3,2,6] and [4,5,1,3,2,6,0] is 3.
+Challenge: Total run time in O(nlogn).
+Clarification What's the definition of Median?
+The median is not equal to median in math.
+Median is the number that in the middle of a sorted array. If there are n numbers in a sorted array A, the median is A[(n - 1) / 2]A[(n−1)/2].
+For example, if A=[1,2,3], median is 2. If A=[1,19], median is 1.
+"""
+    def medianII(self, a):
+        max_h, min_h, ans = [], [], []
+
+        for e in a:
+            if not max_h or -max_h[0] >= e:
+                heappush(max_h, -e)
+            else:
+                heappush(min_h, e)
+
+            if len(max_h) - len(min_h) > 1:
+                heappush(min_h, -heappop(max_h))
+            elif len(min_h) > len(max_h):
+                heappush(max_h, -heappop(min_h))
+
+            ans.append(-max_h[0])
+
+        return ans

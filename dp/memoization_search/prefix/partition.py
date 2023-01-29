@@ -170,20 +170,24 @@ Explanation：dict is null.
 s = “aaaaaaaaaa...” d = {“a”, “aa”, “aaa”, ...} 每个间隔都可以切割, 所以O(2^n)
 使用记忆化搜索优化效果甚微
 """
-    def wordBreak(self, s, d):
-        return self.dvcq({}, s, d, max([len(e) for e in d]) if d else 0, 0)
+    def wordBreak(self, s: str, d: List[str]) -> List[str]:
+        return self.dfs({}, set(d), max([len(e) for e in d]) if d else 0, s, 0)
 
-    def dvcq(self, f, s, d, max_l, i):
-
+    def dfs(self, f, d, max_l, s, i):
         if i in f:
             return f[i]
+
+        if i == len(s):
+            return ['']
 
         f[i] = []
         for j in range(i, min(i + max_l, len(s))):
             w = s[i : j + 1]
 
-            if w in d:
-                f[i] += [w + ' ' + e for e in self.dvcq(f, s, d, max_l, j + 1)] + ([w] if j + 1 == len(s) else [])
+            if w not in d:
+                continue
+            f[i] += [w + (' ' if e else '') + e  for e in self.dfs(f, d, max_l, s, j + 1)]
+    
         return f[i]
 """
 683. Word Break III

@@ -18,7 +18,7 @@ the two subtrees of every node never differ by more than 1.
 
         return l_blncd and r_blncd and abs(l_hght - r_hght) <= 1, max(l_hght, r_hght) + 1
 """
-94.| Binary Tree Maximum Path Sum
+94.Binary Tree Maximum Path Sum
 https://www.lintcode.com/problem/binary-tree-maximum-path-sum/my-submissions
 Given a binary tree, find the maximum path sum. The path may start and end at any node in the tree.
 #考点：类似 41. Maximum Subarray

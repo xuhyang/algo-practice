@@ -25,7 +25,7 @@ Input: [4,2,4,5,3,7] Output: 4 Explanation: LIS is [2,4,5,7]
 
         return max_i + 1
 """
-** 602. Russian Doll Envelopes
+602. Russian Doll Envelopes
 https://www.lintcode.com/problem/russian-doll-envelopes/description
 Give a number of envelopes with widths and heights given as a pair of integers (w, h).
 One envelope can fit into another if and only if both the width and height of one envelope is greater than the width and height of the other envelope.

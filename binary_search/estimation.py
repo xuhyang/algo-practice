@@ -2,7 +2,6 @@
 65. Median of two Sorted Arrays
 https://www.lintcode.com/problem/median-of-two-sorted-arrays/description
 There are two sorted arrays A and B of size m and n respectively. Find the median of the two sorted arrays.
-Have you met this question in a real interview?
 The median here is equivalent to the median in the mathematical definition.
 The median is the middle of the sorted array.
 If there are n numbers in the array and n is an odd number, the median is A[(n-1)/2].
@@ -455,7 +454,6 @@ Note: The m and n will be in the range [1, 30000]. The k will be in the range [1
 https://leetcode.com/problems/find-k-th-smallest-pair-distance/
 Given an integer array, return the k-th smallest distance among all the pairs. The distance of a pair (A, B) is defined as the absolute difference between A and B.
 Example 1: Input: nums = [1,3,1] k = 1 Output: 0 Explanation: Here are all the pairs:
-
 Then the 1st smallest distance pair is (1,1), and its distance is 0.
 """
     def smallestDistancePair(self, a: List[int], k: int) -> int:
@@ -491,3 +489,61 @@ Examples: Input: A = [1, 2, 3, 5], K = 3 Output: [2, 5]
 Explanation: The fractions to be considered in sorted order are: 1/5, 1/3, 2/5, 1/2, 3/5, 2/3.
 The third fraction is 2/5. Input: A = [1, 7], K = 1 Output: [1, 7]
 """
+    def kthSmallestPrimeFraction(self, a: List[int], k: int) -> List[int]:
+        l, r, n = 0, 1, len(a)
+
+        while l < r:
+            m, i, p, q, cnt =  (l + r) / 2, 0, 0, 1, 0
+            for j in range(1, n):
+
+                while a[i] / a[j] < m:
+                    if p / q < a[i] / a[j]:
+                        p, q = a[i], a[j]
+                    i += 1
+                cnt += i
+
+            if cnt > k:
+                r = m
+            elif cnt < k:
+                l = m
+            else:
+                return [p, q]
+"""
+1439. Find the Kth Smallest Sum of a Matrix With Sorted Rows
+You are given an m * n matrix, mat, and an integer k, which has its rows sorted in non-decreasing order.
+You are allowed to choose exactly 1 element from each row to form an array. Return the Kth smallest array sum among all possible arrays.
+Example 1: Input: mat = [[1,3,11],[2,4,6]], k = 5 Output: 7
+Explanation: Choosing one element from each row, the first k smallest sum are: [1,2], [1,4], [3,2], [3,4], [1,6]. Where the 5th sum is 7.
+Example 2: Input: mat = [[1,3,11],[2,4,6]], k = 9 Output: 17
+Example 3: Input: mat = [[1,10,10],[1,4,5],[2,3,6]], k = 7 Output: 9
+Explanation: Choosing one element from each row, the first k smallest sum are: [1,1,2], [1,1,3], [1,4,2], [1,4,3], [1,1,6], [1,5,2], [1,5,3]. Where the 7th sum is 9.
+Example 4: Input: mat = [[1,1,10],[2,2,9]], k = 7 Output: 12
+"""
+    def kthSmallest(self, g: List[List[int]], k: int) -> int:
+        l, r = sum([r[0] for r in g]), sum([r[-1] for r in g])
+
+        while l + 1 < r:
+            m = (l + r) // 2
+
+            if self.dfs(g, k, m, 0) < k:
+                l = m
+            else:
+                r = m
+
+        return l if self.dfs(g, k, l, 0) >= k else r
+
+    def dfs(self, g, k, t, i):
+        if t < 0:
+            return 0
+        if i == len(g):
+            return 1
+
+        ans = 0
+        for e in g[i]:
+            cnt = self.dfs(g, k, t - e, i + 1)
+            if cnt == 0:
+                break
+            ans += cnt
+            if ans >= k:
+                break
+        return ans

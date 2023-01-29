@@ -17,4 +17,16 @@ Example 2: Input: [0,1,0] Output: 2 Explanation: [0, 1] (or [1, 0]) is a longest
                 d[diff] = i + 1
 
         return ans
-                                    
+        
+    def findMaxLength(self, a: List[int]) -> int:
+        df, d, ans = 0, {0:-1}, 0
+
+        for i, e in enumerate(a):
+            df += 1 if e else -1
+
+            if df in d:
+                ans = max(ans, i - (d[df] + 1) + 1 )
+            else:
+                d[df] = i
+
+        return ans
